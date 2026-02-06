@@ -191,12 +191,66 @@
             };
             const nextImage = () => { if(!selectedRoomId) return; const images = siteConfig.roomImages[selectedRoomId] || []; setCurrentImgIdx((prev) => (prev + 1) % images.length); };
             const prevImage = () => { if(!selectedRoomId) return; const images = siteConfig.roomImages[selectedRoomId] || []; setCurrentImgIdx((prev) => (prev - 1 + images.length) % images.length); };
+            
+            // --- FIX: Updated confirmRoomSelection to handle pricing format ---
             const confirmRoomSelection = () => {
-                const roomId = selectedRoomId; const guests = guestCount; const roomInfo = roomConfig[roomId];
-                if (roomId === 'Z8') { const currentZ8 = cart.filter(c => c.id === 'Z8').reduce((sum, c) => sum + c.guests, 0); if (currentZ8 + guests > availability.zone8Available) { alert(`ลานกางเต็นท์ว่างอีก ${availability.zone8Available - currentZ8} ท่าน`); return; } }
-                let price = 0; if (roomId === 'Z8') { price = roomInfo.pricing.priceHead; } else { const tier = roomInfo.pricing.tiers.find(t => guests <= t.max); if (!tier) { const maxTier = roomInfo.pricing.tiers[roomInfo.pricing.tiers.length - 1]; price = maxTier.price; } else { price = tier.price; } }
-                setCart([...cart, { id: roomId, name: roomInfo.name, type: roomInfo.type, guests, pricePerNight: price, nights: calculateNights() }]); setSelectedRoomId(null);
+                const roomId = selectedRoomId; 
+                const guests = guestCount; 
+                const roomInfo = roomConfig[roomId];
+                
+                if (!roomInfo) return;
+
+                // Validation for Z8 (Camping Ground)
+                if (roomId === 'Z8' || roomInfo.type === 'ground') { 
+                    const currentZ8 = cart.filter(c => c.id === 'Z8' || c.type === 'ground').reduce((sum, c) => sum + c.guests, 0); 
+                    if (currentZ8 + guests > availability.zone8Available) { 
+                        alert(`ลานกางเต็นท์ว่างอีก ${availability.zone8Available - currentZ8} ท่าน`); 
+                        return; 
+                    } 
+                }
+
+                let price = 0; 
+                
+                // Pricing Logic
+                if (roomInfo.type === 'ground' || (roomInfo.pricing && roomInfo.pricing.priceHead)) { 
+                    price = roomInfo.pricing.priceHead || 150; 
+                } else { 
+                    // Handle Tiers: pricing might be the array itself OR { tiers: [...] }
+                    let tiers = [];
+                    if (Array.isArray(roomInfo.pricing)) {
+                        tiers = roomInfo.pricing;
+                    } else if (roomInfo.pricing && Array.isArray(roomInfo.pricing.tiers)) {
+                        tiers = roomInfo.pricing.tiers;
+                    }
+
+                    if (tiers.length > 0) {
+                        // Sort tiers just in case
+                        tiers.sort((a,b) => a.max - b.max);
+                        const tier = tiers.find(t => guests <= t.max); 
+                        if (!tier) { 
+                            // If guests > max tier, use the price of the largest tier
+                            const maxTier = tiers[tiers.length - 1]; 
+                            price = maxTier.price; 
+                        } else { 
+                            price = tier.price; 
+                        } 
+                    } else {
+                        // Fallback if no pricing tiers found
+                        price = 0; 
+                    }
+                }
+
+                setCart([...cart, { 
+                    id: roomId, 
+                    name: roomInfo.name, 
+                    type: roomInfo.type, 
+                    guests, 
+                    pricePerNight: price, 
+                    nights: calculateNights() 
+                }]); 
+                setSelectedRoomId(null);
             };
+
             const checkDiscountCode = () => { if(!discount.code) return; setCheckingDiscount(true); fetch(`${GOOGLE_SCRIPT_URL}?action=checkDiscount&code=${discount.code}`).then(r=>r.json()).then(d => { setCheckingDiscount(false); if(d.status === 'success') { setDiscount({...discount, val: parseInt(d.value), type: d.type, message: `ใช้โค้ดสำเร็จ ลด ${d.value} ${d.type==='PERCENT'?'%':'บาท'}`, status: 'success'}); } else { setDiscount({...discount, val: 0, type: '', message: 'ไม่พบโค้ดส่วนลดนี้', status: 'error'}); } }).catch(() => { setCheckingDiscount(false); setDiscount({...discount, val: 0, type: '', message: 'เกิดข้อผิดพลาดในการตรวจสอบ', status: 'error'}); }); };
             const handleSubmit = () => {
                 if (!canSubmit) return; setLoading(true);
