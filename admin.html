@@ -78,7 +78,7 @@
 
         const AdminApp = () => {
             const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-            const [authToken, setAuthToken] = React.useState('');
+            const [authToken, setAuthToken] = React.useState(''); // ใช้ Token
             const [loginPass, setLoginPass] = React.useState('');
             const [loading, setLoading] = React.useState(false);
             const [activeTab, setActiveTab] = React.useState('dashboard');
@@ -183,37 +183,43 @@
                 return result;
             }, [bookings, filter, searchTerm]);
 
+            // --- LOGIN WITH TOKEN ---
             const handleLogin = (e) => {
                 e.preventDefault();
                 setLoading(true);
-                // ใช้ password ที่กรอกในการ request แทน token (เพื่อแก้ปัญหา session expired ที่เกิดจาก version ไม่ตรงกัน)
                 fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'adminLogin', password: loginPass }) })
                 .then(r => r.json()).then(res => {
                     setLoading(false);
                     if (res.status === 'success') { 
                         setIsLoggedIn(true); 
-                        // เก็บ password ไว้ใน state เพื่อใช้ยิง API ครั้งต่อไป (แบบ Basic Auth)
-                        // เพื่อให้ตรงกับ Code.gs ล่าสุดที่ใช้ Password check
-                        fetchData(); 
-                        fetchSettings();
+                        setAuthToken(res.token); // บันทึก Token
+                        setLoginPass(''); // ล้างรหัสผ่าน
+                        // เรียกข้อมูลโดยใช้ Token
+                        fetchData(res.token); 
+                        fetchSettings(res.token);
                         fetchRoomConfig(); 
                     } else errorMsg('รหัสผ่านไม่ถูกต้อง');
                 }).catch(err => { setLoading(false); errorMsg('Connection Error: ' + err); });
             };
 
-            const fetchData = () => {
+            const fetchData = (token = authToken) => {
                 setLoading(true);
-                fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'getAdminData', password: loginPass }) })
+                // ส่ง token ไปแทน password
+                fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'getAdminData', token: token }) })
                 .then(r => r.json()).then(res => { 
                     setLoading(false); 
                     if (res.status === 'success') setBookings(res.data); 
-                    else if (res.message && res.message.includes('Unauthorized')) { setIsLoggedIn(false); errorMsg('Session หมดอายุ'); }
+                    else if (res.message && (res.message.includes('Unauthorized') || res.message.includes('Session'))) { 
+                        setIsLoggedIn(false); 
+                        errorMsg('Session หมดอายุ กรุณาเข้าสู่ระบบใหม่'); 
+                    }
                 });
             };
 
-            const fetchSettings = () => {
-                fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'getSettings', password: loginPass }) }).then(r => r.json()).then(res => { if (res.status === 'success') setSettings(res); });
-                fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiteSettings', password: loginPass }) }).then(r => r.json()).then(res => { if (res.status === 'success') setSiteSettings(res.data); });
+            const fetchSettings = (token = authToken) => {
+                // ส่ง token
+                fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'getSettings', token: token }) }).then(r => r.json()).then(res => { if (res.status === 'success') setSettings(res); });
+                fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiteSettings', token: token }) }).then(r => r.json()).then(res => { if (res.status === 'success') setSiteSettings(res.data); });
             };
 
             const fetchRoomConfig = () => {
@@ -224,7 +230,8 @@
                 const actionText = newStatus === 'ยกเลิก' ? 'ยกเลิกรายการ' : `เปลี่ยนสถานะเป็น "${newStatus}"`;
                 confirmMsg(`ยืนยันการ${actionText} ใช่หรือไม่?`, () => {
                     setBookings(prev => prev.map(b => b.id === id ? {...b, status: newStatus} : b));
-                    fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'updateStatus', bookingId: id, newStatus: newStatus, password: loginPass }) });
+                    // ใช้ token
+                    fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'updateStatus', bookingId: id, newStatus: newStatus, token: authToken }) });
                     if (newStatus === 'ยกเลิก' && viewBooking && viewBooking.id === id) setViewBooking({...viewBooking, status: 'ยกเลิก'});
                 });
             };
@@ -235,7 +242,8 @@
                 confirmMsg('ยืนยันสร้างรายการจอง?', () => {
                     setLoading(true);
                     const cart = rooms.map(rid => ({ id: rid, name: ROOM_NAMES[rid] || rid, type: (rid==='Z8'?'ground':(rid.startsWith('K')?'tent_rent':(rid.startsWith('T')?'tent':'room'))), guests: 2, qty: 1 }));
-                    fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'createAdminBooking', password: loginPass, customer: { name, phone }, checkIn, checkOut, totalGuests: 2, cart: cart, price: parseFloat(price), deposit: parseFloat(deposit || price) })
+                    // ใช้ token
+                    fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'createAdminBooking', token: authToken, customer: { name, phone }, checkIn, checkOut, totalGuests: 2, cart: cart, price: parseFloat(price), deposit: parseFloat(deposit || price) })
                     }).then(r => r.json()).then(res => { setLoading(false); if(res.status === 'success') { successMsg('สร้างรายการจองสำเร็จ'); fetchData(); setShowAdminBooking(false); setAdminBookingForm({ name: '', phone: '', checkIn: '', checkOut: '', rooms: [], price: '', deposit: '' }); setAdminAvailability(null); } else errorMsg('ไม่สำเร็จ: ' + res.message); });
                 });
             };
@@ -244,7 +252,8 @@
                 if(!rescheduleData.checkIn || !rescheduleData.checkOut) return alertMsg('กรุณาเลือกวันที่ให้ครบถ้วน');
                 if(rescheduleData.checkIn >= rescheduleData.checkOut) return alertMsg('วันที่ออกต้องอยู่หลังวันที่เข้าพัก');
                 confirmMsg('ยืนยันการเลื่อนวันเข้าพัก?', () => {
-                    fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'rescheduleBooking', bookingId: rescheduleData.id, newCheckIn: rescheduleData.checkIn, newCheckOut: rescheduleData.checkOut, password: loginPass }) 
+                    // ใช้ token
+                    fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'rescheduleBooking', bookingId: rescheduleData.id, newCheckIn: rescheduleData.checkIn, newCheckOut: rescheduleData.checkOut, token: authToken }) 
                     }).then(r => r.json()).then(res => { if (res.status === 'success') { successMsg('เลื่อนวันสำเร็จเรียบร้อย'); setRescheduleData(null); setViewBooking(null); fetchData(); } else errorMsg('ไม่สำเร็จ: ' + res.message); });
                 });
             };
@@ -256,7 +265,8 @@
                 confirmMsg(`ยืนยันเพิ่ม ${foodItem.name} จำนวน ${addFoodQty} ชุด?`, () => {
                     setLoading(true);
                     if(!foodItem.id || !foodItem.name) return errorMsg('ข้อมูลอาหารไม่ถูกต้อง');
-                    fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'addFoodToBooking', bookingId: viewBooking.id, foodItem: { id: foodItem.id, name: foodItem.name, price: foodItem.price, qty: parseInt(addFoodQty) }, password: loginPass })
+                    // ใช้ token
+                    fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'addFoodToBooking', bookingId: viewBooking.id, foodItem: { id: foodItem.id, name: foodItem.name, price: foodItem.price, qty: parseInt(addFoodQty) }, token: authToken })
                     }).then(r => r.json()).then(res => { setLoading(false); if(res.status === 'success') { successMsg('เพิ่มรายการอาหารเรียบร้อย'); fetchData(); setViewBooking(null); } else { errorMsg('Error: ' + res.message); } });
                 });
             };
@@ -265,12 +275,13 @@
                 const action = editMode ? 'editSetting' : 'addSetting'; const id = editMode ? editMode.id : null;
                 if ((type !== 'discount') && (!payload.startDate || !payload.endDate)) return alertMsg('กรุณาระบุวันที่เริ่มต้นและสิ้นสุด');
                 confirmMsg('ยืนยันการบันทึกข้อมูล?', () => {
-                    fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action, type, id, payload, password: loginPass }) }).then(r => r.json()).then(res => { if (res.status === 'success') { successMsg('บันทึกสำเร็จ'); fetchSettings(); setEditMode(null); setFormDiscount({ code: '', type: 'FIXED', value: '' }); setFormClosed({ startDate: '', endDate: '', reason: '' }); setFormSpecial({ startDate: '', endDate: '', desc: '' }); setFormRoomClosure({ startDate: '', endDate: '', roomId: 'R1', reason: '' }); } else errorMsg('บันทึกไม่สำเร็จ'); });
+                    // ใช้ token
+                    fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action, type, id, payload, token: authToken }) }).then(r => r.json()).then(res => { if (res.status === 'success') { successMsg('บันทึกสำเร็จ'); fetchSettings(); setEditMode(null); setFormDiscount({ code: '', type: 'FIXED', value: '' }); setFormClosed({ startDate: '', endDate: '', reason: '' }); setFormSpecial({ startDate: '', endDate: '', desc: '' }); setFormRoomClosure({ startDate: '', endDate: '', roomId: 'R1', reason: '' }); } else errorMsg('บันทึกไม่สำเร็จ'); });
                 });
             };
             const startEdit = (type, item) => alertMsg('การแก้ไขช่วงวันที่ต้องลบแล้วเพิ่มใหม่ครับ');
-            const handleDeleteSetting = (type, id) => confirmMsg('ยืนยันการลบรายการนี้?', () => { fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'deleteSetting', type, id, password: loginPass }) }).then(r => r.json()).then(res => { if (res.status === 'success') fetchSettings(); }); });
-            const handleSaveSiteSettings = () => confirmMsg('ยืนยันบันทึกการตั้งค่าร้านค้า?', () => { setSavingSiteSettings(true); fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'saveSiteSettings', password: loginPass, settings: siteSettings }) }).then(r => r.json()).then(res => { setSavingSiteSettings(false); if(res.status === 'success') { successMsg('บันทึกเรียบร้อย'); fetchSettings(); } else errorMsg('บันทึกไม่สำเร็จ'); }); });
+            const handleDeleteSetting = (type, id) => confirmMsg('ยืนยันการลบรายการนี้?', () => { fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'deleteSetting', type, id, token: authToken }) }).then(r => r.json()).then(res => { if (res.status === 'success') fetchSettings(); }); });
+            const handleSaveSiteSettings = () => confirmMsg('ยืนยันบันทึกการตั้งค่าร้านค้า?', () => { setSavingSiteSettings(true); fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'saveSiteSettings', token: authToken, settings: siteSettings }) }).then(r => r.json()).then(res => { setSavingSiteSettings(false); if(res.status === 'success') { successMsg('บันทึกเรียบร้อย'); fetchSettings(); } else errorMsg('บันทึกไม่สำเร็จ'); }); });
             const handleImageUpload = async (file, callback) => { if(file) { try { const base64 = await compressImage(file); callback(base64); } catch(e) { errorMsg('Upload Failed'); } } };
             const handleMultipleImageUpload = async (files, callback) => { if (!files || files.length === 0) return; try { const promises = Array.from(files).map(file => compressImage(file)); const base64List = await Promise.all(promises); callback(base64List); } catch(e) { errorMsg('Upload Failed'); } };
             const handleExport = () => { const header = ["BookingID", "Date", "Customer", "Phone", "CheckIn", "CheckOut", "Rooms", "Total", "Deposit", "Status"]; const rows = bookings.map(b => [ b.id, b.timestamp, `"${b.name}"`, `'${b.phone}`, b.checkIn, b.checkOut, `"${b.rooms.replace(/"/g, '""')}"`, b.price, b.deposit, b.status ]); const csvContent = [header.join(","), ...rows.map(r => r.join(","))].join("\n"); const blob = new Blob(["\uFEFF"+csvContent], { type: 'text/csv;charset=utf-8;' }); const url = URL.createObjectURL(blob); const link = document.createElement("a"); link.setAttribute("href", url); link.setAttribute("download", "bookings_lungdam.csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link); };
