@@ -718,7 +718,7 @@
                                                 <div><label className="text-[10px] text-gray-500">แนวนอน (X)</label><input type="number" className="w-full border p-1 rounded text-sm text-center" value={formRoom.posX} onChange={e=>setFormRoom({...formRoom, posX:e.target.value})} /></div>
                                                 <div><label className="text-[10px] text-gray-500">แนวตั้ง (Y)</label><input type="number" className="w-full border p-1 rounded text-sm text-center" value={formRoom.posY} onChange={e=>setFormRoom({...formRoom, posY:e.target.value})} /></div>
                                             </div>
-                                            <div className="mt-2 h-32 bg-gray-200 relative rounded border overflow-hidden"><img src="https://img2.pic.in.th/3d539b84-44ce-4336-ad90-bd2f84b13eca.jpg" className="w-full h-full object-cover opacity-50" /><div className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 shadow" style={{left: `${formRoom.posX}%`, top: `${formRoom.posY}%`}}></div></div>
+                                            <div className="mt-2 relative rounded border overflow-hidden bg-gray-200"><img src="https://img2.pic.in.th/3d539b84-44ce-4336-ad90-bd2f84b13eca.jpg" className="w-full h-auto object-contain opacity-50" /><div className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 shadow" style={{left: `${formRoom.posX}%`, top: `${formRoom.posY}%`}}></div></div>
                                         </div>
                                     </div>
                                     <div className="p-4 bg-gray-50 flex justify-end gap-2">
