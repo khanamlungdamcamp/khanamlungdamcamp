@@ -24,12 +24,25 @@
         
         #print-container { display: none; }
         @media print {
+            @page { size: A4; margin: 0; }
             .no-print, .no-print * { display: none !important; }
             body, html { margin: 0; padding: 0; background: white; height: 100%; overflow: visible !important; }
-            #print-container { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; margin: 0 !important; padding: 0 !important; display: block !important; background: white; z-index: 9999; visibility: visible !important; }
-            #print-container > div { display: none; }
-            #receipt-print-area { width: 210mm; min-height: 297mm; padding: 15mm; display: block !important; }
-            #report-print-area { width: 297mm; min-height: 210mm; padding: 15mm; display: block !important; }
+            #print-container { 
+                position: absolute !important; 
+                left: 0 !important; 
+                top: 0 !important; 
+                width: 100% !important; 
+                margin: 0 !important; 
+                padding: 0 !important; 
+                display: block !important; 
+                background: white; 
+                z-index: 9999; 
+                visibility: visible !important; 
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact;
+            }
+            #receipt-print-area { width: 210mm; min-height: 297mm; padding: 10mm 15mm; display: block !important; }
+            #report-print-area { width: 210mm; min-height: 297mm; padding: 10mm 10mm; display: block !important; }
         }
     </style>
 </head>
@@ -109,6 +122,7 @@
             const [viewBooking, setViewBooking] = React.useState(null); 
             const [filter, setFilter] = React.useState('all'); 
             const [searchTerm, setSearchTerm] = React.useState(''); 
+            const [printMode, setPrintMode] = React.useState('none'); // 'receipt' or 'report'
 
             const [rescheduleData, setRescheduleData] = React.useState({ checkIn: '', checkOut: '' });
             const [selectedAddFood, setSelectedAddFood] = React.useState('');
@@ -382,7 +396,17 @@
             const handleSaveSiteSettings = () => confirmMsg('บันทึกร้านค้า?', ()=>{ setSavingSiteSettings(true); fetch(GOOGLE_SCRIPT_URL,{method:'POST',body:JSON.stringify({action:'saveSiteSettings',password,settings:siteSettings})}).then(r=>r.json()).then(res=>{setSavingSiteSettings(false);if(res.status==='success'){successMsg('สำเร็จ');fetchSettings();}else errorMsg('Error');}); });
             const handleImageUpload = async (f,cb) => { if(f) cb(await compressImage(f)); };
             const handleMultipleImageUpload = async (files,cb) => { const p = Array.from(files).map(f=>compressImage(f)); cb(await Promise.all(p)); };
-            const handlePrintReport = () => window.print();
+            
+            // [MODIFIED] Print Functions
+            const handlePrintReceipt = () => {
+                setPrintMode('receipt');
+                setTimeout(() => { window.print(); }, 200);
+            };
+
+            const handlePrintReport = () => {
+                setPrintMode('report');
+                setTimeout(() => { window.print(); }, 200);
+            };
 
             const addFoodItem = () => {
                 if(!newFood.name || !newFood.price) return alertMsg('ใส่ชื่อและราคาให้ครบ');
@@ -516,8 +540,11 @@
                                 <div>
                                     <div className="flex flex-col md:flex-row gap-4 mb-4">
                                         <div className="flex gap-2 overflow-x-auto pb-2">{['all','pending','confirmed','upcoming'].map(f=><button key={f} onClick={()=>setFilter(f)} className={`px-3 py-1 rounded-full text-xs font-bold ${filter===f?'bg-gray-800 text-white':'bg-white text-gray-600 border'}`}>{FILTER_NAMES[f]}</button>)}</div>
-                                        <input className="w-full md:w-64 pl-4 pr-4 py-2 rounded-full border" placeholder="ค้นหา..." value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} />
-                                        <button onClick={handlePrintReport} className="bg-gray-100 text-gray-600 px-3 py-2 rounded-full hover:bg-gray-200" title="รายงานแบบทางการ"><i className="fas fa-file-alt"></i></button>
+                                        <div className="flex items-center gap-2 w-full md:w-auto">
+                                            <input className="w-full md:w-64 pl-4 pr-4 py-2 rounded-full border" placeholder="ค้นหา..." value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} />
+                                            {/* Report Button */}
+                                            <button onClick={handlePrintReport} className="bg-gray-100 text-gray-600 px-3 py-2 rounded-full hover:bg-gray-200" title="รายงานแบบทางการ"><i className="fas fa-file-alt"></i></button>
+                                        </div>
                                     </div>
                                     <div className="space-y-4">
                                         {filteredBookings.map(b=>(
@@ -583,6 +610,26 @@
                                             </table>
                                         </div>
                                     </div>
+                                    {siteSettings && (
+                                        <div className="p-4 bg-white rounded border border-gray-200 shadow">
+                                            <h3 className="font-bold text-gray-700 mb-2">📸 รูปภาพห้องพัก (จัดการรูป)</h3>
+                                            <div className="flex gap-2 mb-2">
+                                                <select className="border p-2 rounded text-sm w-full max-w-xs" value={selectedRoomForImg} onChange={e=>setSelectedRoomForImg(e.target.value)}><option value="">เลือกห้องที่จะเพิ่มรูป...</option>{ROOM_IDS.map(rid => <option key={rid} value={rid}>{ROOM_NAMES[rid]}</option>)}</select>
+                                                {selectedRoomForImg && <input type="file" multiple accept="image/*" className="text-sm" onChange={e => handleMultipleImageUpload(e.target.files, imgs => { const old = siteSettings.roomImages[selectedRoomForImg] || []; setSiteSettings({...siteSettings, roomImages: {...siteSettings.roomImages, [selectedRoomForImg]: [...old, ...imgs]}}); })} />}
+                                            </div>
+                                            {selectedRoomForImg && (siteSettings.roomImages[selectedRoomForImg] || []).length > 0 && (
+                                                <div className="flex gap-2 overflow-x-auto py-2">
+                                                    {(siteSettings.roomImages[selectedRoomForImg] || []).map((img, idx) => (
+                                                        <div key={idx} className="relative w-24 h-24 flex-shrink-0 group">
+                                                            <img src={img} className="w-full h-full object-cover rounded shadow"/>
+                                                            <button onClick={()=>removeRoomImage(selectedRoomForImg, idx)} className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition"><i className="fas fa-times"></i></button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                            {selectedRoomForImg && (siteSettings.roomImages[selectedRoomForImg] || []).length === 0 && <p className="text-xs text-gray-400">ยังไม่มีรูปภาพสำหรับห้องนี้</p>}
+                                        </div>
+                                    )}
                                 </div>
                             )}
 
@@ -804,7 +851,7 @@
                                     <div className="space-y-4">
                                         {/* Status & Print */}
                                         <div className="flex gap-2">
-                                            <button onClick={()=>handlePrintReport()} className="flex-1 py-2 border rounded hover:bg-gray-50 text-sm"><i className="fas fa-print mr-1"></i>ใบเสร็จ</button>
+                                            <button onClick={()=>handlePrintReceipt()} className="flex-1 py-2 border rounded hover:bg-gray-50 text-sm"><i className="fas fa-print mr-1"></i>ใบเสร็จ</button>
                                             {/* Confirm button removed from Modal as per user request */}
                                             {viewBooking.status==='รอตรวจสอบ' && <div className="flex flex-1 gap-1"><button onClick={()=>updateStatus(viewBooking.id,'ยกเลิก')} className="flex-1 py-2 bg-red-500 text-white rounded text-sm hover:bg-red-600">ยกเลิก</button></div>}
                                             {/* Cancel Button for Confirmed Booking */}
@@ -891,8 +938,8 @@
                     </div>
                     {/* Print Templates (Hidden) */}
                     <div id="print-container">
-                        <div id="receipt-print-area">
-                            {viewBooking && (
+                        {printMode === 'receipt' && viewBooking && (
+                            <div id="receipt-print-area">
                                 <div>
                                     <div className="flex justify-between items-start mb-6 border-b-2 border-gray-800 pb-4">
                                         <div className="flex gap-4 items-center">
@@ -927,7 +974,7 @@
                                     <table className="w-full mb-4 border-collapse">
                                         <thead><tr className="bg-gray-800 text-white text-sm"><th className="py-2 px-3 text-left">รายการ</th><th className="py-2 px-3 text-right">จำนวนเงิน</th></tr></thead>
                                         <tbody>
-                                            <tr className="border-b"><td className="py-2 px-3">{viewBooking.rooms}</td><td className="py-2 px-3 text-right">{parseInt(viewBooking.price).toLocaleString()}</td></tr>
+                                            <tr className="border-b"><td className="py-2 px-3">{viewBooking.rooms} {viewBooking.food && viewBooking.food !== '-' ? `+ ${viewBooking.food}` : ''}</td><td className="py-2 px-3 text-right">{parseInt(viewBooking.price).toLocaleString()}</td></tr>
                                         </tbody>
                                         <tfoot>
                                             <tr><td className="pt-2 text-right font-bold">รวมทั้งสิ้น</td><td className="pt-2 text-right font-bold">{parseInt(viewBooking.price).toLocaleString()}</td></tr>
@@ -935,9 +982,18 @@
                                             <tr className="bg-gray-100"><td className="py-2 text-right font-bold">ยอดคงเหลือ</td><td className="py-2 text-right font-bold text-green-700">{(parseInt(viewBooking.price)-parseInt(viewBooking.deposit)).toLocaleString()}</td></tr>
                                         </tfoot>
                                     </table>
-                                    <div className="mt-12 flex justify-between px-8 text-center text-sm">
-                                        <div><div className="border-b border-black w-40 mb-2"></div>ผู้รับเงิน</div>
-                                        <div><div className="border-b border-black w-40 mb-2"></div>ผู้จ่ายเงิน</div>
+                                    
+                                    <div className="mt-16 flex justify-between items-end px-8">
+                                        <div className="text-center">
+                                            <div className="border-b border-black w-40 mb-2"></div>
+                                            <p className="text-sm font-bold">ผู้รับเงิน (Payee)</p>
+                                            <p className="text-xs text-gray-500">วันที่: ...../...../.......</p>
+                                        </div>
+                                        <div className="text-center">
+                                            <div className="border-b border-black w-40 mb-2"></div>
+                                            <p className="text-sm font-bold">ผู้จ่ายเงิน (Payer)</p>
+                                            <p className="text-xs text-gray-500">วันที่: ...../...../.......</p>
+                                        </div>
                                     </div>
                                     
                                     {/* Footer */}
@@ -945,17 +1001,70 @@
                                         <p>ขอบคุณที่ใช้บริการ ขนำลุงดำ แคมป์ปิ้ง | System Generated</p>
                                     </div>
                                 </div>
-                            )}
-                        </div>
-                        <div id="report-print-area">
-                            <h1 className="text-xl font-bold mb-4 text-center">รายงานการจองห้องพัก</h1>
-                            <table className="w-full text-xs border-collapse border">
-                                <thead className="bg-gray-200"><tr><th className="border p-1">ID</th><th className="border p-1">ลูกค้า</th><th className="border p-1">เบอร์</th><th className="border p-1">เข้าพัก</th><th className="border p-1">รายละเอียด</th><th className="border p-1">ยอดเงิน</th><th className="border p-1">สถานะ</th></tr></thead>
-                                <tbody>
-                                    {filteredBookings.map(b=>(<tr key={b.id}><td className="border p-1">{b.id}</td><td className="border p-1">{b.name}</td><td className="border p-1">{b.phone}</td><td className="border p-1">{formatThaiDate(b.checkIn)}</td><td className="border p-1">{b.rooms}</td><td className="border p-1 text-right">{parseInt(b.price).toLocaleString()}</td><td className="border p-1 text-center">{b.status}</td></tr>))}
-                                </tbody>
-                            </table>
-                        </div>
+                            </div>
+                        )}
+
+                        {printMode === 'report' && (
+                            <div id="report-print-area">
+                                <div className="mb-6">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <div>
+                                            <h1 className="text-xl font-bold">{siteSettings?.headerTitle}</h1>
+                                            <h2 className="text-lg">รายงานการจองห้องพัก (Booking Report)</h2>
+                                        </div>
+                                        <div className="text-right text-xs text-gray-500">
+                                            <p>พิมพ์วันที่: {new Date().toLocaleDateString('th-TH')}</p>
+                                            <p>สถานะ: {FILTER_NAMES[filter]}</p>
+                                        </div>
+                                    </div>
+                                    <table className="w-full text-xs border-collapse border border-gray-300">
+                                        <thead className="bg-gray-100">
+                                            <tr>
+                                                <th className="border border-gray-300 p-2 w-10">#</th>
+                                                <th className="border border-gray-300 p-2">Booking ID</th>
+                                                <th className="border border-gray-300 p-2">ลูกค้า</th>
+                                                <th className="border border-gray-300 p-2">เบอร์โทร</th>
+                                                <th className="border border-gray-300 p-2">เข้าพัก</th>
+                                                <th className="border border-gray-300 p-2">ออก</th>
+                                                <th className="border border-gray-300 p-2">ห้องพัก</th>
+                                                <th className="border border-gray-300 p-2">อาหาร/อื่นๆ</th>
+                                                <th className="border border-gray-300 p-2 text-right">ยอดรวม</th>
+                                                <th className="border border-gray-300 p-2 text-right">มัดจำ</th>
+                                                <th className="border border-gray-300 p-2 text-right">คงเหลือ</th>
+                                                <th className="border border-gray-300 p-2 text-center">สถานะ</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {filteredBookings.map((b, i) => (
+                                                <tr key={b.id}>
+                                                    <td className="border border-gray-300 p-1 text-center">{i+1}</td>
+                                                    <td className="border border-gray-300 p-1 font-mono">{b.id}</td>
+                                                    <td className="border border-gray-300 p-1">{b.name}</td>
+                                                    <td className="border border-gray-300 p-1">{b.phone}</td>
+                                                    <td className="border border-gray-300 p-1 text-center">{formatThaiDate(b.checkIn)}</td>
+                                                    <td className="border border-gray-300 p-1 text-center">{formatThaiDate(b.checkOut)}</td>
+                                                    <td className="border border-gray-300 p-1">{b.rooms}</td>
+                                                    <td className="border border-gray-300 p-1">{b.food}</td>
+                                                    <td className="border border-gray-300 p-1 text-right">{parseInt(b.price).toLocaleString()}</td>
+                                                    <td className="border border-gray-300 p-1 text-right">{parseInt(b.deposit).toLocaleString()}</td>
+                                                    <td className="border border-gray-300 p-1 text-right font-bold">{(parseInt(b.price)-parseInt(b.deposit)).toLocaleString()}</td>
+                                                    <td className="border border-gray-300 p-1 text-center">{b.status}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr className="bg-gray-50 font-bold">
+                                                <td colSpan="8" className="border border-gray-300 p-2 text-right">รวมทั้งหมด</td>
+                                                <td className="border border-gray-300 p-2 text-right">{filteredBookings.reduce((s,b)=>s+parseInt(b.price),0).toLocaleString()}</td>
+                                                <td className="border border-gray-300 p-2 text-right">{filteredBookings.reduce((s,b)=>s+parseInt(b.deposit),0).toLocaleString()}</td>
+                                                <td className="border border-gray-300 p-2 text-right">{filteredBookings.reduce((s,b)=>s+(parseInt(b.price)-parseInt(b.deposit)),0).toLocaleString()}</td>
+                                                <td></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             );
