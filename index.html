@@ -321,8 +321,9 @@
             const openRoomModal = (roomId) => {
                 const room = roomConfig[roomId];
                 if (!room) return;
+                // [FIXED] Ensure numbers for guestCount
                 if(roomId === 'Z8') setGuestCount(1);
-                else setGuestCount(room.min || 1);
+                else setGuestCount(parseInt(room.min) || 1);
                 setCurrentImgIdx(0); 
                 setSelectedRoomId(roomId);
             };
@@ -345,18 +346,51 @@
             const nextImage = () => { if(!selectedRoomId) return; const images = siteConfig.roomImages[selectedRoomId] || []; setCurrentImgIdx((prev) => (prev + 1) % images.length); };
             const prevImage = () => { if(!selectedRoomId) return; const images = siteConfig.roomImages[selectedRoomId] || []; setCurrentImgIdx((prev) => (prev - 1 + images.length) % images.length); };
 
+            // [FIXED] Robust confirmRoomSelection function
             const confirmRoomSelection = () => {
-                const roomId = selectedRoomId;
-                const guests = guestCount;
-                const roomInfo = roomConfig[roomId];
-                if (roomId === 'Z8') {
-                    const currentZ8 = cart.filter(c => c.id === 'Z8').reduce((sum, c) => sum + c.guests, 0);
-                    if (currentZ8 + guests > availability.zone8Available) { alert(`ลานกางเต็นท์ว่างอีก ${availability.zone8Available - currentZ8} ท่าน`); return; }
+                try {
+                    const roomId = selectedRoomId;
+                    const guests = parseInt(guestCount); // Ensure integer
+                    const roomInfo = roomConfig[roomId];
+                    
+                    if (!roomInfo) { alert("เกิดข้อผิดพลาด: ไม่พบข้อมูลห้องพัก"); return; }
+                    
+                    // Validate availability for Z8
+                    if (roomId === 'Z8') {
+                        const currentZ8 = cart.filter(c => c.id === 'Z8').reduce((sum, c) => sum + c.guests, 0);
+                        if (currentZ8 + guests > availability.zone8Available) { 
+                            alert(`ลานกางเต็นท์ว่างอีก ${availability.zone8Available - currentZ8} ท่าน`); 
+                            return; 
+                        }
+                    }
+                    
+                    // Pricing Logic with Safety Checks
+                    let price = 0;
+                    if (roomId === 'Z8') { 
+                        price = roomInfo.pricing.priceHead; 
+                    } else { 
+                        if (!roomInfo.pricing || !roomInfo.pricing.tiers) {
+                             // Fallback safety
+                             console.warn("Pricing tiers missing for room " + roomId);
+                             price = 0; 
+                        } else {
+                            const tier = roomInfo.pricing.tiers.find(t => guests <= t.max); 
+                            if (!tier) { 
+                                // Use the last tier if exceeding defined max (though UI shouldn't allow it)
+                                const maxTier = roomInfo.pricing.tiers[roomInfo.pricing.tiers.length - 1]; 
+                                price = maxTier ? maxTier.price : 0; 
+                            } else { 
+                                price = tier.price; 
+                            } 
+                        }
+                    }
+                    
+                    setCart([...cart, { id: roomId, name: roomInfo.name, type: roomInfo.type, guests, pricePerNight: price, nights: calculateNights() }]);
+                    setSelectedRoomId(null);
+                } catch (e) {
+                    console.error(e);
+                    alert("เกิดข้อผิดพลาดในการเลือกห้อง: " + e.message);
                 }
-                let price = 0;
-                if (roomId === 'Z8') { price = roomInfo.pricing.priceHead; } else { const tier = roomInfo.pricing.tiers.find(t => guests <= t.max); if (!tier) { const maxTier = roomInfo.pricing.tiers[roomInfo.pricing.tiers.length - 1]; price = maxTier.price; } else { price = tier.price; } }
-                setCart([...cart, { id: roomId, name: roomInfo.name, type: roomInfo.type, guests, pricePerNight: price, nights: calculateNights() }]);
-                setSelectedRoomId(null);
             };
 
             const checkDiscountCode = () => { 
@@ -735,7 +769,7 @@
                                             <h3 className="text-xl font-bold mb-2 text-green-800 dark:text-green-400">{roomConfig[selectedRoomId].name}</h3>
                                             <p className="text-gray-500 dark:text-gray-300 text-sm mb-4"> {siteConfig.roomDescriptions?.[selectedRoomId] || "ไม่มีคำอธิบาย"} </p>
                                             <div className="flex items-center justify-between mb-6 bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
-                                                <button onClick={() => setGuestCount(Math.max((roomConfig[selectedRoomId].min||1), guestCount - 1))} className="w-10 h-10 bg-white dark:bg-gray-600 rounded shadow text-xl font-bold text-green-600 dark:text-green-400">-</button>
+                                                <button onClick={() => setGuestCount(Math.max((parseInt(roomConfig[selectedRoomId].min)||1), guestCount - 1))} className="w-10 h-10 bg-white dark:bg-gray-600 rounded shadow text-xl font-bold text-green-600 dark:text-green-400">-</button>
                                                 <div className="text-center"> <div className="text-2xl font-bold dark:text-white">{guestCount}</div> <div className="text-xs text-gray-500 dark:text-gray-400">คน</div> </div>
                                                 <button onClick={() => { let limit = roomConfig[selectedRoomId].maxCap; if(selectedRoomId === 'Z8') limit = availability.zone8Available; setGuestCount(Math.min(limit, guestCount + 1)); }} className="w-10 h-10 bg-white dark:bg-gray-600 rounded shadow text-xl font-bold text-green-600 dark:text-green-400">+</button>
                                             </div>
