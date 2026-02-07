@@ -462,7 +462,6 @@
                                     </div>
                                     
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        {/* Upcoming 3 Days */}
                                         <div className="bg-white p-6 rounded-lg shadow">
                                             <h3 className="font-bold text-lg mb-4 text-blue-800 border-b pb-2"><i className="fas fa-clock mr-2"></i>เข้าพักเร็วๆ นี้ (3 วัน)</h3>
                                             {stats.upcoming.length === 0 ? <p className="text-gray-400 text-center py-4">ไม่มีรายการ</p> : (
@@ -488,7 +487,6 @@
                                             )}
                                         </div>
 
-                                        {/* Monthly Stats Chart */}
                                         <div className="bg-white p-6 rounded-lg shadow">
                                             <h3 className="font-bold text-lg mb-4 text-indigo-800 border-b pb-2"><i className="fas fa-chart-bar mr-2"></i>สถิติรายเดือน (จำนวนครั้ง)</h3>
                                             <div className="flex items-end justify-between h-48 gap-2 pt-6 px-2">
@@ -519,7 +517,6 @@
                                             <div key={b.id} className="bg-white rounded-xl shadow-sm p-5 border-l-4 border-green-500 relative">
                                                 <div className="flex justify-between items-start mb-2"><div><div className="text-xs text-gray-400">{b.id}</div><div className="font-bold text-lg">{b.name}</div></div><StatusBadge status={b.status}/></div>
                                                 <div className="text-sm text-gray-600 mb-2"><i className="fas fa-calendar mr-1"></i> {formatThaiDate(b.checkIn)} - {formatThaiDate(b.checkOut)}</div>
-                                                {/* Added LINE Name, Phone, Food */}
                                                 <div className="text-sm text-gray-600 mb-1"><i className="fab fa-line mr-1 text-green-500"></i> {b.lineProfile || '-'} &nbsp; <i className="fas fa-phone mr-1"></i> {b.phone}</div>
                                                 <div className="bg-gray-50 p-2 rounded text-sm mb-2 text-green-700">{b.rooms}</div>
                                                 {b.food && b.food !== '-' && <div className="text-xs text-orange-600 bg-orange-50 p-1 rounded mb-2"><i className="fas fa-utensils mr-1"></i> {b.food}</div>}
@@ -541,7 +538,6 @@
                                 </div>
                             )}
 
-                            {/* ROOMS TAB (New with Image Management) */}
                             {activeTab === 'rooms' && (
                                 <div className="space-y-6 animate-fade-in">
                                     <div className="bg-white p-6 rounded-lg shadow border-l-4 border-purple-500">
@@ -648,38 +644,48 @@
                                             <h3 className="font-bold text-lg mb-4 text-green-800">โค้ดส่วนลด</h3>
                                             <div className="flex gap-2 mb-4 items-end bg-gray-50 p-2 rounded">
                                                 <div><label className="text-xs">Code</label><input className="border p-2 rounded w-24 block text-sm" value={formDiscount.code} onChange={e=>setFormDiscount({...formDiscount, code:e.target.value})} /></div>
+                                                <div>
+                                                    <label className="text-xs">Type</label>
+                                                    <select className="border p-2 rounded block text-sm" value={formDiscount.type} onChange={e=>setFormDiscount({...formDiscount, type:e.target.value})}>
+                                                        <option value="FIXED">บาท</option>
+                                                        <option value="PERCENT">%</option>
+                                                    </select>
+                                                </div>
                                                 <div><label className="text-xs">Val</label><input type="number" className="border p-2 rounded w-16 block text-sm" value={formDiscount.value} onChange={e=>setFormDiscount({...formDiscount, value:e.target.value})} /></div>
                                                 <button onClick={()=>handleSaveSetting('discount', formDiscount)} className="bg-green-600 text-white px-3 py-2 rounded text-sm mb-0.5">เพิ่ม</button>
                                             </div>
-                                            <ul className="divide-y max-h-40 overflow-y-auto">{settings.discounts.map((d,i)=><li key={i} className="flex justify-between p-2 text-sm"><span><b>{d.code}</b>: {d.value}</span><button onClick={()=>handleDeleteSetting('discount',d.id)} className="text-red-500"><i className="fas fa-trash"></i></button></li>)}</ul>
+                                            <ul className="divide-y max-h-40 overflow-y-auto">{settings.discounts.map((d,i)=><li key={i} className="flex justify-between p-2 text-sm"><span><b>{d.code}</b>: {d.value} {d.type === 'PERCENT' ? '%' : 'บาท'}</span><button onClick={()=>handleDeleteSetting('discount',d.id)} className="text-red-500"><i className="fas fa-trash"></i></button></li>)}</ul>
                                         </div>
                                         <div className="bg-white p-4 rounded-lg shadow border-l-4 border-red-500">
                                             <h3 className="font-bold text-lg mb-4 text-red-800">วันปิดบริการ (ทั้งหมด)</h3>
                                             <div className="flex gap-2 mb-4 items-end bg-gray-50 p-2 rounded flex-wrap">
                                                 <div><label className="text-[10px] text-gray-500 block">เริ่ม</label><input type="date" className="border p-2 rounded text-sm" value={formClosed.startDate} onChange={e=>setFormClosed({...formClosed, startDate:e.target.value})} /></div>
                                                 <div><label className="text-[10px] text-gray-500 block">ถึง</label><input type="date" className="border p-2 rounded text-sm" value={formClosed.endDate} onChange={e=>setFormClosed({...formClosed, endDate:e.target.value})} /></div>
+                                                <div className="flex-1"><label className="text-[10px] text-gray-500 block">หมายเหตุ</label><input type="text" className="border p-2 rounded text-sm w-full" placeholder="ระบุสาเหตุ" value={formClosed.reason} onChange={e=>setFormClosed({...formClosed, reason:e.target.value})} /></div>
                                                 <button onClick={()=>handleSaveSetting('closed', formClosed)} className="bg-red-600 text-white px-3 py-2 rounded text-sm mb-0.5">ปิด</button>
                                             </div>
-                                            <ul className="divide-y max-h-40 overflow-y-auto">{settings.closed.map((c,i)=><li key={i} className="flex justify-between p-2 text-sm text-red-800"><span>{formatThaiDate(c.date)}</span><button onClick={()=>handleDeleteSetting('closed',c.id)} className="text-red-500"><i className="fas fa-trash"></i></button></li>)}</ul>
+                                            <ul className="divide-y max-h-40 overflow-y-auto">{settings.closed.map((c,i)=><li key={i} className="flex justify-between p-2 text-sm text-red-800"><span>{formatThaiDate(c.date)} {c.reason ? `(${c.reason})` : ''}</span><button onClick={()=>handleDeleteSetting('closed',c.id)} className="text-red-500"><i className="fas fa-trash"></i></button></li>)}</ul>
                                         </div>
                                         <div className="bg-white p-4 rounded-lg shadow border-l-4 border-orange-500">
                                             <h3 className="font-bold text-lg mb-4 text-orange-800">ปิดเฉพาะห้อง</h3>
                                             <div className="flex gap-2 mb-4 items-end bg-gray-50 p-2 rounded flex-wrap">
                                                 <div><label className="text-[10px] text-gray-500 block">เริ่ม</label><input type="date" className="border p-2 rounded text-sm" value={formRoomClosure.startDate} onChange={e=>setFormRoomClosure({...formRoomClosure, startDate:e.target.value})} /></div>
                                                 <div><label className="text-[10px] text-gray-500 block">ถึง</label><input type="date" className="border p-2 rounded text-sm" value={formRoomClosure.endDate} onChange={e=>setFormRoomClosure({...formRoomClosure, endDate:e.target.value})} /></div>
-                                                <div className="w-full sm:w-auto"><select className="border p-2 rounded text-sm w-full" value={formRoomClosure.roomId} onChange={e=>setFormRoomClosure({...formRoomClosure, roomId:e.target.value})}><option value="">เลือกห้อง</option>{ROOM_IDS.map(r=><option key={r} value={r}>{r}</option>)}</select></div>
+                                                <div className="w-full sm:w-auto"><label className="text-[10px] text-gray-500 block">ห้อง</label><select className="border p-2 rounded text-sm w-full" value={formRoomClosure.roomId} onChange={e=>setFormRoomClosure({...formRoomClosure, roomId:e.target.value})}><option value="">เลือกห้อง</option>{ROOM_IDS.map(r=><option key={r} value={r}>{r}</option>)}</select></div>
+                                                <div className="flex-1"><label className="text-[10px] text-gray-500 block">หมายเหตุ</label><input type="text" className="border p-2 rounded text-sm w-full" placeholder="ระบุสาเหตุ" value={formRoomClosure.reason} onChange={e=>setFormRoomClosure({...formRoomClosure, reason:e.target.value})} /></div>
                                                 <button onClick={()=>handleSaveSetting('room_closure', formRoomClosure)} className="bg-orange-600 text-white px-3 py-2 rounded text-sm mb-0.5">ปิดห้อง</button>
                                             </div>
-                                            <ul className="divide-y max-h-40 overflow-y-auto">{settings.roomClosures.map((c,i)=><li key={i} className="flex justify-between p-2 text-sm text-orange-800"><span>{formatThaiDate(c.date)} : {c.roomId}</span><button onClick={()=>handleDeleteSetting('room_closure',c.id)} className="text-red-500"><i className="fas fa-trash"></i></button></li>)}</ul>
+                                            <ul className="divide-y max-h-40 overflow-y-auto">{settings.roomClosures.map((c,i)=><li key={i} className="flex justify-between p-2 text-sm text-orange-800"><span>{formatThaiDate(c.date)} : {c.roomId} {c.reason ? `(${c.reason})` : ''}</span><button onClick={()=>handleDeleteSetting('room_closure',c.id)} className="text-red-500"><i className="fas fa-trash"></i></button></li>)}</ul>
                                         </div>
                                         <div className="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
                                             <h3 className="font-bold text-lg mb-4 text-blue-800">วันราคาพิเศษ (High Season)</h3>
                                             <div className="flex gap-2 mb-4 items-end bg-gray-50 p-2 rounded flex-wrap">
                                                 <div><label className="text-[10px] text-gray-500 block">เริ่ม</label><input type="date" className="border p-2 rounded text-sm" value={formSpecial.startDate} onChange={e=>setFormSpecial({...formSpecial, startDate:e.target.value})} /></div>
                                                 <div><label className="text-[10px] text-gray-500 block">ถึง</label><input type="date" className="border p-2 rounded text-sm" value={formSpecial.endDate} onChange={e=>setFormSpecial({...formSpecial, endDate:e.target.value})} /></div>
+                                                <div className="flex-1"><label className="text-[10px] text-gray-500 block">หมายเหตุ</label><input type="text" className="border p-2 rounded text-sm w-full" placeholder="เช่น ปีใหม่" value={formSpecial.desc} onChange={e=>setFormSpecial({...formSpecial, desc:e.target.value})} /></div>
                                                 <button onClick={()=>handleSaveSetting('special', formSpecial)} className="bg-blue-600 text-white px-3 py-2 rounded text-sm mb-0.5">เพิ่ม</button>
                                             </div>
-                                            <ul className="divide-y max-h-40 overflow-y-auto">{settings.special.map((c,i)=><li key={i} className="flex justify-between p-2 text-sm text-blue-800"><span>{formatThaiDate(c.date)}</span><button onClick={()=>handleDeleteSetting('special',c.id)} className="text-red-500"><i className="fas fa-trash"></i></button></li>)}</ul>
+                                            <ul className="divide-y max-h-40 overflow-y-auto">{settings.special.map((c,i)=><li key={i} className="flex justify-between p-2 text-sm text-blue-800"><span>{formatThaiDate(c.date)} {c.desc ? `(${c.desc})` : ''}</span><button onClick={()=>handleDeleteSetting('special',c.id)} className="text-red-500"><i className="fas fa-trash"></i></button></li>)}</ul>
                                         </div>
                                     </div>
                                 </div>
