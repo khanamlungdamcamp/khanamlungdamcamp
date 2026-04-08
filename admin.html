@@ -181,6 +181,7 @@
             const [savingSiteSettings, setSavingSiteSettings] = React.useState(false);
             const [roomConfig, setRoomConfig] = React.useState({});
             const [mapConfig, setMapConfig] = React.useState({});
+            const [mapBackground, setMapBackground] = React.useState("https://img2.pic.in.th/3d539b84-44ce-4336-ad90-bd2f84b13eca.jpg");
 
             const [viewSlip, setViewSlip] = React.useState(null); 
             const [viewBooking, setViewBooking] = React.useState(null); 
@@ -231,6 +232,9 @@
                             setSiteSettings(siteConfig);
                             setRoomConfig(roomConfig);
                             setMapConfig(mapConfig);
+                            if (siteConfig?.roomImages?.['MAP_BG'] && siteConfig.roomImages['MAP_BG'].length > 0) {
+                                setMapBackground(siteConfig.roomImages['MAP_BG'][0]);
+                            }
                             const loadedIds = Object.keys(roomConfig);
                             if (loadedIds.length > 0) { ROOM_IDS = loadedIds; ROOM_NAMES = {}; loadedIds.forEach(id => ROOM_NAMES[id] = roomConfig[id].name); }
                         }
@@ -340,6 +344,9 @@
                     if (res.status === 'success') {
                         const { settings, siteConfig, roomConfig, mapConfig } = res.data;
                         setSettings(settings); setSiteSettings(siteConfig); setRoomConfig(roomConfig); setMapConfig(mapConfig);
+                        if (siteConfig?.roomImages?.['MAP_BG'] && siteConfig.roomImages['MAP_BG'].length > 0) {
+                            setMapBackground(siteConfig.roomImages['MAP_BG'][0]);
+                        }
                     }
                 }).catch(e=>setLoading(false));
             };
@@ -473,6 +480,10 @@
                     const rooms = finalRoomsData.map(r => ({ id: r.id, name: r.name, type: r.type, min: r.min, maxCap: r.maxCap, pricing: r.pricing, bf: r.bf }));
                     const mapConfigObj = {}; finalRoomsData.forEach(r => mapConfigObj[r.id] = { x: r.x, y: r.y });
                     const images = {}, descs = {}; finalRoomsData.forEach(r => { images[r.id] = r.images || []; descs[r.id] = r.desc || ''; });
+                    
+                    // เพิ่ม MAP_BG ลงใน images เพื่อให้ Code.gs ดึงไปอัปโหลดขึ้น Drive อัตโนมัติ
+                    images['MAP_BG'] = [mapBackground];
+
                     fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'saveRoomSystem', password: password, rooms: rooms, mapConfig: mapConfigObj, siteSettings: { roomImages: images, roomDescriptions: descs } }) })
                     .then(r => r.json()).then(res => { setLoading(false); if(res.status === 'success') { successMsg('บันทึกข้อมูลสำเร็จ'); setRoomsMapData(finalRoomsData); setMapConfig(mapConfigObj); fetchInitialData(); setEditingRoom(null); } else errorMsg('บันทึกไม่สำเร็จ: ' + res.message); }).catch(e => { setLoading(false); errorMsg(e.name === 'AbortError' ? 'เน็ตหมดเวลา' : String(e)); });
                 });
@@ -612,7 +623,13 @@
                                     <div className="w-full lg:w-1/3 bg-white rounded-lg shadow-lg flex flex-col overflow-hidden">
                                         <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
                                             <h2 className="font-bold text-gray-800">จัดการห้องพัก</h2>
-                                            <button onClick={() => setEditingRoom({ id: 'R'+Date.now().toString().substr(-4), name: 'ห้องใหม่', type: 'room', min: 2, maxCap: 4, pricing: {tiers:[{max:2,price:1000}]}, bf: false, x: 50, y: 50, desc: '', images: [] })} className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 shadow">+ เพิ่มห้อง</button>
+                                            <div className="flex gap-2 flex-wrap justify-end">
+                                                <label className="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-700 shadow cursor-pointer flex items-center justify-center whitespace-nowrap">
+                                                    <i className="fas fa-map mr-1"></i> เปลี่ยนรูปแผนที่
+                                                    <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e.target.files[0], base64 => setMapBackground(base64))} />
+                                                </label>
+                                                <button onClick={() => setEditingRoom({ id: 'R'+Date.now().toString().substr(-4), name: 'ห้องใหม่', type: 'room', min: 2, maxCap: 4, pricing: {tiers:[{max:2,price:1000}]}, bf: false, x: 50, y: 50, desc: '', images: [] })} className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 shadow whitespace-nowrap">+ เพิ่มห้อง</button>
+                                            </div>
                                         </div>
                                         <div className="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-4">
                                             {editingRoom ? (
@@ -640,7 +657,7 @@
                                     </div>
                                     <div className="w-full lg:w-2/3 bg-gray-200 rounded-lg shadow-inner overflow-auto flex items-center justify-center p-4">
                                         <div className="relative inline-block" onClick={handleMapClick}>
-                                            <img src="https://img2.pic.in.th/3d539b84-44ce-4336-ad90-bd2f84b13eca.jpg" className="max-w-full max-h-[calc(100vh-200px)] object-contain block pointer-events-none select-none shadow-lg rounded" />
+                                            <img src={mapBackground} className="max-w-full max-h-[calc(100vh-200px)] object-contain block pointer-events-none select-none shadow-lg rounded" />
                                             {!editingRoom && roomsMapData.map(r => ( <div key={r.id} className="map-pin" style={{ left: `${r.x}%`, top: `${r.y}%` }} onClick={(e)=>{ e.stopPropagation(); setEditingRoom(r); }}>{r.id}</div> ))}
                                             {editingRoom && ( <div className="map-pin active shadow-xl border-4 border-yellow-400" style={{ left: `${editingRoom.x}%`, top: `${editingRoom.y}%` }}>{editingRoom.id}</div> )}
                                             {editingRoom && <div className="absolute top-4 left-4 bg-black/70 text-white px-4 py-2 rounded-full text-sm pointer-events-none">📍 คลิกบนแผนที่เพื่อย้ายตำแหน่ง <b>{editingRoom.name}</b></div>}
