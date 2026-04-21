@@ -222,7 +222,11 @@
             
             const getPricing = () => {
                 const nights = calculateNights(); let roomTotal = 0; let foodTotal = 0; let z8Total = 0;
-                cart.forEach(item => { if (item.type === 'food') foodTotal += item.price * item.qty; else if (item.id === 'Z8') z8Total += item.pricePerNight * nights * item.guests; else roomTotal += item.pricePerNight * nights; });
+                cart.forEach(item => { 
+                    if (item.type === 'food') foodTotal += (item.price||0) * item.qty; 
+                    else if (item.id === 'Z8') z8Total += (item.pricePerNight||0) * nights * item.guests; 
+                    else roomTotal += (item.pricePerNight||0) * nights; 
+                });
                 let discountAmt = 0; if (discount.type === 'FIXED') discountAmt = discount.val; if (discount.type === 'PERCENT') discountAmt = (roomTotal * discount.val) / 100; if (discountAmt > roomTotal) discountAmt = roomTotal; 
                 const totalBefore = roomTotal + z8Total + foodTotal; const netTotal = totalBefore - discountAmt;
                 let deposit = 0; const isHigh = checkDateOverlapHighSeason(dates.checkIn, dates.checkOut);
@@ -331,12 +335,36 @@
             };
             const nextImage = () => { if(!selectedRoomId) return; const images = siteConfig.roomImages[selectedRoomId] || []; setCurrentImgIdx((prev) => (prev + 1) % images.length); };
             const prevImage = () => { if(!selectedRoomId) return; const images = siteConfig.roomImages[selectedRoomId] || []; setCurrentImgIdx((prev) => (prev - 1 + images.length) % images.length); };
+            
             const confirmRoomSelection = () => {
                 const roomId = selectedRoomId; const guests = guestCount; const roomInfo = roomConfig[roomId];
-                if (roomId === 'Z8') { const currentZ8 = cart.filter(c => c.id === 'Z8').reduce((sum, c) => sum + c.guests, 0); if (currentZ8 + guests > availability.zone8Available) { alert(`ลานกางเต็นท์ว่างอีก ${availability.zone8Available - currentZ8} ท่าน`); return; } }
-                let price = 0; if (roomId === 'Z8') { price = roomInfo.pricing.priceHead; } else { const tier = roomInfo.pricing.tiers.find(t => guests <= t.max); if (!tier) { const maxTier = roomInfo.pricing.tiers[roomInfo.pricing.tiers.length - 1]; price = maxTier.price; } else { price = tier.price; } }
+                if (!roomInfo) { alert("พบปัญหาข้อมูลห้องพักไม่สมบูรณ์"); setSelectedRoomId(null); return; }
+                
+                let maxZone8 = 20;
+                if (availability && availability.zone8Available !== undefined) maxZone8 = availability.zone8Available;
+                
+                if (roomId === 'Z8') { 
+                    const currentZ8 = cart.filter(c => c.id === 'Z8').reduce((sum, c) => sum + c.guests, 0); 
+                    if (currentZ8 + guests > maxZone8) { alert(`ลานกางเต็นท์ว่างอีก ${maxZone8 - currentZ8} ท่าน`); return; } 
+                }
+                
+                let price = 0; 
+                const pricingInfo = roomInfo.pricing || {};
+                
+                if (roomId === 'Z8') { 
+                    price = pricingInfo.priceHead || (pricingInfo.tiers && pricingInfo.tiers.length > 0 ? pricingInfo.tiers[0].price : 150); 
+                } else { 
+                    const tiers = pricingInfo.tiers || [];
+                    if (tiers.length > 0) {
+                        const tier = tiers.find(t => guests <= t.max); 
+                        if (!tier) { const maxTier = tiers[tiers.length - 1]; price = maxTier ? maxTier.price : 0; } 
+                        else { price = tier.price; } 
+                    }
+                }
+                
                 setCart([...cart, { id: roomId, name: roomInfo.name, type: roomInfo.type, guests, pricePerNight: price, nights: calculateNights() }]); setSelectedRoomId(null);
             };
+
             const checkDiscountCode = () => { 
                 if(!discount.code) return; setCheckingDiscount(true); 
                 fetchWithTimeout(`${GOOGLE_SCRIPT_URL}?action=checkDiscount&code=${discount.code}`).then(r=>r.json()).then(d => { setCheckingDiscount(false); if(d.status === 'success') setDiscount({...discount, val: Number(d.value), type: d.type, message: `ใช้โค้ดสำเร็จ ลด ${d.value} ${d.type==='PERCENT'?'%':'บาท'}`, status: 'success'}); else setDiscount({...discount, val: 0, type: '', message: 'ไม่พบโค้ดส่วนลดนี้', status: 'error'}); }).catch(e => { setCheckingDiscount(false); setDiscount({...discount, val: 0, type: '', message: e.name === 'AbortError' ? 'เน็ตหมดเวลา' : 'เกิดข้อผิดพลาด', status: 'error'}); }); 
@@ -603,7 +631,7 @@
                                             <div className="flex items-center justify-between mb-6 bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
                                                 <button onClick={() => setGuestCount(Math.max((roomConfig[selectedRoomId].min||1), guestCount - 1))} className="w-10 h-10 bg-green-600 hover:bg-green-700 text-white rounded shadow text-xl font-bold transition-colors">-</button>
                                                 <div className="text-center"> <div className="text-2xl font-bold dark:text-white">{guestCount}</div> <div className="text-xs text-gray-500 dark:text-gray-400">คน</div> </div>
-                                                <button onClick={() => { let limit = roomConfig[selectedRoomId].maxCap; if(selectedRoomId === 'Z8') limit = availability.zone8Available; setGuestCount(Math.min(limit, guestCount + 1)); }} className="w-10 h-10 bg-green-600 hover:bg-green-700 text-white rounded shadow text-xl font-bold transition-colors">+</button>
+                                                <button onClick={() => { let limit = roomConfig[selectedRoomId].maxCap || 10; if(selectedRoomId === 'Z8') limit = availability ? availability.zone8Available : 20; setGuestCount(Math.min(limit, guestCount + 1)); }} className="w-10 h-10 bg-green-600 hover:bg-green-700 text-white rounded shadow text-xl font-bold transition-colors">+</button>
                                             </div>
                                             <div className="flex gap-2"> <button onClick={() => setSelectedRoomId(null)} className="flex-1 py-3 text-gray-500 bg-gray-200 dark:bg-gray-600 dark:text-gray-300 rounded-lg font-bold">ยกเลิก</button> <button onClick={confirmRoomSelection} className="flex-1 py-3 text-white bg-green-600 hover:bg-green-700 rounded-lg font-bold shadow-lg">ยืนยัน</button> </div>
                                         </div>
