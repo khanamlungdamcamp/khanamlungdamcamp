@@ -773,12 +773,8 @@
                                     {qrUrl ? ( 
                                         <div className="flex flex-col items-center"> 
                                             <img src={qrUrl} className="mx-auto border-2 border-gray-200 dark:border-gray-600 rounded-xl mb-3 shadow-sm p-2 bg-white" alt="QR Code" style={{ width: '200px', height: '200px' }} /> 
-                                            <div className="flex gap-2 justify-center mb-2">
-                                                <a href={qrUrl} download={`qr-deposit-${dates.checkIn}.png`} className="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-2 shadow-sm">
-                                                    <i className="fas fa-download"></i> บันทึกภาพ QR Code
-                                                </a>
-                                            </div>
-                                            <p className="text-sm text-blue-600 dark:text-blue-400 font-bold mt-1"> แคปหน้าจอหรือกดปุ่มเพื่อบันทึก</p> 
+                                            
+                                            <p className="text-sm text-blue-600 dark:text-blue-400 font-bold mt-1"> แคปหน้าจอหรือกดค้างเพื่อบันทึก</p> 
                                         </div> 
                                     ) : ( <div className="h-[200px] flex items-center justify-center text-gray-400">กำลังสร้าง QR Code...</div> )}
                                     <div className="mt-4 bg-gray-50 dark:bg-gray-700 p-2 rounded"> <p className="text-sm font-bold text-gray-800 dark:text-white">{PROMPTPAY_NAME}</p> <p className="text-xs text-gray-500 dark:text-gray-400 font-mono tracking-wider">{PROMPTPAY_PHONE}</p> </div>
