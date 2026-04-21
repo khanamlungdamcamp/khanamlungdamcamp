@@ -62,10 +62,17 @@
         const PROMPTPAY_PHONE = "0615924262";
         const PROMPTPAY_NAME = "อลงกต ทวีผ่อง";
 
-        const safeJsonParse = (str, fallback = []) => {
+        // แก้ไขให้ทนทานต่อการพิมพ์ JSON ผิดรูปแบบจาก Google Sheets
+        const safeJsonParse = (str, fallback = {}) => {
             if (!str || str === '-') return fallback;
             if (typeof str !== 'string') return str;
-            try { return JSON.parse(str); } catch (e) { console.warn('JSON Parse Error:', str); return fallback; }
+            try { 
+                let cleanStr = str.replace(/[“”]/g, '"').replace(/[‘’]/g, "'"); // กัน Smart Quotes
+                return JSON.parse(cleanStr); 
+            } catch (e) { 
+                console.warn('JSON Parse Error:', str); 
+                return fallback; 
+            }
         };
 
         const formatMoney = (val) => Number(val || 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
@@ -222,15 +229,27 @@
             
             const getPricing = () => {
                 const nights = calculateNights(); let roomTotal = 0; let foodTotal = 0; let z8Total = 0;
+                
+                // ใช้ตัวแปร isPerHead เพื่อให้แยกคิดราคาเต็นท์ได้อิสระ ไม่ต้องยึดติดชื่อ Z8
                 cart.forEach(item => { 
-                    if (item.type === 'food') foodTotal += (item.price||0) * item.qty; 
-                    else if (item.id === 'Z8') z8Total += (item.pricePerNight||0) * nights * item.guests; 
-                    else roomTotal += (item.pricePerNight||0) * nights; 
+                    if (item.type === 'food') foodTotal += Number(item.price||0) * Number(item.qty||1); 
+                    else if (item.isPerHead) z8Total += Number(item.pricePerNight||0) * nights * Number(item.guests||1); 
+                    else roomTotal += Number(item.pricePerNight||0) * nights; 
                 });
-                let discountAmt = 0; if (discount.type === 'FIXED') discountAmt = discount.val; if (discount.type === 'PERCENT') discountAmt = (roomTotal * discount.val) / 100; if (discountAmt > roomTotal) discountAmt = roomTotal; 
+                
+                let discountAmt = 0; if (discount.type === 'FIXED') discountAmt = Number(discount.val||0); if (discount.type === 'PERCENT') discountAmt = (roomTotal * Number(discount.val||0)) / 100; if (discountAmt > roomTotal) discountAmt = roomTotal; 
                 const totalBefore = roomTotal + z8Total + foodTotal; const netTotal = totalBefore - discountAmt;
+                
                 let deposit = 0; const isHigh = checkDateOverlapHighSeason(dates.checkIn, dates.checkOut);
-                if (isHigh) deposit = netTotal; else { const roomDeposit = (roomTotal - discountAmt) * 0.5; deposit = roomDeposit + z8Total + foodTotal; }
+                
+                // ระบบมัดจำ 100% สำหรับเต็นท์ ตามที่ลูกค้ากำหนด
+                if (isHigh) {
+                    deposit = netTotal; 
+                } else { 
+                    const roomDeposit = (roomTotal - discountAmt) * 0.5; 
+                    // อาหารและลานกางเต็นท์ (z8Total) เก็บ 100%
+                    deposit = roomDeposit + z8Total + foodTotal; 
+                }
                 return { total: totalBefore, discount: discountAmt, netTotal: netTotal, deposit: Math.ceil(deposit), isHighSeason: isHigh };
             };
             
@@ -349,20 +368,26 @@
                 }
                 
                 let price = 0; 
-                const pricingInfo = roomInfo.pricing || {};
+                // ใช้ safeJsonParse ที่แข็งแรงขึ้น ป้องกันการพิมพ์ผิดรูปแบบ
+                const pricingInfo = typeof roomInfo.pricing === 'string' ? safeJsonParse(roomInfo.pricing, {}) : (roomInfo.pricing || {});
                 
-                if (roomId === 'Z8') { 
-                    price = pricingInfo.priceHead || (pricingInfo.tiers && pricingInfo.tiers.length > 0 ? pricingInfo.tiers[0].price : 150); 
+                // สร้างตัวแปรเช็คว่าเป็นการคิดราคาต่อหัวแบบเต็นท์หรือไม่ (เผื่อเปลี่ยนชื่อ ID จาก Z8)
+                const isPerHead = roomId === 'Z8' || pricingInfo.priceHead !== undefined;
+                
+                if (isPerHead) { 
+                    price = Number(pricingInfo.priceHead || (pricingInfo.tiers && pricingInfo.tiers.length > 0 ? pricingInfo.tiers[0].price : 150)); 
                 } else { 
                     const tiers = pricingInfo.tiers || [];
                     if (tiers.length > 0) {
                         const tier = tiers.find(t => guests <= t.max); 
-                        if (!tier) { const maxTier = tiers[tiers.length - 1]; price = maxTier ? maxTier.price : 0; } 
-                        else { price = tier.price; } 
+                        if (!tier) { const maxTier = tiers[tiers.length - 1]; price = Number(maxTier ? maxTier.price : 0); } 
+                        else { price = Number(tier.price); } 
                     }
                 }
                 
-                setCart([...cart, { id: roomId, name: roomInfo.name, type: roomInfo.type, guests, pricePerNight: price, nights: calculateNights() }]); setSelectedRoomId(null);
+                // บันทึก isPerHead ลงในตะกร้าด้วย เพื่อใช้คิดราคาหน้าสรุป
+                setCart([...cart, { id: roomId, name: roomInfo.name, type: roomInfo.type, guests, pricePerNight: price, nights: calculateNights(), isPerHead }]); 
+                setSelectedRoomId(null);
             };
 
             const checkDiscountCode = () => { 
@@ -646,7 +671,7 @@
                                         })}
                                     </div>
                                 </div>
-                                <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded mb-4"><h3 className="font-bold dark:text-white">🛒 ตะกร้า ({cart.length})</h3> {cart.map((c,i)=><div key={i} className="flex justify-between text-sm mt-1 dark:text-gray-200"><span>{c.name} {c.type==='food'?`x${c.qty}`:`(${c.guests} คน)`}</span><button onClick={()=>setCart(cart.filter((_,idx)=>idx!==i))} className="text-red-500">ลบ</button></div>)} </div>
+                                <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded mb-4"><h3 className="font-bold dark:text-white">🛒 ตะกร้า ({cart.length})</h3> {cart.map((c,i)=><div key={i} className="flex justify-between text-sm mt-1 dark:text-gray-200"><span>{c.name} {c.type==='food'?`x${c.qty}`:`(${c.guests} ท่าน)`}</span><button onClick={()=>setCart(cart.filter((_,idx)=>idx!==i))} className="text-red-500">ลบ</button></div>)} </div>
                                 <button onClick={() => { const hasRoom = cart.some(c => c.type !== 'food'); if (!hasRoom) { setShowRoomRequiredModal(true); return; } setStep(3); }} className="w-full bg-green-600 text-white p-3 rounded-lg font-bold"> ดำเนินการต่อ </button>
                             </div>
                         )}
@@ -660,7 +685,8 @@
                                     <p><strong>จำนวน:</strong> {calculateNights()} คืน</p>
                                     {pricing.isHighSeason && <div className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 p-1 rounded">ℹ️ ช่วงเทศกาล/วันพิเศษ คิดมัดจำ 100%</div>}
                                     <hr className="dark:border-gray-600"/>
-                                    {cart.map((c, i) => <div key={i} className="flex justify-between"><span>{c.name}</span><span>{formatMoney(c.type==='food' ? c.price*c.qty : (c.id === 'Z8' ? c.pricePerNight * calculateNights() * c.guests : c.pricePerNight*calculateNights()))} บ.</span></div>)}
+                                    {/* นำตัวแปร isPerHead มาใช้ เพื่อให้โชว์ราคาที่คูณจำนวนคนได้ถูกต้อง ไม่ว่าจะตั้งชื่อเต็นท์ว่าอะไร */}
+                                    {cart.map((c, i) => <div key={i} className="flex justify-between"><span>{c.name} {c.type !== 'food' && `(${c.guests} ท่าน)`}</span><span>{formatMoney(c.type==='food' ? Number(c.price||0)*Number(c.qty||1) : (c.isPerHead ? Number(c.pricePerNight||0) * calculateNights() * Number(c.guests||1) : Number(c.pricePerNight||0)*calculateNights()))} บ.</span></div>)}
                                     <hr className="dark:border-gray-600"/>
                                     {pricing.discount > 0 && <div className="flex justify-between text-red-500 font-bold"><span>ส่วนลดที่พัก</span><span>-{formatMoney(pricing.discount)} บ.</span></div>}
                                     <div className="flex justify-between font-bold text-lg"><span>สุทธิ</span><span>{formatMoney(pricing.netTotal)} บ.</span></div>
