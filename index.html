@@ -38,6 +38,64 @@
             }
             return data + crc.toString(16).toUpperCase().padStart(4, '0');
         }
+
+        // ฟังก์ชันสร้าง QR พร้อมโลโก้ตรงกลาง
+        function createQRWithLogo(payload, size, shopLogoUrl) {
+            return new Promise((resolve) => {
+                const qr = new QRious({ value: payload, size: size, level: 'H' });
+                const qrBase64 = qr.toDataURL();
+                
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                const ctx = canvas.getContext('2d');
+                
+                const qrImg = new Image();
+                qrImg.onload = () => {
+                    ctx.drawImage(qrImg, 0, 0);
+                    
+                    const drawLogo = (imgSrc, isFallback = false) => {
+                        const logoImg = new Image();
+                        logoImg.crossOrigin = "Anonymous";
+                        logoImg.onload = () => {
+                            const logoSize = size * 0.22;
+                            const x = (size - logoSize) / 2;
+                            const y = (size - logoSize) / 2;
+                            const pad = 6;
+                            
+                            ctx.fillStyle = 'white';
+                            if (ctx.roundRect) {
+                                ctx.beginPath();
+                                ctx.roundRect(x - pad, y - pad, logoSize + pad * 2, logoSize + pad * 2, 8);
+                                ctx.fill();
+                            } else {
+                                ctx.fillRect(x - pad, y - pad, logoSize + pad * 2, logoSize + pad * 2);
+                            }
+                            
+                            ctx.drawImage(logoImg, x, y, logoSize, logoSize);
+                            resolve(canvas.toDataURL('image/png'));
+                        };
+                        logoImg.onerror = () => {
+                            // ถ้าโหลดรูปโลโก้ร้านไม่ได้ ให้ fallback ไปใช้โลโก้ PromptPay
+                            if (!isFallback) {
+                                drawLogo("https://upload.wikimedia.org/wikipedia/commons/e/e0/PromptPay-logo.png", true);
+                            } else {
+                                // ถ้าโลโก้ PromptPay ก็โหลดไม่ได้ ให้ใช้ QR เปล่าๆ
+                                resolve(qrBase64);
+                            }
+                        };
+                        logoImg.src = imgSrc;
+                    };
+                    
+                    if (shopLogoUrl) {
+                        drawLogo(shopLogoUrl);
+                    } else {
+                        drawLogo("https://upload.wikimedia.org/wikipedia/commons/e/e0/PromptPay-logo.png", true);
+                    }
+                };
+                qrImg.src = qrBase64;
+            });
+        }
     </script>
 
     <style>
@@ -230,7 +288,6 @@
             const getPricing = () => {
                 const nights = calculateNights(); let roomTotal = 0; let foodTotal = 0; let z8Total = 0;
                 
-                // ใช้ตัวแปร isPerHead เพื่อให้แยกคิดราคาเต็นท์ได้อิสระ ไม่ต้องยึดติดชื่อ Z8
                 cart.forEach(item => { 
                     if (item.type === 'food') foodTotal += Number(item.price||0) * Number(item.qty||1); 
                     else if (item.isPerHead) z8Total += Number(item.pricePerNight||0) * nights * Number(item.guests||1); 
@@ -242,12 +299,10 @@
                 
                 let deposit = 0; const isHigh = checkDateOverlapHighSeason(dates.checkIn, dates.checkOut);
                 
-                // ระบบมัดจำ 100% สำหรับเต็นท์ ตามที่ลูกค้ากำหนด
                 if (isHigh) {
                     deposit = netTotal; 
                 } else { 
                     const roomDeposit = (roomTotal - discountAmt) * 0.5; 
-                    // อาหารและลานกางเต็นท์ (z8Total) เก็บ 100%
                     deposit = roomDeposit + z8Total + foodTotal; 
                 }
                 return { total: totalBefore, discount: discountAmt, netTotal: netTotal, deposit: Math.ceil(deposit), isHighSeason: isHigh };
@@ -296,18 +351,25 @@
                 });
             }, []);
 
+            // แก้ไขการสร้าง QR ให้ใช้ฟังก์ชันใหม่ที่วาดโลโก้ลงไป
             React.useEffect(() => {
                 if (step === 3 && pricing.deposit > 0) {
-                    const payload = generatePromptPayPayload(PROMPTPAY_PHONE, pricing.deposit); const qr = new QRious({ value: payload, size: 300 }); setQrUrl(qr.toDataURL());
+                    const payload = generatePromptPayPayload(PROMPTPAY_PHONE, pricing.deposit); 
+                    // สร้าง QR แบบมีโลโก้ ขนาด 400px
+                    createQRWithLogo(payload, 400, siteConfig.logoUrl).then(url => setQrUrl(url));
                 }
-            }, [step, pricing.deposit]);
+            }, [step, pricing.deposit, siteConfig.logoUrl]);
 
             React.useEffect(() => {
                 if (mode === 'manage' && manageTab === 'food') {
                     const total = addOnCart.reduce((sum,c)=>sum+(c.price*c.qty),0);
-                    if (total > 0) { const payload = generatePromptPayPayload(PROMPTPAY_PHONE, total); const qr = new QRious({ value: payload, size: 200 }); setAddOnQr(qr.toDataURL()); } else { setAddOnQr(null); }
+                    if (total > 0) { 
+                        const payload = generatePromptPayPayload(PROMPTPAY_PHONE, total); 
+                        // สร้าง QR สำหรับสั่งอาหาร แบบมีโลโก้
+                        createQRWithLogo(payload, 400, siteConfig.logoUrl).then(url => setAddOnQr(url)); 
+                    } else { setAddOnQr(null); }
                 }
-            }, [addOnCart, mode, manageTab]);
+            }, [addOnCart, mode, manageTab, siteConfig.logoUrl]);
 
             // AUTO FETCH BOOKINGS FOR MANAGE MODE
             React.useEffect(() => {
@@ -368,10 +430,7 @@
                 }
                 
                 let price = 0; 
-                // ใช้ safeJsonParse ที่แข็งแรงขึ้น ป้องกันการพิมพ์ผิดรูปแบบ
                 const pricingInfo = typeof roomInfo.pricing === 'string' ? safeJsonParse(roomInfo.pricing, {}) : (roomInfo.pricing || {});
-                
-                // สร้างตัวแปรเช็คว่าเป็นการคิดราคาต่อหัวแบบเต็นท์หรือไม่ (เผื่อเปลี่ยนชื่อ ID จาก Z8)
                 const isPerHead = roomId === 'Z8' || pricingInfo.priceHead !== undefined;
                 
                 if (isPerHead) { 
@@ -385,7 +444,6 @@
                     }
                 }
                 
-                // บันทึก isPerHead ลงในตะกร้าด้วย เพื่อใช้คิดราคาหน้าสรุป
                 setCart([...cart, { id: roomId, name: roomInfo.name, type: roomInfo.type, guests, pricePerNight: price, nights: calculateNights(), isPerHead }]); 
                 setSelectedRoomId(null);
             };
@@ -593,7 +651,15 @@
                                                             <div className="mt-2 pt-2 border-t text-right font-bold text-sm text-green-600 mb-2">รวม {formatMoney(addOnCart.reduce((sum,c)=>sum+(c.price*c.qty),0))} บ.</div>
                                                             <div className="bg-white dark:bg-gray-800 p-3 rounded border border-gray-200 dark:border-gray-600">
                                                                 <p className="text-xs font-bold mb-2 text-center">สแกนจ่ายเพื่อยืนยันออเดอร์</p>
-                                                                {addOnQr && <img src={addOnQr} className="mx-auto w-32 h-32 mb-2 border p-1" />}
+                                                                {/* เพิ่มปุ่มบันทึกรูป QR โหมดสั่งอาหาร */}
+                                                                {addOnQr && (
+                                                                    <div className="flex flex-col items-center mb-3">
+                                                                        <img src={addOnQr} className="mx-auto border-2 border-gray-200 dark:border-gray-600 rounded-xl mb-3 shadow-sm p-2 bg-white" alt="QR Code" style={{ width: '150px', height: '150px' }} />
+                                                                        <a href={addOnQr} download={`qr-food-${manageData.id}.png`} className="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-2 shadow-sm">
+                                                                            <i className="fas fa-download"></i> บันทึกภาพ QR Code
+                                                                        </a>
+                                                                    </div>
+                                                                )}
                                                                 <div className="text-[10px] text-center mb-2 text-gray-500">{PROMPTPAY_NAME} - {PROMPTPAY_PHONE}</div>
                                                                 <input type="file" accept="image/*" onChange={async (e) => { const f = e.target.files[0]; if (f) { try { const resizedBase64 = await compressImage(f); setAddOnSlip(resizedBase64); } catch (err) { alert('Upload Error'); } } }} className="text-xs w-full mb-1" />
                                                                 {!addOnSlip && <div className="text-red-500 text-[10px] text-center">* กรุณาแนบสลิปโอนเงิน</div>}
@@ -700,11 +766,24 @@
                                     <input placeholder="ชื่อผู้จอง" className="w-full border p-2 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white" value={customer.name} onChange={e => setCustomer({...customer, name: e.target.value})} />
                                     <input placeholder="เบอร์โทรศัพท์" className="w-full border p-2 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white" type="tel" value={customer.phone} onChange={e => setCustomer({...customer, phone: e.target.value})} />
                                 </div>
+                                
+                                {/* เปลี่ยนรูปแบบแสดง QR ให้มีปุ่มดาวน์โหลด */}
                                 <div className="text-center mb-6">
                                     <p className="mb-2 font-bold dark:text-white">สแกนจ่ายมัดจำ (พร้อมเพย์)</p>
-                                    {qrUrl ? ( <div className="flex flex-col items-center"> <img src={qrUrl} className="mx-auto border-2 border-gray-200 dark:border-gray-600 rounded-lg mb-3 shadow-sm p-1 bg-white" alt="QR Code" width="200" height="200" /> <p className="text-sm text-blue-600 dark:text-blue-400 font-bold mt-2"> กรุณาแคปหน้าจอหรือกดค้างที่รูปเพื่อบันทึก</p> </div> ) : ( <div className="h-[200px] flex items-center justify-center text-gray-400">กำลังสร้าง QR Code...</div> )}
+                                    {qrUrl ? ( 
+                                        <div className="flex flex-col items-center"> 
+                                            <img src={qrUrl} className="mx-auto border-2 border-gray-200 dark:border-gray-600 rounded-xl mb-3 shadow-sm p-2 bg-white" alt="QR Code" style={{ width: '200px', height: '200px' }} /> 
+                                            <div className="flex gap-2 justify-center mb-2">
+                                                <a href={qrUrl} download={`qr-deposit-${dates.checkIn}.png`} className="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-2 shadow-sm">
+                                                    <i className="fas fa-download"></i> บันทึกภาพ QR Code
+                                                </a>
+                                            </div>
+                                            <p className="text-sm text-blue-600 dark:text-blue-400 font-bold mt-1"> แคปหน้าจอหรือกดปุ่มเพื่อบันทึก</p> 
+                                        </div> 
+                                    ) : ( <div className="h-[200px] flex items-center justify-center text-gray-400">กำลังสร้าง QR Code...</div> )}
                                     <div className="mt-4 bg-gray-50 dark:bg-gray-700 p-2 rounded"> <p className="text-sm font-bold text-gray-800 dark:text-white">{PROMPTPAY_NAME}</p> <p className="text-xs text-gray-500 dark:text-gray-400 font-mono tracking-wider">{PROMPTPAY_PHONE}</p> </div>
                                 </div>
+                                
                                 <div className="mb-4"> <label className="block mb-1 text-sm dark:text-gray-300">สลิปโอนเงิน <span className="text-red-500">*</span></label> <input type="file" accept="image/*" onChange={async (e) => { const f = e.target.files[0]; if (f) { try { const resizedBase64 = await compressImage(f); setSlipImg(resizedBase64); } catch (err) { alert('ไม่สามารถประมวลผลรูปภาพได้'); } } }} className="w-full text-sm dark:text-gray-300" /> </div>
                                 <div className="flex items-start gap-2 mb-4 text-xs text-gray-600 dark:text-gray-400"> <input type="checkbox" className="mt-1" checked={agreed} onChange={e => setAgreed(e.target.checked)} /> <p>ฉันอ่านกฎระเบียบและยอมรับเงื่อนไขของ ขนำลุงดำ แคมป์ปิ้ง ทุกประการ </p> </div>
                                 <button onClick={handleSubmit} disabled={loading || !canSubmit} className={`w-full p-3 rounded-lg font-bold text-white transition ${loading || !canSubmit ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 shadow-lg'}`}>{loading ? 'กำลังยืนยันการจอง...' : 'ยืนยันการจองที่พัก'}</button>
