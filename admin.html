@@ -171,7 +171,6 @@
         const AdminApp = () => {
             const [isLoggedIn, setIsLoggedIn] = React.useState(false);
             const [password, setPassword] = React.useState('');
-            const [adminToken, setAdminToken] = React.useState('');
             const [loading, setLoading] = React.useState(false);
             const [activeTab, setActiveTab] = React.useState('dashboard');
             
@@ -213,19 +212,19 @@
             const [modal, setModal] = React.useState({ isOpen: false, type: 'alert', title: '', message: '', onConfirm: null });
 
             React.useEffect(() => {
-                const storedToken = sessionStorage.getItem('admin_token');
-                if (storedToken) {
-                    setAdminToken(storedToken);
+                const storedPwd = sessionStorage.getItem('admin_pwd');
+                if (storedPwd) {
+                    setPassword(storedPwd);
                     setIsLoggedIn(true);
                 }
             }, []);
 
             React.useEffect(() => {
-                if(isLoggedIn && adminToken) {
+                if(isLoggedIn && password) {
                     setLoading(true);
                     Promise.all([
                         fetchWithTimeout(`${GOOGLE_SCRIPT_URL}?action=getInitialData`).then(r => r.json()),
-                        fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'getAdminData', adminToken: adminToken }) }).then(r=>r.json())
+                        fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'getAdminData', password: password }) }).then(r=>r.json())
                     ]).then(([initRes, adminRes]) => {
                         if(initRes.status === 'success') {
                             const { settings, siteConfig, roomConfig, mapConfig } = initRes.data;
@@ -241,10 +240,6 @@
                         }
                         if(adminRes.status === 'success') {
                             setBookings(adminRes.data);
-                        } else {
-                            sessionStorage.removeItem('admin_token');
-                            setAdminToken('');
-                            setIsLoggedIn(false);
                         }
                         setLoading(false);
                     }).catch(e => {
@@ -252,7 +247,7 @@
                         setLoading(false);
                     });
                 }
-            }, [isLoggedIn, adminToken]);
+            }, [isLoggedIn]);
 
             const showModal = (title, message, type = 'alert', onConfirm = null) => { setModal({ isOpen: true, title, message, type, onConfirm }); };
             const closeModal = () => setModal(prev => ({ ...prev, isOpen: false }));
@@ -329,21 +324,19 @@
                 fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'adminLogin', password: password }) })
                 .then(r => r.json()).then(res => {
                     setLoading(false);
-                    if (res.status === 'success' && res.token) { 
-                        setAdminToken(res.token);
+                    if (res.status === 'success') { 
                         setIsLoggedIn(true); 
-                        sessionStorage.setItem('admin_token', res.token);
-                        setPassword('');
+                        sessionStorage.setItem('admin_pwd', password);
                     } else errorMsg('รหัสผ่านไม่ถูกต้อง');
                 }).catch(err => { setLoading(false); errorMsg('Connection Error: ' + err); });
             };
             
             const handleLogout = () => {
-                sessionStorage.removeItem('admin_token');
+                sessionStorage.removeItem('admin_pwd');
                 window.location.reload();
             }
 
-            const fetchData = () => { setLoading(true); fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'getAdminData', adminToken: adminToken }) }).then(r => r.json()).then(res => { setLoading(false); if (res.status === 'success') setBookings(res.data); }).catch(e=>setLoading(false)); };
+            const fetchData = () => { setLoading(true); fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'getAdminData', password: password }) }).then(r => r.json()).then(res => { setLoading(false); if (res.status === 'success') setBookings(res.data); }).catch(e=>setLoading(false)); };
             const fetchInitialData = () => {
                 setLoading(true);
                 fetchWithTimeout(`${GOOGLE_SCRIPT_URL}?action=getInitialData`).then(r => r.json()).then(res => {
@@ -362,7 +355,7 @@
                 const actionText = newStatus === 'ยกเลิก' ? 'ยกเลิกรายการ' : `เปลี่ยนสถานะเป็น "${newStatus}"`;
                 confirmMsg(`ยืนยันการ${actionText} ใช่หรือไม่?`, () => {
                     setBookings(prev => prev.map(b => b.id === id ? {...b, status: newStatus} : b));
-                    fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'updateStatus', bookingId: id, newStatus: newStatus, adminToken: adminToken }) });
+                    fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'updateStatus', bookingId: id, newStatus: newStatus, password: password }) });
                     if (newStatus === 'ยกเลิก' && viewBooking && viewBooking.id === id) setViewBooking({...viewBooking, status: 'ยกเลิก'});
                 });
             };
@@ -398,7 +391,7 @@
                     }));
                     const totalGuests = rooms.reduce((sum, r) => sum + r.guests, 0);
                     
-                    fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'createAdminBooking', adminToken: adminToken, customer: { name, phone }, checkIn, checkOut, totalGuests: totalGuests, cart: cart, price: parseFloat(price), deposit: parseFloat(deposit || price) })
+                    fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'createAdminBooking', password: password, customer: { name, phone }, checkIn, checkOut, totalGuests: totalGuests, cart: cart, price: parseFloat(price), deposit: parseFloat(deposit || price) })
                     }).then(r => r.json()).then(res => { setLoading(false); if(res.status === 'success') { successMsg('สร้างรายการจองสำเร็จ'); fetchData(); setShowAdminBooking(false); setAdminBookingForm({ name: '', phone: '', checkIn: '', checkOut: '', rooms: [], price: '', deposit: '' }); setAdminAvailability(null); } else errorMsg('ไม่สำเร็จ: ' + res.message); }).catch(e => { setLoading(false); errorMsg(e.name === 'AbortError' ? 'เน็ตหมดเวลา' : String(e)); });
                 });
             };
@@ -408,7 +401,7 @@
                 if(rescheduleData.checkIn >= rescheduleData.checkOut) return alertMsg('วันที่ออกต้องอยู่หลังวันที่เข้าพัก');
                 confirmMsg('ยืนยันการเลื่อนวันเข้าพัก?', () => {
                     setLoading(true);
-                    fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'rescheduleBooking', bookingId: rescheduleData.id, newCheckIn: rescheduleData.checkIn, newCheckOut: rescheduleData.checkOut, adminToken: adminToken }) 
+                    fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'rescheduleBooking', bookingId: rescheduleData.id, newCheckIn: rescheduleData.checkIn, newCheckOut: rescheduleData.checkOut, password: password }) 
                     }).then(r => r.json()).then(res => { setLoading(false); if (res.status === 'success') { successMsg('เลื่อนวันสำเร็จเรียบร้อย'); setRescheduleData(null); setViewBooking(null); fetchData(); } else errorMsg('ไม่สำเร็จ: ' + res.message); }).catch(e => { setLoading(false); errorMsg(e.name === 'AbortError' ? 'เน็ตหมดเวลา' : String(e))});
                 });
             };
@@ -433,7 +426,7 @@
                             action: 'adminAddService', 
                             bookingId: viewBooking.id, 
                             item: itemPayload, 
-                            adminToken: adminToken 
+                            password: password 
                         })
                     }).then(r => r.json()).then(res => { 
                         setLoading(false); 
@@ -456,7 +449,7 @@
                     setLoading(true);
                     fetchWithTimeout(GOOGLE_SCRIPT_URL, { 
                         method: 'POST', 
-                        body: JSON.stringify({ action: 'sendReceipt', bookingId: viewBooking.id, adminToken: adminToken }) 
+                        body: JSON.stringify({ action: 'sendReceipt', bookingId: viewBooking.id, password: password }) 
                     })
                     .then(r => r.json()).then(res => { 
                         setLoading(false); 
@@ -477,15 +470,15 @@
                 if ((type !== 'discount') && (!payload.startDate || !payload.endDate)) return alertMsg('กรุณาระบุวันที่เริ่มต้นและสิ้นสุด');
                 confirmMsg('ยืนยันการบันทึกข้อมูล?', () => {
                     setLoading(true);
-                    fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action, type, id, payload, adminToken: adminToken }) }).then(r => r.json()).then(res => { setLoading(false); if (res.status === 'success') { successMsg('บันทึกสำเร็จ'); fetchInitialData(); setEditMode(null); setFormDiscount({ code: '', type: 'FIXED', value: '' }); setFormClosed({ startDate: '', endDate: '', reason: '' }); setFormSpecial({ startDate: '', endDate: '', desc: '' }); setFormRoomClosure({ startDate: '', endDate: '', roomId: 'R1', reason: '' }); } else errorMsg('บันทึกไม่สำเร็จ'); }).catch(e => { setLoading(false); errorMsg(e.name === 'AbortError' ? 'เน็ตหมดเวลา' : String(e))});
+                    fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action, type, id, payload, password: password }) }).then(r => r.json()).then(res => { setLoading(false); if (res.status === 'success') { successMsg('บันทึกสำเร็จ'); fetchInitialData(); setEditMode(null); setFormDiscount({ code: '', type: 'FIXED', value: '' }); setFormClosed({ startDate: '', endDate: '', reason: '' }); setFormSpecial({ startDate: '', endDate: '', desc: '' }); setFormRoomClosure({ startDate: '', endDate: '', roomId: 'R1', reason: '' }); } else errorMsg('บันทึกไม่สำเร็จ'); }).catch(e => { setLoading(false); errorMsg(e.name === 'AbortError' ? 'เน็ตหมดเวลา' : String(e))});
                 });
             };
             const startEdit = (type, item) => alertMsg('การแก้ไขช่วงวันที่ต้องลบแล้วเพิ่มใหม่ครับ');
-            const handleDeleteSetting = (type, id) => confirmMsg('ยืนยันการลบรายการนี้?', () => { setLoading(true); fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'deleteSetting', type, id, adminToken: adminToken }) }).then(r => r.json()).then(res => { setLoading(false); if (res.status === 'success') fetchInitialData(); }); });
+            const handleDeleteSetting = (type, id) => confirmMsg('ยืนยันการลบรายการนี้?', () => { setLoading(true); fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'deleteSetting', type, id, password: password }) }).then(r => r.json()).then(res => { setLoading(false); if (res.status === 'success') fetchInitialData(); }); });
             
             const handleSaveSiteSettings = () => confirmMsg('ยืนยันบันทึกการตั้งค่าร้านค้า?', () => { 
                 setLoading(true); 
-                fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'saveSiteSettings', adminToken: adminToken, settings: siteSettings }) }).then(r => r.json()).then(res => { setLoading(false); if(res.status === 'success') { successMsg('บันทึกเรียบร้อย'); fetchInitialData(); } else errorMsg('บันทึกไม่สำเร็จ'); }).catch(e => { setLoading(false); errorMsg(e.name === 'AbortError' ? 'เน็ตหมดเวลา' : String(e)); }); 
+                fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'saveSiteSettings', password: password, settings: siteSettings }) }).then(r => r.json()).then(res => { setLoading(false); if(res.status === 'success') { successMsg('บันทึกเรียบร้อย'); fetchInitialData(); } else errorMsg('บันทึกไม่สำเร็จ'); }).catch(e => { setLoading(false); errorMsg(e.name === 'AbortError' ? 'เน็ตหมดเวลา' : String(e)); }); 
             });
             
             const handleImageUpload = async (file, callback) => { if(file) { try { const base64 = await compressImage(file); callback(base64); } catch(e) { errorMsg('Upload Failed'); } } };
@@ -516,7 +509,7 @@
                     // เพิ่ม MAP_BG ลงใน images เพื่อให้ Code.gs ดึงไปอัปโหลดขึ้น Drive อัตโนมัติ
                     images['MAP_BG'] = [mapBackground];
 
-                    fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'saveRoomSystem', adminToken: adminToken, rooms: rooms, mapConfig: mapConfigObj, siteSettings: { roomImages: images, roomDescriptions: descs } }) })
+                    fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'saveRoomSystem', password: password, rooms: rooms, mapConfig: mapConfigObj, siteSettings: { roomImages: images, roomDescriptions: descs } }) })
                     .then(r => r.json()).then(res => { setLoading(false); if(res.status === 'success') { successMsg('บันทึกข้อมูลสำเร็จ'); setRoomsMapData(finalRoomsData); setMapConfig(mapConfigObj); fetchInitialData(); setEditingRoom(null); } else errorMsg('บันทึกไม่สำเร็จ: ' + res.message); }).catch(e => { setLoading(false); errorMsg(e.name === 'AbortError' ? 'เน็ตหมดเวลา' : String(e)); });
                 });
             };
