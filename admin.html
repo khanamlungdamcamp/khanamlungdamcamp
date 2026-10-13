@@ -202,6 +202,7 @@
             const [formRoomClosure, setFormRoomClosure] = React.useState({ startDate: '', endDate: '', roomId: 'R1', reason: '' });
 
             const [showAdminBooking, setShowAdminBooking] = React.useState(false);
+            // เปลี่ยน rooms ให้เก็บเป็น Array ของ Object [{ id: 'R1', guests: 2 }]
             const [adminBookingForm, setAdminBookingForm] = React.useState({ name: '', phone: '', checkIn: '', checkOut: '', rooms: [], price: '', deposit: '' });
             const [adminAvailability, setAdminAvailability] = React.useState(null); 
 
@@ -381,15 +382,52 @@
                 if(!name || !phone || !checkIn || !checkOut || rooms.length === 0 || !price) return alertMsg('กรุณากรอกข้อมูลให้ครบถ้วน');
                 confirmMsg('ยืนยันสร้างรายการจอง?', () => {
                     setLoading(true);
-                    const cart = rooms.map(roomData => ({ 
-                        id: roomData.id, 
-                        name: ROOM_NAMES[roomData.id] || roomData.id, 
-                        type: (roomData.id==='Z8'?'ground':(roomData.id.startsWith('K')?'tent_rent':(roomData.id.startsWith('T')?'tent':'room'))), 
-                        guests: roomData.guests, 
-                        qty: 1 
-                    }));
+
+                    // คำนวณจำนวนคืน
+                    const inDate = new Date(checkIn);
+                    const outDate = new Date(checkOut);
+                    const nights = Math.max(1, Math.round((outDate - inDate) / (1000 * 3600 * 24)));
+
+                    const cart = rooms.map(roomData => {
+                        const rConf = roomConfig[roomData.id];
+                        let pricePerNight = 0;
+                        let isPerHead = false;
+
+                        if (rConf) {
+                            const searchStr = (rConf.type + " " + rConf.name).toLowerCase();
+                            isPerHead = rConf.type === 'ground' || roomData.id === 'Z8' || roomData.id === 'R6528' || searchStr.includes('tent') || searchStr.includes('เต็นท์') || searchStr.includes('ลานกาง') || searchStr.includes('ground');
+
+                            const pricingInfo = typeof rConf.pricing === 'string' ? safeJsonParse(rConf.pricing, {}) : (rConf.pricing || {});
+
+                            if (isPerHead) {
+                                pricePerNight = Number(pricingInfo.priceHead || (pricingInfo.tiers && pricingInfo.tiers.length > 0 ? pricingInfo.tiers[0].price : 150));
+                            } else {
+                                const tiers = pricingInfo.tiers || [];
+                                if (tiers.length > 0) {
+                                    const tier = tiers.find(t => roomData.guests <= t.max);
+                                    if (tier) {
+                                        pricePerNight = Number(tier.price);
+                                    } else {
+                                        const maxTier = tiers[tiers.length - 1];
+                                        pricePerNight = Number(maxTier ? maxTier.price : 0);
+                                    }
+                                }
+                            }
+                        }
+
+                        return {
+                            id: roomData.id,
+                            name: ROOM_NAMES[roomData.id] || roomData.id,
+                            type: rConf ? rConf.type : (roomData.id==='Z8'?'ground':(roomData.id.startsWith('K')?'tent_rent':(roomData.id.startsWith('T')?'tent':'room'))),
+                            guests: roomData.guests,
+                            qty: 1,
+                            pricePerNight: pricePerNight,
+                            nights: nights,
+                            isPerHead: isPerHead
+                        };
+                    });
                     const totalGuests = rooms.reduce((sum, r) => sum + r.guests, 0);
-                    
+
                     fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'createAdminBooking', password: password, customer: { name, phone }, checkIn, checkOut, totalGuests: totalGuests, cart: cart, price: parseFloat(price), deposit: parseFloat(deposit || price) })
                     }).then(r => r.json()).then(res => { setLoading(false); if(res.status === 'success') { successMsg('สร้างรายการจองสำเร็จ'); fetchData(); setShowAdminBooking(false); setAdminBookingForm({ name: '', phone: '', checkIn: '', checkOut: '', rooms: [], price: '', deposit: '' }); setAdminAvailability(null); } else errorMsg('ไม่สำเร็จ: ' + res.message); }).catch(e => { setLoading(false); errorMsg(e.name === 'AbortError' ? 'เน็ตหมดเวลา' : String(e)); });
                 });
