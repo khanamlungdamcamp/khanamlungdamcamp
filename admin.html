@@ -194,6 +194,7 @@
             const [customAddonPrice, setCustomAddonPrice] = React.useState('');
             const [addonQty, setAddonQty] = React.useState(1);
             const [addonStatus, setAddonStatus] = React.useState('unpaid');
+            const [editingAddonId, setEditingAddonId] = React.useState(null); // สำหรับระบุสถานะการแก้ไขรายการอาหาร
 
             const [editMode, setEditMode] = React.useState(null); 
             const [formDiscount, setFormDiscount] = React.useState({ code: '', type: 'FIXED', value: '' });
@@ -202,7 +203,6 @@
             const [formRoomClosure, setFormRoomClosure] = React.useState({ startDate: '', endDate: '', roomId: 'R1', reason: '' });
 
             const [showAdminBooking, setShowAdminBooking] = React.useState(false);
-            // เปลี่ยน rooms ให้เก็บเป็น Array ของ Object [{ id: 'R1', guests: 2 }]
             const [adminBookingForm, setAdminBookingForm] = React.useState({ name: '', phone: '', checkIn: '', checkOut: '', rooms: [], price: '', deposit: '' });
             const [adminAvailability, setAdminAvailability] = React.useState(null); 
 
@@ -395,9 +395,7 @@
 
                         if (rConf) {
                             const searchStr = (rConf.type + " " + rConf.name).toLowerCase();
-                            // เฉพาะลานกางเต็นท์เท่านั้นที่จะคูณตามจำนวนคนตามความต้องการใหม่
                             isPerHead = rConf.type === 'ground' || roomData.id === 'Z8' || searchStr.includes('ลานกาง');
-
                             const pricingInfo = typeof rConf.pricing === 'string' ? safeJsonParse(rConf.pricing, {}) : (rConf.pricing || {});
 
                             if (isPerHead) {
@@ -444,10 +442,29 @@
                 });
             };
 
-            const handleAdminAddService = () => {
+            const startEditAddon = (item) => {
+                if (!item.id) return alertMsg('รายการนี้ไม่มี ID แบบเฉพาะ ไม่สามารถแก้ไขได้');
+                setEditingAddonId(item.id);
+                let cleanName = item.name.replace(/\s*\(จ่ายแล้ว\)/g, '').replace(/\s*\(ยังไม่จ่าย\)/g, '').trim();
+                setCustomAddonName(cleanName);
+                setCustomAddonPrice(item.price);
+                setAddonQty(item.qty);
+                setAddonStatus(item.name.includes('(จ่ายแล้ว)') ? 'paid' : 'unpaid');
+            };
+
+            const cancelEditAddon = () => {
+                setEditingAddonId(null);
+                setCustomAddonName('');
+                setCustomAddonPrice('');
+                setAddonQty(1);
+                setAddonStatus('unpaid');
+            };
+
+            const handleAdminSaveService = () => {
                 if (!customAddonName || !customAddonPrice) return alertMsg('กรุณากรอกชื่อรายการและราคาให้ครบถ้วน');
                 
                 const itemPayload = {
+                    id: editingAddonId || undefined,
                     name: customAddonName,
                     price: parseFloat(customAddonPrice),
                     qty: parseInt(addonQty),
@@ -455,13 +472,15 @@
                 };
 
                 const statusText = addonStatus === 'paid' ? 'จ่ายแล้ว (+ยอดมัดจำ)' : 'ยังไม่จ่าย (+ยอดคงเหลือ)';
+                const actionType = editingAddonId ? 'adminEditService' : 'adminAddService';
+                const confirmText = editingAddonId ? 'แก้ไขรายการ' : 'เพิ่มรายการ';
 
-                confirmMsg(`ยืนยันเพิ่มรายการ:\n${itemPayload.name} จำนวน ${itemPayload.qty}\nสถานะ: ${statusText}\n\n(ระบบจะบันทึกและคำนวณยอดอัตโนมัติ โดยไม่ส่งข้อความกวนลูกค้า)`, () => {
+                confirmMsg(`ยืนยัน${confirmText}:\n${itemPayload.name} จำนวน ${itemPayload.qty}\nสถานะ: ${statusText}\n\n(ระบบจะบันทึกและคำนวณยอดอัตโนมัติ โดยไม่ส่งข้อความกวนลูกค้า)`, () => {
                     setLoading(true);
                     fetchWithTimeout(GOOGLE_SCRIPT_URL, { 
                         method: 'POST', 
                         body: JSON.stringify({ 
-                            action: 'adminAddService', 
+                            action: actionType, 
                             bookingId: viewBooking.id, 
                             item: itemPayload, 
                             password: password 
@@ -469,14 +488,34 @@
                     }).then(r => r.json()).then(res => { 
                         setLoading(false); 
                         if(res.status === 'success') { 
-                            successMsg('เพิ่มรายการลงในบิลเรียบร้อยแล้ว'); 
+                            successMsg(`${confirmText}ลงในบิลเรียบร้อยแล้ว`); 
                             fetchData(); 
                             setViewBooking(null); 
-                            setCustomAddonName(''); 
-                            setCustomAddonPrice(''); 
-                            setAddonQty(1);
-                            setAddonStatus('unpaid');
+                            cancelEditAddon();
                         } else { errorMsg('Error: ' + res.message); } 
+                    }).catch(e => { setLoading(false); errorMsg(e.name === 'AbortError' ? 'เน็ตหมดเวลา' : String(e)); });
+                });
+            };
+
+            const handleDeleteAddon = (itemId) => {
+                if (!itemId) return alertMsg('รายการนี้ไม่มี ID แบบเฉพาะ ไม่สามารถลบได้');
+                confirmMsg('ยืนยันลบรายการอาหาร/บริการเสริมนี้ออกบิล?', () => {
+                    setLoading(true);
+                    fetchWithTimeout(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            action: 'adminDeleteService',
+                            bookingId: viewBooking.id,
+                            itemId: itemId,
+                            password: password
+                        })
+                    }).then(r => r.json()).then(res => {
+                        setLoading(false);
+                        if(res.status === 'success') {
+                            successMsg('ลบรายการเรียบร้อยแล้ว ระบบคำนวณยอดเงินใหม่ให้แล้ว');
+                            fetchData();
+                            setViewBooking(null);
+                        } else { errorMsg('Error: ' + res.message); }
                     }).catch(e => { setLoading(false); errorMsg(e.name === 'AbortError' ? 'เน็ตหมดเวลา' : String(e)); });
                 });
             };
@@ -544,7 +583,6 @@
                     const mapConfigObj = {}; finalRoomsData.forEach(r => mapConfigObj[r.id] = { x: r.x, y: r.y });
                     const images = {}, descs = {}; finalRoomsData.forEach(r => { images[r.id] = r.images || []; descs[r.id] = r.desc || ''; });
                     
-                    // เพิ่ม MAP_BG ลงใน images เพื่อให้ Code.gs ดึงไปอัปโหลดขึ้น Drive อัตโนมัติ
                     images['MAP_BG'] = [mapBackground];
 
                     fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'saveRoomSystem', password: password, rooms: rooms, mapConfig: mapConfigObj, siteSettings: { roomImages: images, roomDescriptions: descs } }) })
@@ -758,7 +796,7 @@
                             )}
                         </div>
 
-                        {/* --- โค้ดเพิ่มใหม่ส่วนของ Modal สำหรับหน้า Walk-in --- */}
+                        {/* --- Modal หน้า Walk-in --- */}
                         {showAdminBooking && (
                             <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 modal-overlay">
                                 <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col animate-modal">
@@ -838,7 +876,6 @@
                                 </div>
                             </div>
                         )}
-                        {/* ------------------------------------------------------------- */}
                         
                         {/* Modals & Popups ... */}
                         {modal.isOpen && (
@@ -871,11 +908,11 @@
                             </div>
                         )}
                         {viewBooking && (
-                            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm modal-overlay" onClick={() => { setViewBooking(null); setRescheduleData(null); }}>
+                            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm modal-overlay" onClick={() => { setViewBooking(null); setRescheduleData(null); cancelEditAddon(); }}>
                                 <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-modal max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
                                     <div className="bg-gray-50 px-6 py-4 border-b flex justify-between items-center">
                                         <h3 className="font-bold text-lg text-gray-800">รายละเอียดการจอง</h3>
-                                        <button onClick={() => { setViewBooking(null); setRescheduleData(null); }} className="text-gray-400 hover:text-gray-600"><i className="fas fa-times text-xl"></i></button>
+                                        <button onClick={() => { setViewBooking(null); setRescheduleData(null); cancelEditAddon(); }} className="text-gray-400 hover:text-gray-600"><i className="fas fa-times text-xl"></i></button>
                                     </div>
                                     <div className="p-6 overflow-y-auto custom-scrollbar">
                                         <div className="flex justify-between items-start mb-4">
@@ -902,7 +939,34 @@
                                                         </div>
                                                     ));
                                                 })()}
-                                                {viewBooking.food !== '-' && ( <div className="mt-2 pt-2 border-t border-green-200"><p className="font-bold text-orange-600 mb-1"><i className="fas fa-utensils mr-1"></i> อาหาร</p><p>{viewBooking.food}</p></div> )}
+                                                
+                                                {/* ปรับปรุงส่วนแสดงรายการอาหาร ให้มีปุ่มแก้ไขลบ */}
+                                                {(() => {
+                                                    let cart = safeJsonParse(viewBooking.cart, []);
+                                                    const foodItems = cart.filter(c => c.type === 'food');
+                                                    if (foodItems.length > 0) {
+                                                        return (
+                                                            <div className="mt-3 pt-3 border-t border-green-200">
+                                                                <p className="font-bold text-orange-600 mb-2"><i className="fas fa-utensils mr-1"></i> อาหาร/บริการ</p>
+                                                                <div className="space-y-2">
+                                                                    {foodItems.map((f, i) => (
+                                                                        <div key={f.id || i} className="flex justify-between items-center bg-white p-2 rounded border border-orange-100 shadow-sm">
+                                                                            <div>
+                                                                                <div className="text-sm font-bold text-gray-800">{f.name}</div>
+                                                                                <div className="text-xs text-gray-500">{formatMoney(f.price)} x {f.qty} = {formatMoney(f.price * f.qty)}</div>
+                                                                            </div>
+                                                                            <div className="flex gap-1">
+                                                                                <button onClick={() => startEditAddon(f)} className="w-7 h-7 flex items-center justify-center bg-blue-50 text-blue-500 rounded hover:bg-blue-100 transition" title="แก้ไข"><i className="fas fa-edit"></i></button>
+                                                                                <button onClick={() => handleDeleteAddon(f.id)} className="w-7 h-7 flex items-center justify-center bg-red-50 text-red-500 rounded hover:bg-red-100 transition" title="ลบ"><i className="fas fa-trash"></i></button>
+                                                                            </div>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    }
+                                                    return null;
+                                                })()}
                                             </div>
                                             <div className="flex justify-between items-center pt-2 bg-blue-50 p-3 rounded-lg border border-blue-100">
                                                 <div className="text-center w-1/3"><div className="text-[10px] text-gray-500">ยอดสุทธิ</div><div className="font-bold text-gray-800">{formatMoney(viewBooking.price)}</div></div>
@@ -913,8 +977,12 @@
                                             </div>
                                         </div>
 
+                                        {/* ฟอร์มเพิ่ม/แก้ไขบริการ */}
                                         <div className="mt-6 border-t pt-4">
-                                            <h4 className="font-bold text-sm text-blue-700 flex items-center mb-3"><i className="fas fa-plus-circle mr-2"></i> เพิ่มบริการ/อาหาร (แอดมิน)</h4>
+                                            <h4 className="font-bold text-sm text-blue-700 flex items-center mb-3">
+                                                <i className={`fas ${editingAddonId ? 'fa-edit' : 'fa-plus-circle'} mr-2`}></i>
+                                                {editingAddonId ? 'แก้ไขบริการ/อาหาร (แอดมิน)' : 'เพิ่มบริการ/อาหาร (แอดมิน)'}
+                                            </h4>
                                             <div className="space-y-2 mb-3">
                                                 <input type="text" placeholder="ชื่อรายการ (เช่น กะเพราหมู, รถรับส่ง)" className="w-full border p-2 rounded-lg text-sm bg-gray-50 focus:ring-2 focus:ring-blue-200 focus:outline-none" value={customAddonName} onChange={e => setCustomAddonName(e.target.value)} />
                                                 <div className="flex gap-2">
@@ -926,7 +994,10 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <button onClick={handleAdminAddService} className="w-full py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 text-sm font-bold shadow transition mt-1"><i className="fas fa-save mr-1"></i> บันทึกเพิ่มรายการ</button>
+                                            <div className="flex gap-2 mt-2">
+                                                <button onClick={handleAdminSaveService} className="flex-1 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 text-sm font-bold shadow transition"><i className={`fas ${editingAddonId ? 'fa-save' : 'fa-plus'} mr-1`}></i> {editingAddonId ? 'บันทึกการแก้ไข' : 'บันทึกเพิ่มรายการ'}</button>
+                                                {editingAddonId && <button onClick={cancelEditAddon} className="flex-1 py-2.5 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 text-sm font-bold transition">ยกเลิก</button>}
+                                            </div>
                                         </div>
 
                                         <div className="mt-6 flex flex-col gap-2 border-t pt-4">
