@@ -123,218 +123,68 @@
         const PROMPTPAY_NAME = "อลงกต ทวีผ่อง";
 
         // =====================================
-        // I18N DICTIONARY (ระบบสองภาษา)
+        // I18N DICTIONARY (ระบบสองภาษา UI)
         // =====================================
         const TRANSLATIONS = {
             th: {
-                // UI ทั่วไป
-                back: "ย้อนกลับ",
-                cancel: "ยกเลิก",
-                confirm: "ยืนยัน",
-                ok: "ตกลง",
-                delete: "ลบ",
-                loadingPrepare: "กำลังเตรียมพื้นที่กางเต็นท์...",
-                loadingWait: "กำลังดำเนินการ...",
-                loadingData: "กำลังกางเต็นท์ข้อมูล...",
-                notice: "แจ้งเตือน",
-                success: "สำเร็จ!",
-                error: "เกิดข้อผิดพลาด",
-                
-                // หน้าแรกจอง (Booking Step 1)
-                checkInDate: "วันที่เข้าพัก",
-                checkOutDate: "วันที่ออก",
-                searchRooms: "ค้นหาที่พักว่าง",
-                searching: "กำลังตรวจสอบ...",
-                
-                // หน้าเลือกห้องและอาหาร (Booking Step 2)
-                selectRoom: "เลือกที่พัก",
-                noDesc: "ไม่มีคำอธิบาย",
-                persons: "คน",
-                quotaFullTitle: "โควต้าเต็ม",
-                quotaFullDesc: "สามารถเพิ่มได้สูงสุด {limit} ท่านครับ",
-                preOrderFood: "🍽️ สั่งอาหารล่วงหน้า",
-                cart: "🛒 ตะกร้า",
-                continueBtn: "ดำเนินการต่อ",
-                addCart: "เพิ่มลงตะกร้า",
+                back: "ย้อนกลับ", cancel: "ยกเลิก", confirm: "ยืนยัน", ok: "ตกลง", delete: "ลบ",
+                loadingPrepare: "กำลังเตรียมพื้นที่กางเต็นท์...", loadingWait: "กำลังดำเนินการ...", loadingData: "กำลังกางเต็นท์ข้อมูล...",
+                notice: "แจ้งเตือน", success: "สำเร็จ!", error: "เกิดข้อผิดพลาด",
+                checkInDate: "วันที่เข้าพัก", checkOutDate: "วันที่ออก", searchRooms: "ค้นหาที่พักว่าง", searching: "กำลังตรวจสอบ...",
+                selectRoom: "เลือกที่พัก", noDesc: "ไม่มีคำอธิบาย", persons: "คน",
+                quotaFullTitle: "โควต้าเต็ม", quotaFullDesc: "สามารถเพิ่มได้สูงสุด {limit} ท่านครับ",
+                preOrderFood: "🍽️ สั่งอาหารล่วงหน้า", cart: "🛒 ตะกร้า", continueBtn: "ดำเนินการต่อ", addCart: "เพิ่มลงตะกร้า",
                 foodNotePlaceholder: "หมายเหตุเพิ่มเติม (เช่น ไม่เผ็ด, เพิ่มไข่ดาว)...",
-                roomRequiredTitle: "กรุณาเลือกที่พัก",
-                roomRequiredDesc: "คุณต้องเลือกห้องพักหรือลานกางเต็นท์อย่างน้อย 1 รายการก่อนดำเนินการต่อครับ",
-                acknowledge: "รับทราบ",
-                
-                // หน้าสรุปยอด (Booking Step 3)
-                summaryPayment: "สรุปยอดและชำระเงิน",
-                checkIn: "เข้าพัก:",
-                checkOut: "คืนห้อง:",
-                nights: "จำนวน:",
-                nightsUnit: "คืน",
-                highSeasonNotice: "ℹ️ ช่วงเทศกาล/วันพิเศษ คิดมัดจำ 100%",
-                discountRoom: "ส่วนลดที่พัก",
-                netTotal: "สุทธิ",
-                depositRequired: "ยอดมัดจำที่ต้องโอน",
-                enterDiscount: "กรอกโค้ดส่วนลด",
-                applyCode: "กดใช้โค้ด",
-                bookerName: "ชื่อผู้จอง",
-                phoneNumber: "เบอร์โทรศัพท์",
-                scanPromptpay: "สแกนจ่ายมัดจำ (พร้อมเพย์)",
-                saveQrNote: "แคปหน้าจอหรือกดค้างเพื่อบันทึก",
-                generatingQr: "กำลังสร้าง QR Code...",
-                uploadSlip: "สลิปโอนเงิน",
+                roomRequiredTitle: "กรุณาเลือกที่พัก", roomRequiredDesc: "คุณต้องเลือกห้องพักหรือลานกางเต็นท์อย่างน้อย 1 รายการก่อนดำเนินการต่อครับ", acknowledge: "รับทราบ",
+                summaryPayment: "สรุปยอดและชำระเงิน", checkIn: "เข้าพัก:", checkOut: "คืนห้อง:", nights: "จำนวน:", nightsUnit: "คืน",
+                highSeasonNotice: "ℹ️ ช่วงเทศกาล/วันพิเศษ คิดมัดจำ 100%", discountRoom: "ส่วนลดที่พัก", netTotal: "สุทธิ",
+                depositRequired: "ยอดมัดจำที่ต้องโอน", enterDiscount: "กรอกโค้ดส่วนลด", applyCode: "กดใช้โค้ด",
+                bookerName: "ชื่อผู้จอง", phoneNumber: "เบอร์โทรศัพท์", scanPromptpay: "สแกนจ่ายมัดจำ (พร้อมเพย์)",
+                saveQrNote: "แคปหน้าจอหรือกดค้างเพื่อบันทึก", generatingQr: "กำลังสร้าง QR Code...", uploadSlip: "สลิปโอนเงิน",
                 agreeTerms: "ฉันอ่านกฎระเบียบและยอมรับเงื่อนไขของ ขนำลุงดำ แคมป์ปิ้ง ทุกประการ",
-                confirmBookingBtn: "ยืนยันการจองที่พัก",
-                confirmingBtn: "กำลังยืนยันการจอง...",
-                
-                // หน้าจองสำเร็จ (Booking Step 5)
-                bookingSuccessTitle: "จองสำเร็จ!",
-                bookingIdText: "รหัสการจอง:",
+                confirmBookingBtn: "ยืนยันการจองที่พัก", confirmingBtn: "กำลังยืนยันการจอง...",
+                bookingSuccessTitle: "จองสำเร็จ!", bookingIdText: "รหัสการจอง:",
                 successMessage: "ระบบได้ส่งข้อมูลการจองไปที่ LINE ของท่านแล้ว\nแอดมินจะตรวจสอบสลิปและอัปเดตสถานะเร็วๆ นี้ครับ",
-                backToHome: "กลับหน้าแรก",
-                
-                // โหมดจัดการการจอง (Manage Mode)
-                manageTitle: "จัดการการจอง",
-                connectingLine: "Connecting to LINE...",
-                noLineUser: "ไม่พบข้อมูลผู้ใช้ LINE",
-                noLineUserDesc: "กรุณาเปิดผ่านแอป LINE หรือ",
-                loginLine: "เข้าสู่ระบบ LINE",
-                foundBookings: "พบ {count} รายการจอง",
-                noBookings: "ไม่พบประวัติการจอง",
-                noBookingsDesc: "หากเพิ่งจอง กรุณารอแอดมินยืนยันสักครู่",
-                tryAgain: "ลองใหม่อีกครั้ง",
-                statusPast: "สำเร็จ",
-                btnReschedule: "เลื่อนวัน",
-                btnOrderFood: "สั่งอาหาร",
-                checkedOut: "สิ้นสุดการเข้าพัก",
-                
-                // รายละเอียดการจอง
-                tabInfo: "ข้อมูล",
-                tabReschedule: "เลื่อนวัน",
-                tabFood: "สั่งอาหาร",
-                guestsCount: "จำนวนผู้เข้าพัก:",
-                roomsList: "ห้องพัก:",
-                orderedFood: "อาหารที่สั่งแล้ว",
-                
-                // แท็บเลื่อนวัน
+                backToHome: "กลับหน้าแรก", manageTitle: "จัดการการจอง", connectingLine: "Connecting to LINE...",
+                noLineUser: "ไม่พบข้อมูลผู้ใช้ LINE", noLineUserDesc: "กรุณาเปิดผ่านแอป LINE หรือ", loginLine: "เข้าสู่ระบบ LINE",
+                foundBookings: "พบ {count} รายการจอง", noBookings: "ไม่พบประวัติการจอง", noBookingsDesc: "หากเพิ่งจอง กรุณารอแอดมินยืนยันสักครู่",
+                tryAgain: "ลองใหม่อีกครั้ง", statusPast: "สำเร็จ", btnReschedule: "เลื่อนวัน", btnOrderFood: "สั่งอาหาร", checkedOut: "สิ้นสุดการเข้าพัก",
+                tabInfo: "ข้อมูล", tabReschedule: "เลื่อนวัน", tabFood: "สั่งอาหาร", guestsCount: "จำนวนผู้เข้าพัก:", roomsList: "ห้องพัก:", orderedFood: "อาหารที่สั่งแล้ว",
                 rescheduleRule: "⚠️ เงื่อนไข: ต้องเลื่อนล่วงหน้าอย่างน้อย 7 วัน และห้องพักต้องว่างในวันที่เลือกใหม่",
-                newCheckIn: "เช็คอินใหม่",
-                newCheckOut: "เช็คเอาท์ใหม่",
-                confirmRescheduleBtn: "ยืนยันการเลื่อน",
-                working: "กำลังทำงาน...",
-                rescheduleSuccess: "เลื่อนวันเรียบร้อย",
-                
-                // แท็บสั่งอาหาร
-                foodOrderRule: "🍽️ เงื่อนไข: สั่งล่วงหน้าอย่างน้อย 2 วันก่อนเข้าพัก",
-                selectedItems: "รายการที่เลือก ({count})",
-                total: "รวม",
-                scanToOrder: "สแกนจ่ายเพื่อยืนยันออเดอร์",
-                saveQrBtn: "บันทึกภาพ QR Code",
-                pleaseAttachSlip: "* กรุณาแนบสลิปโอนเงิน",
-                confirmOrderBtn: "ยืนยันการสั่งอาหาร",
-                sendingToKitchen: "กำลังส่งข้อมูล...ให้แม่ครัว",
-                orderFoodSuccess: "สั่งอาหารเรียบร้อย",
+                newCheckIn: "เช็คอินใหม่", newCheckOut: "เช็คเอาท์ใหม่", confirmRescheduleBtn: "ยืนยันการเลื่อน", working: "กำลังทำงาน...", rescheduleSuccess: "เลื่อนวันเรียบร้อย",
+                foodOrderRule: "🍽️ เงื่อนไข: สั่งล่วงหน้าอย่างน้อย 2 วันก่อนเข้าพัก", selectedItems: "รายการที่เลือก ({count})", total: "รวม",
+                scanToOrder: "สแกนจ่ายเพื่อยืนยันออเดอร์", saveQrBtn: "บันทึกภาพ QR Code", pleaseAttachSlip: "* กรุณาแนบสลิปโอนเงิน",
+                confirmOrderBtn: "ยืนยันการสั่งอาหาร", sendingToKitchen: "กำลังส่งข้อมูล...ให้แม่ครัว", orderFoodSuccess: "สั่งอาหารเรียบร้อย",
             },
             en: {
-                // General UI
-                back: "Back",
-                cancel: "Cancel",
-                confirm: "Confirm",
-                ok: "OK",
-                delete: "Remove",
-                loadingPrepare: "Preparing campsite...",
-                loadingWait: "Processing...",
-                loadingData: "Loading data...",
-                notice: "Notice",
-                success: "Success!",
-                error: "Error",
-                
-                // Booking Step 1
-                checkInDate: "Check-in Date",
-                checkOutDate: "Check-out Date",
-                searchRooms: "Search Availability",
-                searching: "Checking...",
-                
-                // Booking Step 2
-                selectRoom: "Select Accommodation",
-                noDesc: "No description available",
-                persons: "Guests",
-                quotaFullTitle: "Quota Full",
-                quotaFullDesc: "Maximum additional guests allowed: {limit}.",
-                preOrderFood: "🍽️ Pre-order Food",
-                cart: "🛒 Cart",
-                continueBtn: "Continue",
-                addCart: "Add to Cart",
+                back: "Back", cancel: "Cancel", confirm: "Confirm", ok: "OK", delete: "Remove",
+                loadingPrepare: "Preparing campsite...", loadingWait: "Processing...", loadingData: "Loading data...",
+                notice: "Notice", success: "Success!", error: "Error",
+                checkInDate: "Check-in Date", checkOutDate: "Check-out Date", searchRooms: "Search Availability", searching: "Checking...",
+                selectRoom: "Select Accommodation", noDesc: "No description available", persons: "Guests",
+                quotaFullTitle: "Quota Full", quotaFullDesc: "Maximum additional guests allowed: {limit}.",
+                preOrderFood: "🍽️ Pre-order Food", cart: "🛒 Cart", continueBtn: "Continue", addCart: "Add to Cart",
                 foodNotePlaceholder: "Additional notes (e.g. No spicy, Add egg)...",
-                roomRequiredTitle: "Accommodation Required",
-                roomRequiredDesc: "Please select at least 1 room or tent area before proceeding.",
-                acknowledge: "Got it",
-                
-                // Booking Step 3
-                summaryPayment: "Summary & Payment",
-                checkIn: "Check-in:",
-                checkOut: "Check-out:",
-                nights: "Duration:",
-                nightsUnit: "Nights",
-                highSeasonNotice: "ℹ️ 100% deposit required during High Season/Holidays",
-                discountRoom: "Discount",
-                netTotal: "Net Total",
-                depositRequired: "Required Deposit",
-                enterDiscount: "Enter discount code",
-                applyCode: "Apply",
-                bookerName: "Full Name",
-                phoneNumber: "Phone Number",
-                scanPromptpay: "Scan PromptPay to Pay",
-                saveQrNote: "Screenshot or long press to save",
-                generatingQr: "Generating QR Code...",
-                uploadSlip: "Payment Slip",
+                roomRequiredTitle: "Accommodation Required", roomRequiredDesc: "Please select at least 1 room or tent area before proceeding.", acknowledge: "Got it",
+                summaryPayment: "Summary & Payment", checkIn: "Check-in:", checkOut: "Check-out:", nights: "Duration:", nightsUnit: "Nights",
+                highSeasonNotice: "ℹ️ 100% deposit required during High Season/Holidays", discountRoom: "Discount", netTotal: "Net Total",
+                depositRequired: "Required Deposit", enterDiscount: "Enter discount code", applyCode: "Apply",
+                bookerName: "Full Name", phoneNumber: "Phone Number", scanPromptpay: "Scan PromptPay to Pay",
+                saveQrNote: "Screenshot or long press to save", generatingQr: "Generating QR Code...", uploadSlip: "Payment Slip",
                 agreeTerms: "I have read and agree to all terms and conditions of Khanam Lungdam Camping.",
-                confirmBookingBtn: "Confirm Booking",
-                confirmingBtn: "Confirming...",
-                
-                // Booking Step 5
-                bookingSuccessTitle: "Booking Successful!",
-                bookingIdText: "Booking ID:",
+                confirmBookingBtn: "Confirm Booking", confirmingBtn: "Confirming...",
+                bookingSuccessTitle: "Booking Successful!", bookingIdText: "Booking ID:",
                 successMessage: "Your booking details have been sent to your LINE.\nOur admin will verify the payment slip and update your status soon.",
-                backToHome: "Back to Home",
-                
-                // Manage Mode
-                manageTitle: "Manage Booking",
-                connectingLine: "Connecting to LINE...",
-                noLineUser: "LINE account not found",
-                noLineUserDesc: "Please open via LINE app or",
-                loginLine: "Login with LINE",
-                foundBookings: "Found {count} booking(s)",
-                noBookings: "No booking history",
-                noBookingsDesc: "If you just booked, please wait a moment for admin confirmation.",
-                tryAgain: "Try Again",
-                statusPast: "Completed",
-                btnReschedule: "Reschedule",
-                btnOrderFood: "Order Food",
-                checkedOut: "Checked Out",
-                
-                // Booking Details
-                tabInfo: "Info",
-                tabReschedule: "Reschedule",
-                tabFood: "Food",
-                guestsCount: "Total Guests:",
-                roomsList: "Accommodation:",
-                orderedFood: "Pre-ordered Food",
-                
-                // Reschedule Tab
+                backToHome: "Back to Home", manageTitle: "Manage Booking", connectingLine: "Connecting to LINE...",
+                noLineUser: "LINE account not found", noLineUserDesc: "Please open via LINE app or", loginLine: "Login with LINE",
+                foundBookings: "Found {count} booking(s)", noBookings: "No booking history", noBookingsDesc: "If you just booked, please wait a moment for admin confirmation.",
+                tryAgain: "Try Again", statusPast: "Completed", btnReschedule: "Reschedule", btnOrderFood: "Order Food", checkedOut: "Checked Out",
+                tabInfo: "Info", tabReschedule: "Reschedule", tabFood: "Food", guestsCount: "Total Guests:", roomsList: "Accommodation:", orderedFood: "Pre-ordered Food",
                 rescheduleRule: "⚠️ Policy: Rescheduling must be done at least 7 days in advance, subject to room availability.",
-                newCheckIn: "New Check-in",
-                newCheckOut: "New Check-out",
-                confirmRescheduleBtn: "Confirm Reschedule",
-                working: "Working...",
-                rescheduleSuccess: "Reschedule successful",
-                
-                // Food Tab
-                foodOrderRule: "🍽️ Policy: Food must be pre-ordered at least 2 days before check-in.",
-                selectedItems: "Selected Items ({count})",
-                total: "Total",
-                scanToOrder: "Scan to pay and confirm order",
-                saveQrBtn: "Save QR Code",
-                pleaseAttachSlip: "* Payment slip is required",
-                confirmOrderBtn: "Confirm Order",
-                sendingToKitchen: "Sending order to kitchen...",
-                orderFoodSuccess: "Food ordered successfully",
+                newCheckIn: "New Check-in", newCheckOut: "New Check-out", confirmRescheduleBtn: "Confirm Reschedule", working: "Working...", rescheduleSuccess: "Reschedule successful",
+                foodOrderRule: "🍽️ Policy: Food must be pre-ordered at least 2 days before check-in.", selectedItems: "Selected Items ({count})", total: "Total",
+                scanToOrder: "Scan to pay and confirm order", saveQrBtn: "Save QR Code", pleaseAttachSlip: "* Payment slip is required",
+                confirmOrderBtn: "Confirm Order", sendingToKitchen: "Sending order to kitchen...", orderFoodSuccess: "Food ordered successfully",
             }
         };
 
@@ -481,13 +331,52 @@
             const [modalAlert, setModalAlert] = React.useState({ show: false, type: 'info', title: '', text: '' }); 
             const [modalConfirm, setModalConfirm] = React.useState({ show: false, title: '', text: '', onConfirm: null });
 
-            // Helper function สำหรับการแปลภาษา
+            // ==========================================
+            // HELPER: ฟังก์ชันสำหรับดึงคำแปล
+            // ==========================================
             const t = (key, params = {}) => {
                 let text = TRANSLATIONS[lang][key] || key;
                 for (let k in params) {
                     text = text.replace(`{${k}}`, params[k]);
                 }
                 return text;
+            };
+
+            // HELPER: สับคำด้วย | (Pipe) สำหรับข้อมูลจาก Database
+            const tData = (text, forceLang = null) => {
+                if (!text) return "";
+                const parts = String(text).split('|');
+                const targetLang = forceLang || lang;
+                if (targetLang === 'en' && parts.length > 1) {
+                    return parts[1].trim();
+                }
+                return parts[0].trim();
+            };
+
+            // HELPER: สำหรับ List ที่ Backend มัดรวมมา (เช่น "บ้านริมน้ำ | Riverside, หมูกระทะ | BBQ x1")
+            const tDataList = (text) => {
+                if(!text || text === '-') return text;
+                return text.split(',').map(item => {
+                    const parts = item.split('|');
+                    if (parts.length > 1) {
+                        const th = parts[0].trim();
+                        let en = parts[1].trim();
+                        let suffix = '';
+                        
+                        // ดึง (จำนวนคน) หรือ xจำนวน ออกมาก่อน
+                        const match = en.match(/(x\d+|\(\d+\s*ท่าน\)|\(\d+\s*คน\))$/);
+                        if (match) {
+                            let rawSuffix = match[1];
+                            if (lang === 'en') {
+                                rawSuffix = rawSuffix.replace('ท่าน', 'Guests').replace('คน', 'Guests');
+                            }
+                            suffix = ' ' + rawSuffix;
+                            en = en.replace(match[1], '').trim();
+                        }
+                        return lang === 'en' ? `${en}${suffix}` : `${th}${suffix}`;
+                    }
+                    return item.trim();
+                }).join('\n'); // ตัดขึ้นบรรทัดใหม่ให้อ่านง่าย
             };
 
             const toggleLanguage = () => {
@@ -573,7 +462,6 @@
                     }).catch(err => { console.error('LIFF Error', err); setIsLiffReady(true); });
                 } else { setIsLiffReady(true); }
                 
-                // --- 1. ลองดึงข้อมูลเก่าจาก sessionStorage ขึ้นมาแสดงก่อนเลย ---
                 const cachedData = sessionStorage.getItem('khanam_init_data');
                 if (cachedData) {
                     try {
@@ -582,26 +470,22 @@
                         setSiteConfig(prev => ({ ...prev, ...parsed.siteConfig }));
                         setRoomConfig(parsed.roomConfig);
                         setPinPos(parsed.mapConfig);
-                        setIsInitializing(false); // ปิดจอมืด โชว์หน้าเว็บได้เลยทันที
+                        setIsInitializing(false); 
                     } catch(e) {
                         console.error('Cache parsing error', e);
                     }
                 }
 
-                // --- 2. ดึงข้อมูลล่าสุดจาก Server แบบ Background ---
                 fetchWithTimeout(`${GOOGLE_SCRIPT_URL}?action=getInitialData`).then(r => r.json()).then(res => {
                     if (res.status === 'success') {
                         const { settings, siteConfig, roomConfig, mapConfig } = res.data;
-                        // อัปเดต State อีกรอบ (เผื่อมีการแก้ไขจากแอดมิน)
                         setSystemSettings({ closed: settings.closed, special: settings.special });
                         setSiteConfig(prev => ({ ...prev, ...siteConfig }));
                         setRoomConfig(roomConfig);
                         setPinPos(mapConfig);
-                        
-                        // อัปเดต Cache สำหรับการโหลดครั้งหน้า
                         sessionStorage.setItem('khanam_init_data', JSON.stringify(res.data));
                     }
-                    setIsInitializing(false); // ปิด Loading เผื่อกรณีที่ไม่เคยมี Cache มาก่อน
+                    setIsInitializing(false);
                 }).catch(e=>{
                     console.error(e);
                     setIsInitializing(false);
@@ -654,7 +538,6 @@
                 if (dates.checkIn >= dates.checkOut) { setSearchError(lang === 'en' ? 'Check-out date must be after check-in date.' : 'วันเช็คเอาท์ต้องอยู่หลังจากวันเช็คอินครับ'); return; }
                 const closedFound = getClosedDateOverlap(dates.checkIn, dates.checkOut); if (closedFound) { setClosedModal(closedFound); return; }
                 setLoading(true);
-                // แนบ _t=${Date.now()} ป้องกันการค้าง Cache บนมือถือ
                 fetchWithTimeout(`${GOOGLE_SCRIPT_URL}?action=getAvailability&checkIn=${dates.checkIn}&checkOut=${dates.checkOut}&_t=${Date.now()}`)
                 .then(r => r.json()).then(data => { setAvailability(data); setStep(2); setLoading(false); })
                 .catch(e => { setLoading(false); alert(e.name === 'AbortError' ? (lang==='en'?'Connection timeout, please try again.':'การเชื่อมต่อใช้เวลานานเกินไป กรุณาลองอีกครั้งครับ') : 'Error: ' + e); });
@@ -679,7 +562,11 @@
                 const targetCart = mode === 'manage' ? addOnCart : cart; 
                 const setTargetCart = mode === 'manage' ? setAddOnCart : setCart;
                 
-                const finalName = foodNote.trim() ? `${selectedFood.name} (${foodNote.trim()})` : selectedFood.name;
+                // ใช้ tData บันทึกแบบสองภาษา เช่น "หมูกระทะ (ไม่เผ็ด) | Pork BBQ (ไม่เผ็ด)" ให้แอดมินอ่านรู้เรื่อง
+                const finalName = foodNote.trim() 
+                    ? `${tData(selectedFood.name, 'th')} (${foodNote.trim()}) | ${tData(selectedFood.name, 'en')} (${foodNote.trim()})` 
+                    : selectedFood.name;
+
                 const existIndex = targetCart.findIndex(c => c.id === selectedFood.id && c.name === finalName && c.type === 'food');
                 
                 if (existIndex > -1) {
@@ -783,7 +670,7 @@
                 const diffTime = currentCheckIn.getTime() - today.getTime();
                 const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24));
                 if (diffDays < 2) return setModalAlert({ show: true, type: 'warning', title: t('notice'), text: lang === 'en' ? 'Must order at least 2 days in advance.' : 'ต้องสั่งอาหารล่วงหน้าอย่างน้อย 2 วันก่อนเข้าพัก' });
-                setModalConfirm({ show: true, title: lang === 'en' ? 'Confirm Order' : 'ยืนยันการสั่งอาหาร', text: `${lang==='en'?'Items:':'รายการ:'}\n${addOnCart.map(i => '- '+i.name).join('\n')}`, onConfirm: () => { setModalConfirm({ ...modalConfirm, show: false }); executeAddFood(); } });
+                setModalConfirm({ show: true, title: lang === 'en' ? 'Confirm Order' : 'ยืนยันการสั่งอาหาร', text: `${lang==='en'?'Items:':'รายการ:'}\n${addOnCart.map(i => '- '+ tData(i.name)).join('\n')}`, onConfirm: () => { setModalConfirm({ ...modalConfirm, show: false }); executeAddFood(); } });
             };
 
             const executeAddFood = () => {
@@ -796,7 +683,7 @@
                 <div className={isDark ? "dark" : ""}>
                     <div className="min-h-screen bg-[#f3f4f6] dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-300 relative">
                         
-                        {/* LANGUAGE TOGGLE (Moved to Top-Left) */}
+                        {/* LANGUAGE TOGGLE (Top-Left) */}
                         <button onClick={toggleLanguage} className="fixed top-4 left-4 z-50 bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-12 h-12 flex items-center justify-center transition-transform hover:scale-110 font-bold text-sm text-blue-600 dark:text-blue-400">
                             <i className="fas fa-globe mr-1"></i> {lang === 'th' ? 'EN' : 'TH'}
                         </button>
@@ -852,7 +739,7 @@
                                                                                 </div>
                                                                                 <div className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
                                                                                     <div className="flex items-center"><i className="fas fa-calendar-day w-5 text-center mr-2 text-gray-400"></i> {formatDateLocalized(b.checkIn)}</div>
-                                                                                    <div className="flex items-center"><i className="fas fa-home w-5 text-center mr-2 text-gray-400"></i> {b.rooms}</div>
+                                                                                    <div className="flex items-center"><i className="fas fa-home w-5 text-center mr-2 text-gray-400"></i> {tDataList(b.rooms)}</div>
                                                                                 </div>
                                                                             </div>
                                                                             {!isPast ? (
@@ -910,11 +797,11 @@
                                                         <div className="flex justify-between"><span>{t('checkIn')}</span> <b>{formatDateLocalized(manageData.checkIn)}</b></div>
                                                         <div className="flex justify-between"><span>{t('checkOut')}</span> <b>{formatDateLocalized(manageData.checkOut)}</b></div>
                                                         <div className="flex justify-between"><span>{t('guestsCount')}</span> <b>{manageData.guests} {t('persons')}</b></div>
-                                                        <div className="flex justify-between"><span>{t('roomsList')}</span> <span className="text-right">{manageData.rooms}</span></div>
+                                                        <div className="flex justify-between"><span>{t('roomsList')}</span> <span className="text-right whitespace-pre-line">{tDataList(manageData.rooms)}</span></div>
                                                     </div>
                                                     <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-700">
                                                         <h4 className="font-bold text-sm text-blue-800 dark:text-blue-300 mb-2">{t('orderedFood')}</h4>
-                                                        <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">{manageData.food}</p>
+                                                        <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">{tDataList(manageData.food)}</p>
                                                     </div>
                                                 </div>
                                             )}
@@ -949,7 +836,7 @@
                                                                     openFoodModal(f);
                                                                 }} className={`cursor-pointer rounded-lg overflow-hidden border-2 transition-all shadow-sm relative ${inCart ? 'border-green-500 bg-green-50 dark:bg-green-900 dark:border-green-500' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700'}`}>
                                                                     <img src={f.img} className="w-full h-20 object-cover" />
-                                                                    <div className="p-1"><h4 className="font-bold text-xs line-clamp-1">{f.name}</h4><div className="flex justify-between items-center mt-1"><span className="text-green-600 text-xs font-bold">{f.price}.-</span>{inCart && <span className="bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">x{inCart.qty}</span>}</div></div>
+                                                                    <div className="p-1"><h4 className="font-bold text-xs line-clamp-1">{tData(f.name)}</h4><div className="flex justify-between items-center mt-1"><span className="text-green-600 text-xs font-bold">{f.price}.-</span>{inCart && <span className="bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">x{inCart.qty}</span>}</div></div>
                                                                 </div>
                                                             );
                                                         })}
@@ -957,7 +844,7 @@
                                                     {addOnCart.length > 0 && (
                                                         <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded mb-4">
                                                             <h4 className="font-bold text-xs mb-2">{t('selectedItems', { count: addOnCart.length })}</h4>
-                                                            {addOnCart.map((c,i)=><div key={i} className="flex justify-between text-xs mt-1"><span>{c.name} x{c.qty}</span><button onClick={()=>setAddOnCart(addOnCart.filter((_,idx)=>idx!==i))} className="text-red-500">{t('delete')}</button></div>)}
+                                                            {addOnCart.map((c,i)=><div key={i} className="flex justify-between text-xs mt-1"><span>{tData(c.name)} x{c.qty}</span><button onClick={()=>setAddOnCart(addOnCart.filter((_,idx)=>idx!==i))} className="text-red-500">{t('delete')}</button></div>)}
                                                             <div className="mt-2 pt-2 border-t text-right font-bold text-sm text-green-600 mb-2">{t('total')} {formatMoney(addOnCart.reduce((sum,c)=>sum+(c.price*c.qty),0))} ฿</div>
                                                             <div className="bg-white dark:bg-gray-800 p-3 rounded border border-gray-200 dark:border-gray-600">
                                                                 <p className="text-xs font-bold mb-2 text-center">{t('scanToOrder')}</p>
@@ -990,8 +877,8 @@
                                 <div className="h-48 relative"><img src={siteConfig.bannerUrl} referrerPolicy="no-referrer" className="w-full h-full object-cover" /><div className="absolute inset-0 bg-black bg-opacity-10"></div></div>
                                 <div className="p-6 -mt-24 relative z-10">
                                     <img src={siteConfig.logoUrl} referrerPolicy="no-referrer" className="w-48 h-48 mx-auto rounded-full border-4 border-white dark:border-gray-800 object-cover bg-white shadow-lg mb-4"/>
-                                    <h1 className="text-xl text-center mb-2 text-green-800 dark:text-green-400 font-bold">{siteConfig.headerTitle}</h1>
-                                    <p className="block text-center mb-4 text-gray-700 dark:text-gray-300 text-sm whitespace-pre-line">{siteConfig.headerDesc}</p>
+                                    <h1 className="text-xl text-center mb-2 text-green-800 dark:text-green-400 font-bold">{tData(siteConfig.headerTitle)}</h1>
+                                    <p className="block text-center mb-4 text-gray-700 dark:text-gray-300 text-sm whitespace-pre-line">{tData(siteConfig.headerDesc)}</p>
                                     <div className="space-y-4">
                                         <div><label className="block text-gray-700 dark:text-green-400 font-bold mb-1">{t('checkInDate')}</label><input type="date" min={getTommorow()} className="w-full border p-2 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white" onChange={e => setDates({...dates, checkIn: e.target.value})} /></div>
                                         <div><label className="block text-gray-700 dark:text-red-300 font-bold mb-1">{t('checkOutDate')}</label><input type="date" min={dates.checkIn || getTommorow()} className="w-full border p-2 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white" onChange={e => setDates({...dates, checkOut: e.target.value})} /></div>
@@ -1004,7 +891,7 @@
                         {mode === 'booking' && step === 2 && (
                             <div className="max-w-4xl mx-auto p-4 relative">
                                 <div className="flex justify-between items-center mb-4"><div className="flex items-center gap-2"><button onClick={()=>setStep(1)} className="text-gray-500 dark:text-gray-300 hover:text-green-600 font-bold"><i className="fas fa-chevron-left"></i> {t('back')}</button><h2 className="text-xl font-bold dark:text-white">{t('selectRoom')}</h2></div></div>
-                                <div className="map-container bg-blue-100 dark:bg-gray-700 mb-6" style={{paddingBottom: '100%'}}>
+                                <div className="map-container bg-blue-100 dark:bg-gray-700 mb-6" style={{paddingBottom: '56.22%'}}>
                                     <img src={siteConfig?.roomImages?.['MAP_BG']?.[0] || "https://img2.pic.in.th/3d539b84-44ce-4336-ad90-bd2f84b13eca.jpg"} referrerPolicy="no-referrer" className="absolute top-0 left-0 w-full h-full object-cover" alt="Camp Map" />
                                     {Object.keys(pinPos).map(key => {
                                         if (!roomConfig[key]) return null;
@@ -1038,7 +925,7 @@
                                                     if(inCart && !isSharedZone) setCart(cart.filter(c => c.id !== key)); 
                                                     else openRoomModal(key); 
                                                 }}> 
-                                                <div className={circleClasses}> <div> {roomConfig[key].name} </div> </div> 
+                                                <div className={circleClasses}> <div> {tData(roomConfig[key].name)} </div> </div> 
                                             </div> 
                                         )
                                     })}
@@ -1050,8 +937,8 @@
                                                 <img src={(siteConfig.roomImages[selectedRoomId]||[])[currentImgIdx] || "https://via.placeholder.com/600x400?text=No+Image"} className="w-full h-full object-cover transition-opacity duration-300" />
                                                 {(siteConfig.roomImages[selectedRoomId]||[]).length > 1 && ( <> <button onClick={prevImage} className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-full hover:bg-opacity-70"><i className="fas fa-chevron-left"></i></button> <button onClick={nextImage} className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-full hover:bg-opacity-70"><i className="fas fa-chevron-right"></i></button> </> )}
                                             </div>
-                                            <h3 className="text-xl font-bold mb-2 text-green-800 dark:text-green-400">{roomConfig[selectedRoomId].name}</h3>
-                                            <p className="text-gray-500 dark:text-gray-300 text-sm mb-4"> {siteConfig.roomDescriptions?.[selectedRoomId] || t('noDesc')} </p>
+                                            <h3 className="text-xl font-bold mb-2 text-green-800 dark:text-green-400">{tData(roomConfig[selectedRoomId].name)}</h3>
+                                            <p className="text-gray-500 dark:text-gray-300 text-sm mb-4"> {tData(siteConfig.roomDescriptions?.[selectedRoomId]) || t('noDesc')} </p>
                                             <div className="flex items-center justify-between mb-6 bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
                                                 <button onClick={() => setGuestCount(Math.max((parseInt(roomConfig[selectedRoomId].min)||1), guestCount - 1))} className="w-10 h-10 bg-green-600 hover:bg-green-700 text-white rounded shadow text-xl font-bold transition-colors">-</button>
                                                 <div className="text-center"> <div className="text-2xl font-bold dark:text-white">{guestCount}</div> <div className="text-xs text-gray-500 dark:text-gray-400">{t('persons')}</div> </div>
@@ -1089,7 +976,6 @@
                                     <h3 className="font-bold mb-4 dark:text-white text-lg">{t('preOrderFood')}</h3>
                                     <div className="grid grid-cols-2 gap-3">
                                         {siteConfig.foodMenu.map(f => {
-                                            // เช็คว่ามีเมนูนี้ในตะกร้ากี่รายการ โดยดูจากชื่อพื้นฐานของ id นั้นๆ
                                             const inCartItems = cart.filter(c => c.id === f.id && c.type === 'food');
                                             const inCartCount = inCartItems.reduce((sum, item) => sum + item.qty, 0);
                                             
@@ -1097,8 +983,8 @@
                                                 <div key={f.id} onClick={() => openFoodModal(f)} className={`cursor-pointer rounded-lg overflow-hidden border-2 transition-all shadow-sm relative ${inCartCount > 0 ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900 dark:border-yellow-500' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 hover:border-green-400'}`} > 
                                                     <img src={f.img} className="w-full h-24 object-cover" /> 
                                                     <div className="p-2"> 
-                                                        <h4 className="font-bold text-sm text-gray-800 dark:text-white line-clamp-1">{f.name}</h4> 
-                                                        {f.desc && <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 my-1">{f.desc}</p>} 
+                                                        <h4 className="font-bold text-sm text-gray-800 dark:text-white line-clamp-1">{tData(f.name)}</h4> 
+                                                        {f.desc && <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 my-1">{tData(f.desc)}</p>} 
                                                         <div className="flex justify-between items-center mt-1"> 
                                                             <span className="text-green-600 dark:text-green-400 text-sm font-bold">{f.price}.-</span> 
                                                             {inCartCount > 0 && <span className="bg-yellow-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">x{inCartCount}</span>} 
@@ -1109,7 +995,7 @@
                                         })}
                                     </div>
                                 </div>
-                                <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded mb-4"><h3 className="font-bold dark:text-white">{t('cart')} ({cart.length})</h3> {cart.map((c,i)=><div key={i} className="flex justify-between text-sm mt-1 dark:text-gray-200"><span>{c.name} {c.type==='food'?`x${c.qty}`:`(${c.guests} ${t('persons')})`}</span><button onClick={()=>setCart(cart.filter((_,idx)=>idx!==i))} className="text-red-500">{t('delete')}</button></div>)} </div>
+                                <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded mb-4"><h3 className="font-bold dark:text-white">{t('cart')} ({cart.length})</h3> {cart.map((c,i)=><div key={i} className="flex justify-between text-sm mt-1 dark:text-gray-200"><span>{tData(c.name)} {c.type==='food'?`x${c.qty}`:`(${c.guests} ${t('persons')})`}</span><button onClick={()=>setCart(cart.filter((_,idx)=>idx!==i))} className="text-red-500">{t('delete')}</button></div>)} </div>
                                 <button onClick={() => { const hasRoom = cart.some(c => c.type !== 'food'); if (!hasRoom) { setShowRoomRequiredModal(true); return; } setStep(3); }} className="w-full bg-green-600 text-white p-3 rounded-lg font-bold"> {t('continueBtn')} </button>
                             </div>
                         )}
@@ -1123,7 +1009,7 @@
                                     <p><strong>{t('nights')}</strong> {calculateNights()} {t('nightsUnit')}</p>
                                     {pricing.isHighSeason && <div className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 p-1 rounded">{t('highSeasonNotice')}</div>}
                                     <hr className="dark:border-gray-600"/>
-                                    {cart.map((c, i) => <div key={i} className="flex justify-between"><span>{c.name} {c.type !== 'food' && `(${c.guests} ${t('persons')})`}</span><span>{formatMoney(c.type==='food' ? Number(c.price||0)*Number(c.qty||1) : (c.isPerHead ? Number(c.pricePerNight||0) * calculateNights() * Number(c.guests||1) : Number(c.pricePerNight||0)*calculateNights()))} ฿</span></div>)}
+                                    {cart.map((c, i) => <div key={i} className="flex justify-between"><span>{tData(c.name)} {c.type !== 'food' && `(${c.guests} ${t('persons')})`}</span><span>{formatMoney(c.type==='food' ? Number(c.price||0)*Number(c.qty||1) : (c.isPerHead ? Number(c.pricePerNight||0) * calculateNights() * Number(c.guests||1) : Number(c.pricePerNight||0)*calculateNights()))} ฿</span></div>)}
                                     <hr className="dark:border-gray-600"/>
                                     {pricing.discount > 0 && <div className="flex justify-between text-red-500 font-bold"><span>{t('discountRoom')}</span><span>-{formatMoney(pricing.discount)} ฿</span></div>}
                                     <div className="flex justify-between font-bold text-lg"><span>{t('netTotal')}</span><span>{formatMoney(pricing.netTotal)} ฿</span></div>
@@ -1173,8 +1059,8 @@
                                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm relative animate-pop overflow-hidden">
                                     <button onClick={() => setSelectedFood(null)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10 w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm"><i className="fas fa-times text-lg"></i></button>
                                     <div className="w-full h-48 -mt-6 -mx-6 mb-4 relative"><img src={selectedFood.img} className="w-full h-full object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div></div>
-                                    <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-1">{selectedFood.name}</h3>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 h-10 overflow-y-auto custom-scrollbar">{selectedFood.desc || t('noDesc')}</p>
+                                    <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-1">{tData(selectedFood.name)}</h3>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 h-10 overflow-y-auto custom-scrollbar">{tData(selectedFood.desc) || t('noDesc')}</p>
                                     <div className="flex items-center justify-between mb-4 bg-gray-50 dark:bg-gray-700 p-4 rounded-xl border border-gray-100 dark:border-gray-600">
                                         <div className="text-lg font-bold text-green-600 dark:text-green-400">{selectedFood.price} ฿ <span className="text-xs text-gray-500">/ ชุด</span></div>
                                         <div className="flex items-center gap-3">
