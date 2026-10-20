@@ -416,29 +416,35 @@
                     const nights = Math.max(1, Math.round((outDate - inDate) / (1000 * 3600 * 24)));
 
                     const cart = rooms.map(roomData => {
-                        const rConf = roomConfig[roomData.id];
+                        const rConf = roomConfig[roomData.id] || {};
                         let pricePerNight = 0;
-                        let isPerHead = false;
-                        if (rConf) {
-                            const searchStr = (rConf.type + " " + rConf.name).toLowerCase();
-                            isPerHead = rConf.type === 'ground' || roomData.id === 'Z8' || searchStr.includes('ลานกาง');
-                            const pricingInfo = typeof rConf.pricing === 'string' ? safeJsonParse(rConf.pricing, {}) : (rConf.pricing || {});
+                        
+                        // เฉพาะลานกางเต็นท์
+                        let isPerHead = (rConf.type === 'ground') || roomData.id === 'Z8' || (ROOM_NAMES[roomData.id] && ROOM_NAMES[roomData.id].includes('ลานกาง'));
+                        
+                        const pricingInfo = typeof rConf.pricing === 'string' ? safeJsonParse(rConf.pricing, {}) : (rConf.pricing || {});
 
-                            if (isPerHead) { pricePerNight = Number(pricingInfo.priceHead || (pricingInfo.tiers && pricingInfo.tiers.length > 0 ? pricingInfo.tiers[0].price : 150)); } 
-                            else {
-                                const tiers = pricingInfo.tiers || [];
-                                if (tiers.length > 0) {
-                                    const tier = tiers.find(t => roomData.guests <= t.max);
-                                    if (tier) { pricePerNight = Number(tier.price); } 
-                                    else { const maxTier = tiers[tiers.length - 1]; pricePerNight = Number(maxTier ? maxTier.price : 0); }
-                                }
+                        if (isPerHead) { 
+                            pricePerNight = Number(pricingInfo.priceHead || (pricingInfo.tiers && pricingInfo.tiers.length > 0 ? pricingInfo.tiers[0].price : 150)); 
+                        } 
+                        else {
+                            const tiers = pricingInfo.tiers || [];
+                            if (tiers.length > 0) {
+                                const tier = tiers.find(t => roomData.guests <= t.max);
+                                if (tier) { pricePerNight = Number(tier.price); } 
+                                else { const maxTier = tiers[tiers.length - 1]; pricePerNight = Number(maxTier ? maxTier.price : 0); }
                             }
                         }
 
                         return {
-                            id: roomData.id, name: ROOM_NAMES[roomData.id] || roomData.id,
-                            type: rConf ? rConf.type : (roomData.id==='Z8'?'ground':(roomData.id.startsWith('K')?'tent_rent':(roomData.id.startsWith('T')?'tent':'room'))),
-                            guests: roomData.guests, qty: 1, pricePerNight: pricePerNight, nights: nights, isPerHead: isPerHead
+                            id: roomData.id, 
+                            name: ROOM_NAMES[roomData.id] || roomData.id,
+                            type: rConf.type || (roomData.id==='Z8'?'ground':(roomData.id.startsWith('K')?'tent_rent':(roomData.id.startsWith('T')?'tent':'room'))),
+                            guests: roomData.guests, 
+                            qty: 1, 
+                            pricePerNight: pricePerNight, 
+                            nights: nights, 
+                            isPerHead: isPerHead
                         };
                     });
                     const totalGuests = rooms.reduce((sum, r) => sum + r.guests, 0);
@@ -455,7 +461,6 @@
                 confirmMsg('ยืนยันการบันทึกแก้ไขข้อมูลการจอง?', () => {
                     setLoading(true);
 
-                    // เก็บรายการอาหารเดิมไว้
                     let oldCart = safeJsonParse(viewBooking.cart, []);
                     let foodItems = oldCart.filter(c => c.type === 'food');
 
@@ -464,31 +469,29 @@
                     const nights = Math.max(1, Math.round((outDate - inDate) / (1000 * 3600 * 24)));
 
                     const newRooms = rescheduleData.rooms.map(roomData => {
-                        const rConf = roomConfig[roomData.id];
+                        const rConf = roomConfig[roomData.id] || {};
                         let pricePerNight = 0;
-                        let isPerHead = false;
+                        
+                        // เฉพาะลานกางเต็นท์
+                        let isPerHead = (rConf.type === 'ground') || roomData.id === 'Z8' || (ROOM_NAMES[roomData.id] && ROOM_NAMES[roomData.id].includes('ลานกาง'));
 
-                        if (rConf) {
-                            const searchStr = (rConf.type + " " + rConf.name).toLowerCase();
-                            isPerHead = rConf.type === 'ground' || roomData.id === 'Z8' || searchStr.includes('ลานกาง');
-                            const pricingInfo = typeof rConf.pricing === 'string' ? safeJsonParse(rConf.pricing, {}) : (rConf.pricing || {});
+                        const pricingInfo = typeof rConf.pricing === 'string' ? safeJsonParse(rConf.pricing, {}) : (rConf.pricing || {});
 
-                            if (isPerHead) {
-                                pricePerNight = Number(pricingInfo.priceHead || (pricingInfo.tiers && pricingInfo.tiers.length > 0 ? pricingInfo.tiers[0].price : 150));
-                            } else {
-                                const tiers = pricingInfo.tiers || [];
-                                if (tiers.length > 0) {
-                                    const tier = tiers.find(t => roomData.guests <= t.max);
-                                    if (tier) pricePerNight = Number(tier.price);
-                                    else { const maxTier = tiers[tiers.length - 1]; pricePerNight = Number(maxTier ? maxTier.price : 0); }
-                                }
+                        if (isPerHead) {
+                            pricePerNight = Number(pricingInfo.priceHead || (pricingInfo.tiers && pricingInfo.tiers.length > 0 ? pricingInfo.tiers[0].price : 150));
+                        } else {
+                            const tiers = pricingInfo.tiers || [];
+                            if (tiers.length > 0) {
+                                const tier = tiers.find(t => roomData.guests <= t.max);
+                                if (tier) pricePerNight = Number(tier.price);
+                                else { const maxTier = tiers[tiers.length - 1]; pricePerNight = Number(maxTier ? maxTier.price : 0); }
                             }
                         }
 
                         return {
                             id: roomData.id,
                             name: ROOM_NAMES[roomData.id] || roomData.id,
-                            type: rConf ? rConf.type : (roomData.id==='Z8'?'ground':(roomData.id.startsWith('K')?'tent_rent':(roomData.id.startsWith('T')?'tent':'room'))),
+                            type: rConf.type || (roomData.id==='Z8'?'ground':(roomData.id.startsWith('K')?'tent_rent':(roomData.id.startsWith('T')?'tent':'room'))),
                             guests: roomData.guests,
                             qty: 1,
                             pricePerNight: pricePerNight,
@@ -658,32 +661,37 @@
                 if (nights <= 0 || isNaN(nights)) nights = 1;
 
                 printRoomItems = roomItems.map(item => {
-                    let pricePerNight = item.pricePerNight !== undefined ? item.pricePerNight : item.price;
-                    let isPerHead = item.isPerHead;
+                    const rConf = roomConfig[item.id] || {};
+                    // เฉพาะ ลานกางเต็นท์ เท่านั้นที่คิดต่อคน
+                    const isPerHead = (rConf.type === 'ground') || item.id === 'Z8' || (item.name && item.name.includes('ลานกาง'));
                     
-                    if (pricePerNight === undefined) {
-                        const rConf = roomConfig[item.id];
-                        isPerHead = rConf ? (rConf.type === 'ground') : (item.id === 'Z8' || (item.name && item.name.includes('ลานกาง')));
-                        if (rConf) {
-                            const pricingInfo = typeof rConf.pricing === 'string' ? safeJsonParse(rConf.pricing, {}) : (rConf.pricing || {});
+                    let pricePerNight = item.pricePerNight !== undefined ? Number(item.pricePerNight) : Number(item.price);
+                    
+                    // กรณีไม่มีราคาเก็บไว้ ให้ดึงจาก config
+                    if (isNaN(pricePerNight) || pricePerNight === 0 || item.pricePerNight === undefined) {
+                        if (rConf.pricing) {
+                            const pricingInfo = typeof rConf.pricing === 'string' ? safeJsonParse(rConf.pricing, {}) : rConf.pricing;
                             if (isPerHead) {
                                 pricePerNight = Number(pricingInfo.priceHead || (pricingInfo.tiers && pricingInfo.tiers.length > 0 ? pricingInfo.tiers[0].price : 150));
                             } else {
                                 const tiers = pricingInfo.tiers || [];
                                 if (tiers.length > 0) {
-                                    const tier = tiers.find(t => item.guests <= t.max);
-                                    if (tier) pricePerNight = Number(tier.price);
-                                    else { const maxTier = tiers[tiers.length - 1]; pricePerNight = Number(maxTier ? maxTier.price : 0); }
+                                    const tier = tiers.find(t => (item.guests || 1) <= t.max);
+                                    pricePerNight = tier ? Number(tier.price) : Number(tiers[tiers.length - 1].price || 0);
                                 } else { pricePerNight = 0; }
                             }
                         } else { pricePerNight = 0; }
                     }
                     
-                    const guests = item.guests || 1;
-                    const total = isPerHead ? (pricePerNight * nights * guests) : (pricePerNight * nights);
+                    const guests = Number(item.guests || 1);
+                    const itemNights = Number(item.nights || nights);
+                    
+                    // กฎ: ถ้าเป็นลานกางเต็นท์ เอา ราคา x คืน x คน, ถ้าห้องอื่นๆ เอา ราคา x คืน (ไม่คูณคน)
+                    const total = isPerHead ? (pricePerNight * itemNights * guests) : (pricePerNight * itemNights);
+                    
                     printCalculatedRoomSum += total;
                     
-                    return { ...item, _computedPrice: pricePerNight, _computedTotal: total, _isPerHead: isPerHead, _guests: guests, _nights: nights };
+                    return { ...item, _computedPrice: pricePerNight, _computedTotal: total, _isPerHead: isPerHead, _guests: guests, _nights: itemNights };
                 });
 
                 printFoodSum = printFoodItems.reduce((s, i) => s + (Number(i.price||0) * Number(i.qty||1)), 0);
@@ -1238,32 +1246,36 @@
                                 if (nights <= 0 || isNaN(nights)) nights = 1;
 
                                 printRoomItems = roomItems.map(item => {
-                                    let pricePerNight = item.pricePerNight !== undefined ? item.pricePerNight : item.price;
-                                    let isPerHead = item.isPerHead;
+                                    const rConf = roomConfig[item.id] || {};
+                                    // เงื่อนไข: เฉพาะ "ลานกางเต็นท์" เท่านั้นที่เอาจำนวนคนไปคูณในราคา (ประเภท ground หรือ id=Z8 หรือชื่อมีคำว่าลานกาง)
+                                    const isPerHead = (rConf.type === 'ground') || item.id === 'Z8' || (item.name && item.name.includes('ลานกาง'));
                                     
-                                    if (pricePerNight === undefined) {
-                                        const rConf = roomConfig[item.id];
-                                        isPerHead = rConf ? (rConf.type === 'ground') : (item.id === 'Z8' || (item.name && item.name.includes('ลานกาง')));
-                                        if (rConf) {
-                                            const pricingInfo = typeof rConf.pricing === 'string' ? safeJsonParse(rConf.pricing, {}) : (rConf.pricing || {});
+                                    let pricePerNight = item.pricePerNight !== undefined ? Number(item.pricePerNight) : Number(item.price);
+                                    
+                                    if (isNaN(pricePerNight) || pricePerNight === 0 || item.pricePerNight === undefined) {
+                                        if (rConf.pricing) {
+                                            const pricingInfo = typeof rConf.pricing === 'string' ? safeJsonParse(rConf.pricing, {}) : rConf.pricing;
                                             if (isPerHead) {
                                                 pricePerNight = Number(pricingInfo.priceHead || (pricingInfo.tiers && pricingInfo.tiers.length > 0 ? pricingInfo.tiers[0].price : 150));
                                             } else {
                                                 const tiers = pricingInfo.tiers || [];
                                                 if (tiers.length > 0) {
-                                                    const tier = tiers.find(t => item.guests <= t.max);
-                                                    if (tier) pricePerNight = Number(tier.price);
-                                                    else { const maxTier = tiers[tiers.length - 1]; pricePerNight = Number(maxTier ? maxTier.price : 0); }
+                                                    const tier = tiers.find(t => (item.guests || 1) <= t.max);
+                                                    pricePerNight = tier ? Number(tier.price) : Number(tiers[tiers.length - 1].price || 0);
                                                 } else { pricePerNight = 0; }
                                             }
                                         } else { pricePerNight = 0; }
                                     }
                                     
-                                    const guests = item.guests || 1;
-                                    const total = isPerHead ? (pricePerNight * nights * guests) : (pricePerNight * nights);
+                                    const guests = Number(item.guests || 1);
+                                    const itemNights = Number(item.nights || nights);
+                                    
+                                    // กฎ: ถ้าเป็นลานกางเต็นท์ เอา (ราคา x คืน x คน) ถ้าห้องอื่นๆ เอา (ราคา x คืน) (ไม่คูณคน)
+                                    const total = isPerHead ? (pricePerNight * itemNights * guests) : (pricePerNight * itemNights);
+                                    
                                     printCalculatedRoomSum += total;
                                     
-                                    return { ...item, _computedPrice: pricePerNight, _computedTotal: total, _isPerHead: isPerHead, _guests: guests, _nights: nights };
+                                    return { ...item, _computedPrice: pricePerNight, _computedTotal: total, _isPerHead: isPerHead, _guests: guests, _nights: itemNights };
                                 });
 
                                 printFoodSum = printFoodItems.reduce((s, i) => s + (Number(i.price||0) * Number(i.qty||1)), 0);
@@ -1302,7 +1314,7 @@
                                                             <td className="py-2 px-3">
                                                                 <div className="font-bold text-gray-800">{item.name}</div>
                                                                 <div className="text-xs text-gray-500">
-                                                                    {item._isPerHead ? `(${item._guests} ท่าน) x ${item._nights} คืน` : `(พัก ${item._guests} ท่าน) x ${item._nights} คืน`}
+                                                                    {item._isPerHead ? `(${formatMoney(item._computedPrice)} บ. x ${item._guests} ท่าน) x ${item._nights} คืน` : `(${formatMoney(item._computedPrice)} บ. / คืน) x ${item._nights} คืน`}
                                                                 </div>
                                                             </td>
                                                             <td className="py-2 px-3 text-center">1</td>
@@ -1392,7 +1404,7 @@
                                                             <td className="py-2 px-3">
                                                                 <div className="font-bold text-gray-800">{item.name}</div>
                                                                 <div className="text-xs text-gray-500">
-                                                                    {item._isPerHead ? `(${item._guests} ท่าน) x ${item._nights} คืน` : `(พัก ${item._guests} ท่าน) x ${item._nights} คืน`}
+                                                                    {item._isPerHead ? `(${formatMoney(item._computedPrice)} บ. x ${item._guests} ท่าน) x ${item._nights} คืน` : `(${formatMoney(item._computedPrice)} บ. / คืน) x ${item._nights} คืน`}
                                                                 </div>
                                                             </td>
                                                             <td className="py-2 px-3 text-center">1</td>
@@ -1453,4 +1465,3 @@
     </script>
 </body>
 </html>
-```eof
