@@ -795,18 +795,19 @@
             return (
                 <div className={isDark ? "dark" : ""}>
                     <div className="min-h-screen bg-[#f3f4f6] dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-300 relative">
-                        {/* TOGGLE BUTTONS (Theme & Language) */}
-                        <div className="fixed top-4 right-4 z-50 flex gap-2">
-                            <button onClick={toggleLanguage} className="bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-10 h-10 flex items-center justify-center transition-transform hover:scale-110 font-bold text-sm text-gray-800 dark:text-white">
-                                {lang === 'th' ? 'EN' : 'TH'}
-                            </button>
-                            <button onClick={() => setIsDark(!isDark)} className="bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-10 h-10 flex items-center justify-center transition-transform hover:scale-110"> 
-                                {isDark ? '☀️' : '🌙'} 
-                            </button>
-                        </div>
                         
-                        {/* MODE TOGGLE */}
-                        <button onClick={() => { setMode(mode === 'booking' ? 'manage' : 'booking'); setStep(1); setManageData(null); setManageTab('info'); }} className="fixed top-16 right-4 z-50 bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-10 h-10 flex items-center justify-center transition-transform hover:scale-110 text-gray-800 dark:text-white"> 
+                        {/* LANGUAGE TOGGLE (Moved to Top-Left) */}
+                        <button onClick={toggleLanguage} className="fixed top-4 left-4 z-50 bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-12 h-12 flex items-center justify-center transition-transform hover:scale-110 font-bold text-sm text-blue-600 dark:text-blue-400">
+                            <i className="fas fa-globe mr-1"></i> {lang === 'th' ? 'EN' : 'TH'}
+                        </button>
+
+                        {/* THEME TOGGLE (Top-Right) */}
+                        <button onClick={() => setIsDark(!isDark)} className="fixed top-4 right-4 z-50 bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-12 h-12 flex items-center justify-center transition-transform hover:scale-110 text-gray-800 dark:text-white"> 
+                            {isDark ? '☀️' : '🌙'} 
+                        </button>
+                        
+                        {/* MODE TOGGLE (Manage/Booking) */}
+                        <button onClick={() => { setMode(mode === 'booking' ? 'manage' : 'booking'); setStep(1); setManageData(null); setManageTab('info'); }} className="fixed top-20 right-4 z-50 bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-12 h-12 flex items-center justify-center transition-transform hover:scale-110 text-gray-800 dark:text-white"> 
                             {mode === 'booking' ? <i className="fas fa-search"></i> : <i className="fas fa-home"></i>} 
                         </button>
 
