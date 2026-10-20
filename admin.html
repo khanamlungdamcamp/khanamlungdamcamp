@@ -662,12 +662,11 @@
 
                 printRoomItems = roomItems.map(item => {
                     const rConf = roomConfig[item.id] || {};
-                    // เฉพาะ ลานกางเต็นท์ เท่านั้นที่คิดต่อคน
+                    // เงื่อนไข: เฉพาะ "ลานกางเต็นท์" เท่านั้นที่เอาจำนวนคนไปคูณในราคา (ประเภท ground หรือ id=Z8 หรือชื่อมีคำว่าลานกาง)
                     const isPerHead = (rConf.type === 'ground') || item.id === 'Z8' || (item.name && item.name.includes('ลานกาง'));
                     
                     let pricePerNight = item.pricePerNight !== undefined ? Number(item.pricePerNight) : Number(item.price);
                     
-                    // กรณีไม่มีราคาเก็บไว้ ให้ดึงจาก config
                     if (isNaN(pricePerNight) || pricePerNight === 0 || item.pricePerNight === undefined) {
                         if (rConf.pricing) {
                             const pricingInfo = typeof rConf.pricing === 'string' ? safeJsonParse(rConf.pricing, {}) : rConf.pricing;
@@ -686,7 +685,7 @@
                     const guests = Number(item.guests || 1);
                     const itemNights = Number(item.nights || nights);
                     
-                    // กฎ: ถ้าเป็นลานกางเต็นท์ เอา ราคา x คืน x คน, ถ้าห้องอื่นๆ เอา ราคา x คืน (ไม่คูณคน)
+                    // กฎ: ถ้าเป็นลานกางเต็นท์ เอา (ราคา x คืน x คน) ถ้าห้องอื่นๆ เอา (ราคา x คืน) (ไม่คูณคน)
                     const total = isPerHead ? (pricePerNight * itemNights * guests) : (pricePerNight * itemNights);
                     
                     printCalculatedRoomSum += total;
@@ -1336,7 +1335,7 @@
                                                 </tbody>
                                                 <tfoot>
                                                     <tr>
-                                                        <td colSpan="2" rowSpan={printDiff !== 0 ? 5 : 4} className="align-top pt-4 pr-4">
+                                                        <td colSpan="2" rowSpan={printDiff > 0 ? 5 : 4} className="align-top pt-4 pr-4">
                                                             <div className="border border-gray-300 rounded p-3 text-xs text-gray-600 h-full w-full">
                                                                 <p className="font-bold mb-1">หมายเหตุ:</p>
                                                                 <p>- กรุณาตรวจสอบรายการให้ถูกต้อง</p>
@@ -1351,7 +1350,6 @@
                                                         <td className="pt-1 text-right font-medium text-sm">{formatMoney(printFoodSum)}</td>
                                                     </tr>
                                                     {printDiff > 0 && ( <tr><td className="pt-1 text-right font-bold text-green-600 text-sm">ส่วนลด</td><td className="pt-1 text-right font-medium text-green-600 text-sm">-{formatMoney(printDiff)}</td></tr> )}
-                                                    {printDiff < 0 && ( <tr><td className="pt-1 text-right font-bold text-orange-600 text-sm">ส่วนต่าง/เพิ่มเติม</td><td className="pt-1 text-right font-medium text-orange-600 text-sm">+{formatMoney(Math.abs(printDiff))}</td></tr> )}
                                                     <tr>
                                                         <td className="pt-1 text-right font-bold text-gray-800 text-sm border-t border-gray-300 mt-1">ยอดสุทธิ</td>
                                                         <td className="pt-1 text-right font-bold text-gray-800 text-sm border-t border-gray-300 mt-1">{formatMoney(printNetPrice)}</td>
@@ -1418,7 +1416,7 @@
                                                 </tbody>
                                                 <tfoot>
                                                     <tr>
-                                                        <td colSpan="2" rowSpan={printDiff !== 0 ? 3 : 2} className="align-top pt-4 pr-4">
+                                                        <td colSpan="2" rowSpan={printDiff > 0 ? 3 : 2} className="align-top pt-4 pr-4">
                                                             <div className="border border-gray-300 rounded p-3 text-xs text-gray-600 h-full w-full">
                                                                 <p className="font-bold mb-1">หมายเหตุ:</p>
                                                                 <p>- ขอบคุณที่ใช้บริการขนำลุงดำ</p>
@@ -1432,7 +1430,6 @@
                                                         <td className="pt-1 text-right font-medium text-sm">{formatMoney(printFoodSum)}</td>
                                                     </tr>
                                                     {printDiff > 0 && ( <tr><td className="pt-1 text-right font-bold text-green-600 text-sm">ส่วนลด</td><td className="pt-1 text-right font-medium text-green-600 text-sm">-{formatMoney(printDiff)}</td></tr> )}
-                                                    {printDiff < 0 && ( <tr><td className="pt-1 text-right font-bold text-orange-600 text-sm">ส่วนต่าง/เพิ่มเติม</td><td className="pt-1 text-right font-medium text-orange-600 text-sm">+{formatMoney(Math.abs(printDiff))}</td></tr> )}
                                                     <tr className="bg-gray-100">
                                                         <td colSpan="2"></td>
                                                         <td className="py-2 text-right font-bold text-xl text-gray-800 border-t border-b border-gray-300 mt-1">ยอดสุทธิรวม</td>
