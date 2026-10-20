@@ -320,7 +320,7 @@
         // ==========================================
         // COMPONENT: Custom Date Range Picker Calendar
         // ==========================================
-        const DateRangePicker = ({ dates, setDates, closedDates, specialDates, lang, t, setModalAlert }) => {
+        const DateRangePicker = ({ dates, setDates, closedDates, specialDates, lang, t, setModalAlert, formatDateLocalized }) => {
             const [viewDate, setViewDate] = React.useState(new Date());
             
             const today = new Date();
@@ -347,8 +347,8 @@
                 
                 // Block clicking on closed dates
                 if (closedDates.some(c => c.date === dateStr)) return;
-                // Block clicking past dates (except today if you allow same-day booking, but usually we allow >= tomorrow)
-                if (dateStr <= todayStr) return; // Allow booking from tomorrow
+                // Block clicking past dates
+                if (dateStr <= todayStr) return; 
                 
                 if (!dates.checkIn || (dates.checkIn && dates.checkOut)) {
                     setDates({ checkIn: dateStr, checkOut: '' });
@@ -477,6 +477,7 @@
         
         const App = () => {
             const [isDark, setIsDark] = React.useState(true);
+            
             const [lang, setLang] = React.useState(() => {
                 const saved = localStorage.getItem('khanam_lang');
                 if (saved) return saved;
@@ -601,13 +602,25 @@
             };
             
             const getClosedDateOverlap = (inDate, outDate) => {
+                if (!inDate || !outDate) return null;
                 let current = new Date(inDate); const end = new Date(outDate);
-                while(current < end) { const dStr = current.toISOString().split('T')[0]; const closed = systemSettings.closed.find(c => c.date === dStr); if (closed) return closed; current.setDate(current.getDate() + 1); }
+                while(current < end) { 
+                    const dStr = toLocalISOString(current); 
+                    const closed = systemSettings.closed.find(c => c.date === dStr); 
+                    if (closed) return closed; 
+                    current.setDate(current.getDate() + 1); 
+                }
                 return null;
             };
+
             const checkDateOverlapHighSeason = (inDate, outDate) => {
+                if (!inDate || !outDate) return false;
                 let current = new Date(inDate); const end = new Date(outDate);
-                while(current < end) { const dStr = current.toISOString().split('T')[0]; if (systemSettings.special.some(s => s.date === dStr)) return true; current.setDate(current.getDate() + 1); }
+                while(current < end) { 
+                    const dStr = toLocalISOString(current); 
+                    if (systemSettings.special.some(s => s.date === dStr)) return true; 
+                    current.setDate(current.getDate() + 1); 
+                }
                 return false;
             };
 
@@ -1119,6 +1132,7 @@
                                         lang={lang} 
                                         t={t}
                                         setModalAlert={setModalAlert}
+                                        formatDateLocalized={formatDateLocalized}
                                     />
                                     
                                     <button onClick={handleSearch} disabled={loading} className="w-full bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition font-bold shadow-lg mt-2">{loading ? t('searching') : t('searchRooms')}</button>
