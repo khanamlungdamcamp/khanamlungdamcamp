@@ -27,6 +27,9 @@
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     
+    <!-- jsQR Library สำหรับเช็คสลิปโอนเงินฝั่ง Client -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    
     <script>
         function generatePromptPayPayload(phoneNumber, amount) {
             const target = phoneNumber.replace(/^0/, '66');
@@ -99,6 +102,36 @@
                 qrImg.src = qrBase64;
             });
         }
+
+        // ==========================================
+        // ฟังก์ชันตรวจสอบ QR บนสลิปโอนเงิน
+        // ==========================================
+        function checkSlipQR(base64Str, promptpayPhone, callback) {
+            if (typeof jsQR === 'undefined') { callback(null); return; }
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
+                
+                if (code) {
+                    const phoneRaw = promptpayPhone.replace(/\D/g, ''); // ตัดขีดออกเหลือ 0615924262
+                    const phone66 = "66" + phoneRaw.substring(1); // 66615924262
+                    if (code.data.includes(phoneRaw) || code.data.includes(phone66)) {
+                        callback({ type: 'success', msg: 'slipValid' });
+                    } else {
+                        callback({ type: 'error', msg: 'slipWarningWrongQR' });
+                    }
+                } else {
+                    callback({ type: 'warning', msg: 'slipWarningNoQR' });
+                }
+            };
+            img.src = base64Str;
+        }
     </script>
 
     <style>
@@ -140,7 +173,7 @@
                 highSeasonNotice: "ℹ️ ช่วงเทศกาล/วันพิเศษ คิดมัดจำ 100%", discountRoom: "ส่วนลดที่พัก", netTotal: "สุทธิ",
                 depositRequired: "ยอดมัดจำที่ต้องโอน", enterDiscount: "กรอกโค้ดส่วนลด", applyCode: "กดใช้โค้ด",
                 bookerName: "ชื่อผู้จอง", phoneNumber: "เบอร์โทรศัพท์", scanPromptpay: "สแกนจ่ายมัดจำ (พร้อมเพย์)",
-                saveQrNote: "แคปหน้าจอหรือกดค้างเพื่อบันทึก", generatingQr: "กำลังสร้าง QR Code...", uploadSlip: "สลิปโอนเงิน",
+                saveQrNote: "แคปหน้าจอหรือกดค้างเพื่อบันทึก", generatingQr: "กำลังสร้าง QR Code...", uploadSlip: "อัปโหลดสลิปโอนเงิน",
                 agreeTerms: "ฉันอ่านกฎระเบียบและยอมรับเงื่อนไขของ ขนำลุงดำ แคมป์ปิ้ง ทุกประการ",
                 confirmBookingBtn: "ยืนยันการจองที่พัก", confirmingBtn: "กำลังยืนยันการจอง...",
                 bookingSuccessTitle: "จองสำเร็จ!", bookingIdText: "รหัสการจอง:",
@@ -155,6 +188,10 @@
                 foodOrderRule: "🍽️ เงื่อนไข: สั่งล่วงหน้าอย่างน้อย 2 วันก่อนเข้าพัก", selectedItems: "รายการที่เลือก ({count})", total: "รวม",
                 scanToOrder: "สแกนจ่ายเพื่อยืนยันออเดอร์", saveQrBtn: "บันทึกภาพ QR Code", pleaseAttachSlip: "* กรุณาแนบสลิปโอนเงิน",
                 confirmOrderBtn: "ยืนยันการสั่งอาหาร", sendingToKitchen: "กำลังส่งข้อมูล...ให้แม่ครัว", orderFoodSuccess: "สั่งอาหารเรียบร้อย",
+                // Slip Verification Texts
+                slipWarningNoQR: "⚠️ ตรวจไม่พบ QR Code ในสลิป แอดมินจะตรวจสอบอีกครั้ง",
+                slipWarningWrongQR: "⚠️ สลิปนี้อาจไม่ใช่การโอนเข้าบัญชีขนำลุงดำ โปรดตรวจสอบอีกครั้ง!",
+                slipValid: "✅ สลิปถูกต้อง (ตรวจพบ QR Code บัญชีร้านค้า)"
             },
             en: {
                 back: "Back", cancel: "Cancel", confirm: "Confirm", ok: "OK", delete: "Remove",
@@ -170,7 +207,7 @@
                 highSeasonNotice: "ℹ️ 100% deposit required during High Season/Holidays", discountRoom: "Discount", netTotal: "Net Total",
                 depositRequired: "Required Deposit", enterDiscount: "Enter discount code", applyCode: "Apply",
                 bookerName: "Full Name", phoneNumber: "Phone Number", scanPromptpay: "Scan PromptPay to Pay",
-                saveQrNote: "Screenshot or long press to save", generatingQr: "Generating QR Code...", uploadSlip: "Payment Slip",
+                saveQrNote: "Screenshot or long press to save", generatingQr: "Generating QR Code...", uploadSlip: "Upload Payment Slip",
                 agreeTerms: "I have read and agree to all terms and conditions of Khanam Lungdam Camping.",
                 confirmBookingBtn: "Confirm Booking", confirmingBtn: "Confirming...",
                 bookingSuccessTitle: "Booking Successful!", bookingIdText: "Booking ID:",
@@ -185,6 +222,10 @@
                 foodOrderRule: "🍽️ Policy: Food must be pre-ordered at least 2 days before check-in.", selectedItems: "Selected Items ({count})", total: "Total",
                 scanToOrder: "Scan to pay and confirm order", saveQrBtn: "Save QR Code", pleaseAttachSlip: "* Payment slip is required",
                 confirmOrderBtn: "Confirm Order", sendingToKitchen: "Sending order to kitchen...", orderFoodSuccess: "Food ordered successfully",
+                // Slip Verification Texts
+                slipWarningNoQR: "⚠️ No QR Code detected. Admin will verify manually.",
+                slipWarningWrongQR: "⚠️ This slip might not belong to our account. Please verify!",
+                slipValid: "✅ Valid slip (Merchant QR detected)"
             }
         };
 
@@ -280,9 +321,15 @@
         
         const App = () => {
             const [isDark, setIsDark] = React.useState(true);
+            
+            // --- Auto-Detect Language (Quick Win 1) ---
             const [lang, setLang] = React.useState(() => {
-                return localStorage.getItem('khanam_lang') || 'th';
+                const saved = localStorage.getItem('khanam_lang');
+                if (saved) return saved;
+                const browserLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
+                return browserLang.includes('th') ? 'th' : 'en'; // ถ้าเครื่องไม่ใช่ไทย จะตั้งต้นเป็น EN อัตโนมัติ
             });
+
             const [step, setStep] = React.useState(1);
             const [mode, setMode] = React.useState(() => {
                 const params = new URLSearchParams(window.location.search);
@@ -304,7 +351,11 @@
 
             const [discount, setDiscount] = React.useState({ code: '', val: 0, type: '', message: '', status: '' });
             const [checkingDiscount, setCheckingDiscount] = React.useState(false);
+            
+            // สเตทเก็บข้อมูลสลิป
             const [slipImg, setSlipImg] = React.useState(null);
+            const [slipStatus, setSlipStatus] = React.useState(null); // เช็คสถานะ QR สลิปหน้าจอง
+            
             const [bookingResult, setBookingResult] = React.useState(null);
             const [agreed, setAgreed] = React.useState(false);
             const [qrUrl, setQrUrl] = React.useState(null);
@@ -324,16 +375,17 @@
             const [rescheduleDates, setRescheduleDates] = React.useState({ checkIn: '', checkOut: '' });
             const [manageTab, setManageTab] = React.useState('info'); 
             const [addOnCart, setAddOnCart] = React.useState([]); 
+            
+            // สเตทสลิปสั่งอาหารเพิ่ม
             const [addOnSlip, setAddOnSlip] = React.useState(null);
+            const [addOnSlipStatus, setAddOnSlipStatus] = React.useState(null);
+
             const [addOnQr, setAddOnQr] = React.useState(null);
             const [manageForm, setManageForm] = React.useState({ bookingId: '', phone: '' });
 
             const [modalAlert, setModalAlert] = React.useState({ show: false, type: 'info', title: '', text: '' }); 
             const [modalConfirm, setModalConfirm] = React.useState({ show: false, title: '', text: '', onConfirm: null });
 
-            // ==========================================
-            // HELPER: ฟังก์ชันสำหรับดึงคำแปล
-            // ==========================================
             const t = (key, params = {}) => {
                 let text = TRANSLATIONS[lang][key] || key;
                 for (let k in params) {
@@ -342,7 +394,6 @@
                 return text;
             };
 
-            // HELPER: สับคำด้วย | (Pipe) สำหรับข้อมูลจาก Database
             const tData = (text, forceLang = null) => {
                 if (!text) return "";
                 const parts = String(text).split('|');
@@ -353,7 +404,6 @@
                 return parts[0].trim();
             };
 
-            // HELPER: สำหรับ List ที่ Backend มัดรวมมา (เช่น "บ้านริมน้ำ | Riverside, หมูกระทะ | BBQ x1")
             const tDataList = (text) => {
                 if(!text || text === '-') return text;
                 return text.split(',').map(item => {
@@ -363,7 +413,6 @@
                         let en = parts[1].trim();
                         let suffix = '';
                         
-                        // ดึง (จำนวนคน) หรือ xจำนวน ออกมาก่อน
                         const match = en.match(/(x\d+|\(\d+\s*ท่าน\)|\(\d+\s*คน\))$/);
                         if (match) {
                             let rawSuffix = match[1];
@@ -376,7 +425,7 @@
                         return lang === 'en' ? `${en}${suffix}` : `${th}${suffix}`;
                     }
                     return item.trim();
-                }).join('\n'); // ตัดขึ้นบรรทัดใหม่ให้อ่านง่าย
+                }).join('\n'); 
             };
 
             const toggleLanguage = () => {
@@ -562,7 +611,6 @@
                 const targetCart = mode === 'manage' ? addOnCart : cart; 
                 const setTargetCart = mode === 'manage' ? setAddOnCart : setCart;
                 
-                // ใช้ tData บันทึกแบบสองภาษา เช่น "หมูกระทะ (ไม่เผ็ด) | Pork BBQ (ไม่เผ็ด)" ให้แอดมินอ่านรู้เรื่อง
                 const finalName = foodNote.trim() 
                     ? `${tData(selectedFood.name, 'th')} (${foodNote.trim()}) | ${tData(selectedFood.name, 'en')} (${foodNote.trim()})` 
                     : selectedFood.name;
@@ -863,7 +911,34 @@
                                                                     </div>
                                                                 )}
                                                                 <div className="text-[10px] text-center mb-2 text-gray-500">{PROMPTPAY_NAME} - {PROMPTPAY_PHONE}</div>
-                                                                <input type="file" accept="image/*" onChange={async (e) => { const f = e.target.files[0]; if (f) { try { const resizedBase64 = await compressImage(f); setAddOnSlip(resizedBase64); } catch (err) { alert('Upload Error'); } } }} className="text-xs w-full mb-1" />
+                                                                <input type="file" accept="image/*" onChange={async (e) => { 
+                                                                    const f = e.target.files[0]; 
+                                                                    if (f) { 
+                                                                        try { 
+                                                                            setAddOnSlipStatus({ type: 'loading', msg: lang === 'en' ? 'Checking slip...' : 'กำลังตรวจสอบสลิป...' });
+                                                                            const resizedBase64 = await compressImage(f); 
+                                                                            setAddOnSlip(resizedBase64); 
+
+                                                                            // Client-Side Slip Verification
+                                                                            checkSlipQR(resizedBase64, PROMPTPAY_PHONE, (res) => {
+                                                                                setAddOnSlipStatus(res);
+                                                                            });
+                                                                        } catch (err) { alert('Upload Error'); } 
+                                                                    } 
+                                                                }} className="text-xs w-full mb-1" />
+                                                                
+                                                                {/* สถานะเช็คสลิป */}
+                                                                {addOnSlipStatus && addOnSlipStatus.type !== 'loading' && (
+                                                                    <p className={`text-[10px] mt-2 p-1.5 rounded ${addOnSlipStatus.type === 'success' ? 'bg-green-100 text-green-700' : addOnSlipStatus.type === 'error' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                                                        {t(addOnSlipStatus.msg)}
+                                                                    </p>
+                                                                )}
+                                                                {addOnSlipStatus && addOnSlipStatus.type === 'loading' && (
+                                                                    <p className="text-[10px] mt-2 p-1.5 rounded bg-blue-100 text-blue-700">
+                                                                        <i className="fas fa-spinner fa-spin mr-1"></i> {addOnSlipStatus.msg}
+                                                                    </p>
+                                                                )}
+
                                                                 {!addOnSlip && <div className="text-red-500 text-[10px] text-center">{t('pleaseAttachSlip')}</div>}
                                                             </div>
                                                         </div>
@@ -879,7 +954,7 @@
 
                         {/* --- MODE: BOOKING --- */}
                         {mode === 'booking' && step === 1 && (
-                            <div className="max-w-md mx-auto bg-white dark:bg-gray-800 shadow-xl rounded-xl mt-4 border dark:border-gray-700 overflow-hidden">
+                            <div className="max-w-md mx-auto bg-white dark:bg-gray-800 shadow-xl rounded-xl mt-20 border dark:border-gray-700 overflow-hidden">
                                 <div className="h-48 relative"><img src={siteConfig.bannerUrl} referrerPolicy="no-referrer" className="w-full h-full object-cover" /><div className="absolute inset-0 bg-black bg-opacity-10"></div></div>
                                 <div className="p-6 -mt-24 relative z-10">
                                     <img src={siteConfig.logoUrl} referrerPolicy="no-referrer" className="w-48 h-48 mx-auto rounded-full border-4 border-white dark:border-gray-800 object-cover bg-white shadow-lg mb-4"/>
@@ -895,9 +970,9 @@
                         )}
 
                         {mode === 'booking' && step === 2 && (
-                            <div className="max-w-4xl mx-auto p-4 relative">
+                            <div className="max-w-4xl mx-auto p-4 pt-20 relative">
                                 <div className="flex justify-between items-center mb-4"><div className="flex items-center gap-2"><button onClick={()=>setStep(1)} className="text-gray-500 dark:text-gray-300 hover:text-green-600 font-bold"><i className="fas fa-chevron-left"></i> {t('back')}</button><h2 className="text-xl font-bold dark:text-white">{t('selectRoom')}</h2></div></div>
-                                <div className="map-container bg-blue-100 dark:bg-gray-700 mb-6" style={{paddingBottom: '56.22%'}}>
+                                <div className="map-container bg-blue-100 dark:bg-gray-700 mb-6" style={{paddingBottom: '100%'}}>
                                     <img src={siteConfig?.roomImages?.['MAP_BG']?.[0] || "https://img2.pic.in.th/3d539b84-44ce-4336-ad90-bd2f84b13eca.jpg"} referrerPolicy="no-referrer" className="absolute top-0 left-0 w-full h-full object-cover" alt="Camp Map" />
                                     {Object.keys(pinPos).map(key => {
                                         if (!roomConfig[key]) return null;
@@ -1007,7 +1082,7 @@
                         )}
 
                         {mode === 'booking' && step === 3 && (
-                            <div className="max-w-md mx-auto p-6 bg-white dark:bg-gray-800 shadow-xl rounded-xl">
+                            <div className="max-w-md mx-auto p-6 pt-20 bg-white dark:bg-gray-800 shadow-xl rounded-xl">
                                 <div className="flex items-center gap-2 mb-4"><button onClick={()=>setStep(2)} className="text-gray-500 dark:text-gray-300 hover:text-green-600 font-bold text-sm"><i className="fas fa-chevron-left"></i> {t('back')}</button><h2 className="text-xl font-bold dark:text-white">{t('summaryPayment')}</h2></div>
                                 <div className="space-y-2 mb-4 text-sm dark:text-gray-200">
                                     <p><strong>{t('checkIn')}</strong> {formatDateLocalized(dates.checkIn)}</p>
@@ -1041,7 +1116,37 @@
                                     <div className="mt-4 bg-gray-50 dark:bg-gray-700 p-2 rounded"> <p className="text-sm font-bold text-gray-800 dark:text-white">{PROMPTPAY_NAME}</p> <p className="text-xs text-gray-500 dark:text-gray-400 font-mono tracking-wider">{PROMPTPAY_PHONE}</p> </div>
                                 </div>
                                 
-                                <div className="mb-4"> <label className="block mb-1 text-sm dark:text-gray-300">{t('uploadSlip')} <span className="text-red-500">*</span></label> <input type="file" accept="image/*" onChange={async (e) => { const f = e.target.files[0]; if (f) { try { const resizedBase64 = await compressImage(f); setSlipImg(resizedBase64); } catch (err) { alert('Upload error'); } } }} className="w-full text-sm dark:text-gray-300" /> </div>
+                                <div className="mb-4"> 
+                                    <label className="block mb-1 text-sm dark:text-gray-300">{t('uploadSlip')} <span className="text-red-500">*</span></label> 
+                                    <input type="file" accept="image/*" onChange={async (e) => { 
+                                        const f = e.target.files[0]; 
+                                        if (f) { 
+                                            try { 
+                                                setSlipStatus({ type: 'loading', msg: lang === 'en' ? 'Checking slip...' : 'กำลังตรวจสอบสลิป...' });
+                                                const resizedBase64 = await compressImage(f); 
+                                                setSlipImg(resizedBase64); 
+                                                
+                                                // Client-Side Slip Verification
+                                                checkSlipQR(resizedBase64, PROMPTPAY_PHONE, (res) => {
+                                                    setSlipStatus(res);
+                                                });
+                                            } catch (err) { alert('Upload error'); } 
+                                        } 
+                                    }} className="w-full text-sm dark:text-gray-300" /> 
+                                    
+                                    {/* สถานะเช็คสลิป */}
+                                    {slipStatus && slipStatus.type !== 'loading' && (
+                                        <p className={`text-[10px] mt-2 p-1.5 rounded ${slipStatus.type === 'success' ? 'bg-green-100 text-green-700' : slipStatus.type === 'error' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                            {t(slipStatus.msg)}
+                                        </p>
+                                    )}
+                                    {slipStatus && slipStatus.type === 'loading' && (
+                                        <p className="text-[10px] mt-2 p-1.5 rounded bg-blue-100 text-blue-700">
+                                            <i className="fas fa-spinner fa-spin mr-1"></i> {slipStatus.msg}
+                                        </p>
+                                    )}
+                                </div>
+
                                 <div className="flex items-start gap-2 mb-4 text-xs text-gray-600 dark:text-gray-400"> <input type="checkbox" className="mt-1" checked={agreed} onChange={e => setAgreed(e.target.checked)} /> <p>{t('agreeTerms')}</p> </div>
                                 <button onClick={handleSubmit} disabled={loading || !canSubmit} className={`w-full p-3 rounded-lg font-bold text-white transition ${loading || !canSubmit ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 shadow-lg'}`}>{loading ? t('confirmingBtn') : t('confirmBookingBtn')}</button>
                             </div>
