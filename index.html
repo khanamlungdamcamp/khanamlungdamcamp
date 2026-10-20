@@ -393,7 +393,7 @@
                 const room = roomConfig[roomId]; 
                 if (!room) return; 
                 const searchStr = (room.type + " " + room.name).toLowerCase();
-                const isSharedZone = room.type === 'ground' || roomId === 'Z8' || roomId === 'R6528' || searchStr.includes('tent') || searchStr.includes('เต็นท์') || searchStr.includes('ลานกาง') || searchStr.includes('ground');
+                const isSharedZone = room.type === 'ground' || roomId === 'Z8' || roomId === 'R6528' || searchStr.includes('ลานกาง') || searchStr.includes('ground');
                 
                 if(isSharedZone) setGuestCount(1); 
                 else setGuestCount(parseInt(room.min) || 1); 
@@ -433,7 +433,7 @@
                 if (!roomInfo) { alert("พบปัญหาข้อมูลห้องพักไม่สมบูรณ์"); setSelectedRoomId(null); return; }
                 
                 const searchStr = (roomInfo.type + " " + roomInfo.name).toLowerCase();
-                const isSharedZone = roomInfo.type === 'ground' || roomId === 'Z8' || roomId === 'R6528' || searchStr.includes('tent') || searchStr.includes('เต็นท์') || searchStr.includes('ลานกาง') || searchStr.includes('ground');
+                const isSharedZone = roomInfo.type === 'ground' || roomId === 'Z8' || roomId === 'R6528' || searchStr.includes('ลานกาง') || searchStr.includes('ground');
                 
                 let limit = parseInt(roomInfo.maxCap) || 10;
                 
@@ -724,13 +724,13 @@
                         {mode === 'booking' && step === 2 && (
                             <div className="max-w-4xl mx-auto p-4 relative">
                                 <div className="flex justify-between items-center mb-4"><div className="flex items-center gap-2"><button onClick={()=>setStep(1)} className="text-gray-500 dark:text-gray-300 hover:text-green-600 font-bold"><i className="fas fa-chevron-left"></i> ย้อนกลับ</button><h2 className="text-xl font-bold dark:text-white">เลือกที่พัก</h2></div></div>
-                                <div className="map-container bg-blue-100 dark:bg-gray-700 mb-6" style={{paddingBottom: '56.25%'}}>
+                                <div className="map-container bg-blue-100 dark:bg-gray-700 mb-6" style={{paddingBottom: '100%'}}>
                                     <img src={siteConfig?.roomImages?.['MAP_BG']?.[0] || "https://img2.pic.in.th/3d539b84-44ce-4336-ad90-bd2f84b13eca.jpg"} referrerPolicy="no-referrer" className="absolute top-0 left-0 w-full h-full object-cover" alt="Camp Map" />
                                     {Object.keys(pinPos).map(key => {
                                         if (!roomConfig[key]) return null;
                                         const rConf = roomConfig[key];
                                         const searchStr = rConf ? (rConf.type + " " + rConf.name).toLowerCase() : '';
-                                        const isSharedZone = rConf ? (rConf.type === 'ground') : (key === 'Z8' || key === 'R6528' || searchStr.includes('tent') || searchStr.includes('เต็นท์') || searchStr.includes('ลานกาง') || searchStr.includes('ground'));
+                                        const isSharedZone = rConf ? (rConf.type === 'ground') : (key === 'Z8' || key === 'R6528' || searchStr.includes('ลานกาง') || searchStr.includes('ground'));
                                         
                                         let available = 1;
                                         if (availability && availability.roomAvailableCount && availability.roomAvailableCount[key] !== undefined) {
@@ -778,7 +778,7 @@
                                                 <button onClick={() => { 
                                                     const rConf = roomConfig[selectedRoomId];
                                                     const searchStr = rConf ? (rConf.type + " " + rConf.name).toLowerCase() : '';
-                                                    const isSharedZone = rConf ? (rConf.type === 'ground') : (selectedRoomId === 'Z8' || selectedRoomId === 'R6528' || searchStr.includes('tent') || searchStr.includes('เต็นท์') || searchStr.includes('ลานกาง') || searchStr.includes('ground'));
+                                                    const isSharedZone = rConf ? (rConf.type === 'ground') : (selectedRoomId === 'Z8' || selectedRoomId === 'R6528' || searchStr.includes('ลานกาง') || searchStr.includes('ground'));
                                                     
                                                     let limit = parseInt(rConf.maxCap) || 10; 
                                                     
