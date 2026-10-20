@@ -638,6 +638,61 @@
 
             const updateEditingRoomInList = () => { setRoomsMapData(prev => { const idx = prev.findIndex(r => r.id === editingRoom.id); if (idx > -1) { const newArr = [...prev]; newArr[idx] = editingRoom; return newArr; } return [...prev, editingRoom]; }); setEditingRoom(null); };
 
+            // ====== BEGIN CALCULATE RECEIPT ======
+            let printRoomItems = [];
+            let printFoodItems = [];
+            let printCalculatedRoomSum = 0;
+            let printFoodSum = 0;
+            let printNetPrice = 0;
+            let printDeposit = 0;
+            let printDiff = 0;
+
+            if (viewBooking) {
+                const cart = safeJsonParse(viewBooking.cart, []);
+                const roomItems = cart.filter(c => c.type !== 'food');
+                printFoodItems = cart.filter(c => c.type === 'food');
+                
+                const checkIn = new Date(viewBooking.checkIn);
+                const checkOut = new Date(viewBooking.checkOut);
+                let nights = Math.round((checkOut.getTime() - checkIn.getTime()) / (1000 * 3600 * 24));
+                if (nights <= 0 || isNaN(nights)) nights = 1;
+
+                printRoomItems = roomItems.map(item => {
+                    let pricePerNight = item.pricePerNight !== undefined ? item.pricePerNight : item.price;
+                    let isPerHead = item.isPerHead;
+                    
+                    if (pricePerNight === undefined) {
+                        const rConf = roomConfig[item.id];
+                        isPerHead = rConf ? (rConf.type === 'ground') : (item.id === 'Z8' || (item.name && item.name.includes('ลานกาง')));
+                        if (rConf) {
+                            const pricingInfo = typeof rConf.pricing === 'string' ? safeJsonParse(rConf.pricing, {}) : (rConf.pricing || {});
+                            if (isPerHead) {
+                                pricePerNight = Number(pricingInfo.priceHead || (pricingInfo.tiers && pricingInfo.tiers.length > 0 ? pricingInfo.tiers[0].price : 150));
+                            } else {
+                                const tiers = pricingInfo.tiers || [];
+                                if (tiers.length > 0) {
+                                    const tier = tiers.find(t => item.guests <= t.max);
+                                    if (tier) pricePerNight = Number(tier.price);
+                                    else { const maxTier = tiers[tiers.length - 1]; pricePerNight = Number(maxTier ? maxTier.price : 0); }
+                                } else { pricePerNight = 0; }
+                            }
+                        } else { pricePerNight = 0; }
+                    }
+                    
+                    const guests = item.guests || 1;
+                    const total = isPerHead ? (pricePerNight * nights * guests) : (pricePerNight * nights);
+                    printCalculatedRoomSum += total;
+                    
+                    return { ...item, _computedPrice: pricePerNight, _computedTotal: total, _isPerHead: isPerHead, _guests: guests, _nights: nights };
+                });
+
+                printFoodSum = printFoodItems.reduce((s, i) => s + (Number(i.price||0) * Number(i.qty||1)), 0);
+                printNetPrice = Number(viewBooking.price || 0);
+                printDeposit = Number(viewBooking.deposit || 0);
+                printDiff = (printCalculatedRoomSum + printFoodSum) - printNetPrice;
+            }
+            // ====== END CALCULATE RECEIPT ======
+
             if (!isLoggedIn) return ( 
                 <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4 relative"> 
                     <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm z-10"> 
@@ -1162,183 +1217,230 @@
                             </table>
                         </div>
                         
-                        {/* Receipt Template */}
-                        {viewBooking && (
-                            <div id="receipt-print-area">
-                                <div className="flex justify-between items-start mb-6 border-b-2 border-gray-800 pb-4">
-                                    <div className="flex gap-4 items-center">
-                                        <div className="w-24 h-24 bg-white rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center">
-                                            {siteSettings && siteSettings.logoUrl ? ( <img src={siteSettings.logoUrl} className="w-full h-full object-contain" alt="Logo" onError={(e) => e.target.style.display = 'none'} /> ) : <span className="text-gray-400 text-xs">NO LOGO</span>}
-                                        </div>
-                                        <div><h1 className="text-2xl font-bold text-green-900">{siteSettings && siteSettings.headerTitle}</h1><p className="text-sm text-gray-600">หมู่ที่ 3 ต.ฉลุง อ.หาดใหญ่ จ.สงขลา 90110</p><p className="text-sm font-bold mt-2 text-black"><i className="fas fa-phone-alt mr-1"></i> โทร: {SHOP_PHONE} (พร้อมเพย์)</p></div>
-                                    </div>
-                                    <div className="text-right"><h2 className="text-3xl font-bold text-gray-800 uppercase tracking-widest">RECEIPT</h2><p className="text-sm text-gray-500">ใบเสร็จรับเงิน</p><div className="mt-4 text-sm"><p><b>เลขที่:</b> {viewBooking.id}</p><p><b>วันที่:</b> {new Date().toLocaleDateString('th-TH')}</p></div></div>
-                                </div>
-                                
-                                <div className="flex w-full justify-between mb-6 bg-gray-50 p-4 rounded border border-gray-200">
-                                    <div className="flex-1 pr-4 border-r border-gray-200"><h3 className="font-bold text-gray-700 mb-2 border-b pb-1">ลูกค้า (Customer)</h3><p className="text-sm mb-1"><b>ชื่อ:</b> {viewBooking.name}</p><p className="text-sm mb-1"><b>เบอร์โทร:</b> {viewBooking.phone}</p><p className="text-sm"><b>LINE ID:</b> {viewBooking.lineProfile}</p></div>
-                                    <div className="flex-1 pl-4 text-right"><h3 className="font-bold text-gray-700 mb-2 border-b pb-1">รายละเอียดการเข้าพัก</h3><p className="text-sm mb-1"><b>เช็คอิน:</b> {formatThaiDate(viewBooking.checkIn)}</p><p className="text-sm mb-1"><b>เช็คเอาท์:</b> {formatThaiDate(viewBooking.checkOut)}</p><p className="text-sm"><b>จำนวน:</b> {viewBooking.totalGuests} ท่าน</p></div>
-                                </div>
+                        {/* ====== BEGIN CALCULATE RECEIPT ====== */}
+                        {(() => {
+                            let printRoomItems = [];
+                            let printFoodItems = [];
+                            let printCalculatedRoomSum = 0;
+                            let printFoodSum = 0;
+                            let printNetPrice = 0;
+                            let printDeposit = 0;
+                            let printDiff = 0;
 
-                                <table className="w-full mb-4 border-collapse">
-                                    <thead><tr className="bg-gray-800 text-white text-sm"><th className="py-2 px-3 text-left rounded-tl w-12">#</th><th className="py-2 px-3 text-left">รายการ (Description)</th><th className="py-2 px-3 text-right w-24">จำนวน</th><th className="py-2 px-3 text-right w-32 rounded-tr">จำนวนเงิน</th></tr></thead>
-                                    <tbody className="text-sm">
-                                        {(() => {
-                                            const cart = safeJsonParse(viewBooking.cart, []);
-                                            const roomItems = cart.filter(c => c.type !== 'food'); const foodItems = cart.filter(c => c.type === 'food');
-                                            return ( <>
-                                                {roomItems.length > 0 && ( <tr className="bg-gray-100 font-bold"><td colSpan="4" className="py-1 px-3 text-xs text-gray-600">ค่าที่พัก (Accommodation)</td></tr> )}
-                                                {roomItems.map((item, idx) => { 
-                                                    const price = (item.pricePerNight || item.price || 0); 
-                                                    const nights = item.nights || 1; 
-                                                    const guests = item.guests || 1; 
-                                                    const isPerHead = item.type === 'ground' || item.id === 'Z8' || (item.name && item.name.includes('ลานกาง')); 
-                                                    const total = isPerHead ? (price * nights * guests) : (price * nights); 
-                                                    return ( 
+                            if (viewBooking) {
+                                const cart = safeJsonParse(viewBooking.cart, []);
+                                const roomItems = cart.filter(c => c.type !== 'food');
+                                printFoodItems = cart.filter(c => c.type === 'food');
+                                
+                                const checkIn = new Date(viewBooking.checkIn);
+                                const checkOut = new Date(viewBooking.checkOut);
+                                let nights = Math.round((checkOut.getTime() - checkIn.getTime()) / (1000 * 3600 * 24));
+                                if (nights <= 0 || isNaN(nights)) nights = 1;
+
+                                printRoomItems = roomItems.map(item => {
+                                    let pricePerNight = item.pricePerNight !== undefined ? item.pricePerNight : item.price;
+                                    let isPerHead = item.isPerHead;
+                                    
+                                    if (pricePerNight === undefined) {
+                                        const rConf = roomConfig[item.id];
+                                        isPerHead = rConf ? (rConf.type === 'ground') : (item.id === 'Z8' || (item.name && item.name.includes('ลานกาง')));
+                                        if (rConf) {
+                                            const pricingInfo = typeof rConf.pricing === 'string' ? safeJsonParse(rConf.pricing, {}) : (rConf.pricing || {});
+                                            if (isPerHead) {
+                                                pricePerNight = Number(pricingInfo.priceHead || (pricingInfo.tiers && pricingInfo.tiers.length > 0 ? pricingInfo.tiers[0].price : 150));
+                                            } else {
+                                                const tiers = pricingInfo.tiers || [];
+                                                if (tiers.length > 0) {
+                                                    const tier = tiers.find(t => item.guests <= t.max);
+                                                    if (tier) pricePerNight = Number(tier.price);
+                                                    else { const maxTier = tiers[tiers.length - 1]; pricePerNight = Number(maxTier ? maxTier.price : 0); }
+                                                } else { pricePerNight = 0; }
+                                            }
+                                        } else { pricePerNight = 0; }
+                                    }
+                                    
+                                    const guests = item.guests || 1;
+                                    const total = isPerHead ? (pricePerNight * nights * guests) : (pricePerNight * nights);
+                                    printCalculatedRoomSum += total;
+                                    
+                                    return { ...item, _computedPrice: pricePerNight, _computedTotal: total, _isPerHead: isPerHead, _guests: guests, _nights: nights };
+                                });
+
+                                printFoodSum = printFoodItems.reduce((s, i) => s + (Number(i.price||0) * Number(i.qty||1)), 0);
+                                printNetPrice = Number(viewBooking.price || 0);
+                                printDeposit = Number(viewBooking.deposit || 0);
+                                printDiff = (printCalculatedRoomSum + printFoodSum) - printNetPrice;
+                            }
+
+                            return (
+                                <>
+                                    {/* Receipt Template (Standard) */}
+                                    {viewBooking && (
+                                        <div id="receipt-print-area">
+                                            <div className="flex justify-between items-start mb-6 border-b-2 border-gray-800 pb-4">
+                                                <div className="flex gap-4 items-center">
+                                                    <div className="w-24 h-24 bg-white rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center">
+                                                        {siteSettings && siteSettings.logoUrl ? ( <img src={siteSettings.logoUrl} className="w-full h-full object-contain" alt="Logo" onError={(e) => e.target.style.display = 'none'} /> ) : <span className="text-gray-400 text-xs">NO LOGO</span>}
+                                                    </div>
+                                                    <div><h1 className="text-2xl font-bold text-green-900">{siteSettings && siteSettings.headerTitle}</h1><p className="text-sm text-gray-600">หมู่ที่ 3 ต.ฉลุง อ.หาดใหญ่ จ.สงขลา 90110</p><p className="text-sm font-bold mt-2 text-black"><i className="fas fa-phone-alt mr-1"></i> โทร: {SHOP_PHONE} (พร้อมเพย์)</p></div>
+                                                </div>
+                                                <div className="text-right"><h2 className="text-3xl font-bold text-gray-800 uppercase tracking-widest">RECEIPT</h2><p className="text-sm text-gray-500">ใบเสร็จรับเงิน</p><div className="mt-4 text-sm"><p><b>เลขที่:</b> {viewBooking.id}</p><p><b>วันที่:</b> {new Date().toLocaleDateString('th-TH')}</p></div></div>
+                                            </div>
+                                            
+                                            <div className="flex w-full justify-between mb-6 bg-gray-50 p-4 rounded border border-gray-200">
+                                                <div className="flex-1 pr-4 border-r border-gray-200"><h3 className="font-bold text-gray-700 mb-2 border-b pb-1">ลูกค้า (Customer)</h3><p className="text-sm mb-1"><b>ชื่อ:</b> {viewBooking.name}</p><p className="text-sm mb-1"><b>เบอร์โทร:</b> {viewBooking.phone}</p><p className="text-sm"><b>LINE ID:</b> {viewBooking.lineProfile}</p></div>
+                                                <div className="flex-1 pl-4 text-right"><h3 className="font-bold text-gray-700 mb-2 border-b pb-1">รายละเอียดการเข้าพัก</h3><p className="text-sm mb-1"><b>เช็คอิน:</b> {formatThaiDate(viewBooking.checkIn)}</p><p className="text-sm mb-1"><b>เช็คเอาท์:</b> {formatThaiDate(viewBooking.checkOut)}</p><p className="text-sm"><b>จำนวน:</b> {viewBooking.totalGuests} ท่าน</p></div>
+                                            </div>
+
+                                            <table className="w-full mb-4 border-collapse">
+                                                <thead><tr className="bg-gray-800 text-white text-sm"><th className="py-2 px-3 text-left rounded-tl w-12">#</th><th className="py-2 px-3 text-left">รายการ (Description)</th><th className="py-2 px-3 text-right w-24">จำนวน</th><th className="py-2 px-3 text-right w-32 rounded-tr">จำนวนเงิน</th></tr></thead>
+                                                <tbody className="text-sm">
+                                                    {printRoomItems.length > 0 && ( <tr className="bg-gray-100 font-bold"><td colSpan="4" className="py-1 px-3 text-xs text-gray-600">ค่าที่พัก (Accommodation)</td></tr> )}
+                                                    {printRoomItems.map((item, idx) => (
                                                         <tr key={'r'+idx} className="border-b border-gray-200">
                                                             <td className="py-2 px-3 text-center">{idx+1}</td>
                                                             <td className="py-2 px-3">
                                                                 <div className="font-bold text-gray-800">{item.name}</div>
                                                                 <div className="text-xs text-gray-500">
-                                                                    {isPerHead ? `(${guests} ท่าน) x ${nights} คืน` : `(พัก ${guests} ท่าน) x ${nights} คืน`}
+                                                                    {item._isPerHead ? `(${item._guests} ท่าน) x ${item._nights} คืน` : `(พัก ${item._guests} ท่าน) x ${item._nights} คืน`}
                                                                 </div>
                                                             </td>
                                                             <td className="py-2 px-3 text-center">1</td>
-                                                            <td className="py-2 px-3 text-right">{total.toLocaleString()}</td>
-                                                        </tr> 
-                                                    ); 
-                                                })}
-                                                {foodItems.length > 0 && ( <tr className="bg-gray-100 font-bold"><td colSpan="4" className="py-1 px-3 text-xs text-gray-600">ค่าอาหารและบริการ (Food & Services)</td></tr> )}
-                                                {foodItems.map((item, idx) => { const total = (item.price || 0) * (item.qty || 1); return ( <tr key={'f'+idx} className="border-b border-gray-200"><td className="py-2 px-3 text-center">{idx+1}</td><td className="py-2 px-3">{item.name}</td><td className="py-2 px-3 text-center">{item.qty}</td><td className="py-2 px-3 text-right">{total.toLocaleString()}</td></tr> ); })}
-                                            </> );
-                                        })()}
-                                    </tbody>
-                                    <tfoot>
-                                        {(() => {
-                                            const cart = safeJsonParse(viewBooking.cart, []);
-                                            const roomItems = cart.filter(c => c.type !== 'food'); const foodItems = cart.filter(c => c.type === 'food');
-                                            const roomSum = roomItems.reduce((s, i) => { 
-                                                const p = i.pricePerNight||i.price||0; 
-                                                const n = i.nights||1; 
-                                                const g = i.guests||1; 
-                                                const isPH = i.type === 'ground' || i.id === 'Z8' || (i.name && i.name.includes('ลานกาง')); 
-                                                return s + (isPH ? p * n * g : p * n); 
-                                            }, 0);
-                                            const foodSum = foodItems.reduce((s, i) => s + ((i.price||0) * (i.qty||1)), 0);
-                                            const netPrice = Number(viewBooking.price || 0); const deposit = Number(viewBooking.deposit || 0);
-                                            const totalCalculated = roomSum + foodSum; const discount = totalCalculated - netPrice;
+                                                            <td className="py-2 px-3 text-right">{item._computedTotal.toLocaleString()}</td>
+                                                        </tr>
+                                                    ))}
+                                                    {printFoodItems.length > 0 && ( <tr className="bg-gray-100 font-bold"><td colSpan="4" className="py-1 px-3 text-xs text-gray-600">ค่าอาหารและบริการ (Food & Services)</td></tr> )}
+                                                    {printFoodItems.map((item, idx) => { 
+                                                        const total = (item.price || 0) * (item.qty || 1); 
+                                                        return ( 
+                                                            <tr key={'f'+idx} className="border-b border-gray-200">
+                                                                <td className="py-2 px-3 text-center">{idx+1}</td>
+                                                                <td className="py-2 px-3">{item.name}</td>
+                                                                <td className="py-2 px-3 text-center">{item.qty}</td>
+                                                                <td className="py-2 px-3 text-right">{total.toLocaleString()}</td>
+                                                            </tr> 
+                                                        ); 
+                                                    })}
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <td colSpan="2" rowSpan={printDiff !== 0 ? 5 : 4} className="align-top pt-4 pr-4">
+                                                            <div className="border border-gray-300 rounded p-3 text-xs text-gray-600 h-full w-full">
+                                                                <p className="font-bold mb-1">หมายเหตุ:</p>
+                                                                <p>- กรุณาตรวจสอบรายการให้ถูกต้อง</p>
+                                                                <p>- ขอบคุณที่ใช้บริการขนำลุงดำ</p>
+                                                            </div>
+                                                        </td>
+                                                        <td className="pt-4 text-right font-bold text-gray-700 text-sm">รวมค่าที่พัก</td>
+                                                        <td className="pt-4 text-right font-medium text-sm">{formatMoney(printCalculatedRoomSum)}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className="pt-1 text-right font-bold text-gray-700 text-sm">รวมค่าบริการ</td>
+                                                        <td className="pt-1 text-right font-medium text-sm">{formatMoney(printFoodSum)}</td>
+                                                    </tr>
+                                                    {printDiff > 0 && ( <tr><td className="pt-1 text-right font-bold text-green-600 text-sm">ส่วนลด</td><td className="pt-1 text-right font-medium text-green-600 text-sm">-{formatMoney(printDiff)}</td></tr> )}
+                                                    {printDiff < 0 && ( <tr><td className="pt-1 text-right font-bold text-orange-600 text-sm">ส่วนต่าง/เพิ่มเติม</td><td className="pt-1 text-right font-medium text-orange-600 text-sm">+{formatMoney(Math.abs(printDiff))}</td></tr> )}
+                                                    <tr>
+                                                        <td className="pt-1 text-right font-bold text-gray-800 text-sm border-t border-gray-300 mt-1">ยอดสุทธิ</td>
+                                                        <td className="pt-1 text-right font-bold text-gray-800 text-sm border-t border-gray-300 mt-1">{formatMoney(printNetPrice)}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className="pt-1 text-right text-sm text-red-500">หัก มัดจำ</td>
+                                                        <td className="pt-1 text-right text-sm text-red-500">-{formatMoney(printDeposit)}</td>
+                                                    </tr>
+                                                    <tr className="bg-gray-100">
+                                                        <td colSpan="2"></td>
+                                                        <td className="py-2 text-right font-bold text-xl text-green-700 border-b border-gray-200">ยอดคงเหลือ</td>
+                                                        <td className="py-2 text-right font-bold text-xl text-green-700 border-b border-gray-200 pr-3">{formatMoney(printNetPrice - printDeposit)} ฿</td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
                                             
-                                            const noteRowSpan = discount > 0 ? 5 : 4; 
-
-                                            return ( <>
-                                                <tr><td colSpan="2" rowSpan={noteRowSpan} className="align-top pt-4 pr-4"><div className="border border-gray-300 rounded p-3 text-xs text-gray-600 h-full w-full"><p className="font-bold mb-1">หมายเหตุ:</p><p>- กรุณาตรวจสอบรายการให้ถูกต้อง</p><p>- ขอบคุณที่ใช้บริการขนำลุงดำ</p></div></td><td className="pt-4 text-right font-bold text-gray-700 text-sm">รวมค่าที่พัก</td><td className="pt-4 text-right font-medium text-sm">{formatMoney(roomSum)}</td></tr>
-                                                <tr><td className="pt-1 text-right font-bold text-gray-700 text-sm">รวมค่าบริการ</td><td className="pt-1 text-right font-medium text-sm">{formatMoney(foodSum)}</td></tr>
-                                                {discount > 0 && ( <tr><td className="pt-1 text-right font-bold text-green-600 text-sm">ส่วนลด</td><td className="pt-1 text-right font-medium text-green-600 text-sm">-{formatMoney(discount)}</td></tr> )}
-                                                <tr><td className="pt-1 text-right font-bold text-gray-800 text-sm border-t border-gray-300 mt-1">ยอดสุทธิ</td><td className="pt-1 text-right font-bold text-gray-800 text-sm border-t border-gray-300 mt-1">{formatMoney(netPrice)}</td></tr>
-                                                <tr><td className="pt-1 text-right text-sm text-red-500">หัก มัดจำ</td><td className="pt-1 text-right text-sm text-red-500">-{formatMoney(deposit)}</td></tr>
-                                                <tr className="bg-gray-100"><td colSpan="2"></td><td className="py-2 text-right font-bold text-xl text-green-700 border-b border-gray-200">ยอดคงเหลือ</td><td className="py-2 text-right font-bold text-xl text-green-700 border-b border-gray-200 pr-3">{formatMoney(netPrice - deposit)} ฿</td></tr>
-                                            </> );
-                                        })()}
-                                    </tfoot>
-                                </table>
-                                
-                                <div className="mt-auto pt-8 flex w-full justify-between items-end px-8">
-                                    <div className="text-center flex-1"><div className="border-b border-black w-48 mx-auto mb-2"></div><p className="text-sm font-bold">ผู้รับเงิน (Payee)</p><p className="text-xs text-gray-500">วันที่: ...../...../.......</p></div>
-                                    <div className="text-center flex-1"><div className="border-b border-black w-48 mx-auto mb-2"></div><p className="text-sm font-bold">ผู้จ่ายเงิน (Payer)</p><p className="text-xs text-gray-500">วันที่: ...../...../.......</p></div>
-                                </div>
-                                <div className="absolute bottom-4 w-full text-center text-[10px] text-gray-400 left-0"><p>ขอบคุณที่ใช้บริการ ขนำลุงดำ แคมป์ปิ้ง | System Generated</p></div>
-                            </div>
-                        )}
-                        
-                        {/* Official Receipt Template */}
-                        {viewBooking && (
-                            <div id="official-receipt-print-area">
-                                <div className="flex justify-between items-start mb-6 border-b-2 border-gray-800 pb-4">
-                                    <div className="flex gap-4 items-center">
-                                        <div className="w-24 h-24 bg-white rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center">
-                                            {siteSettings && siteSettings.logoUrl ? ( <img src={siteSettings.logoUrl} className="w-full h-full object-contain" alt="Logo" onError={(e) => e.target.style.display = 'none'} /> ) : <span className="text-gray-400 text-xs">NO LOGO</span>}
+                                            <div className="mt-auto pt-8 flex w-full justify-between items-end px-8">
+                                                <div className="text-center flex-1"><div className="border-b border-black w-48 mx-auto mb-2"></div><p className="text-sm font-bold">ผู้รับเงิน (Payee)</p><p className="text-xs text-gray-500">วันที่: ...../...../.......</p></div>
+                                                <div className="text-center flex-1"><div className="border-b border-black w-48 mx-auto mb-2"></div><p className="text-sm font-bold">ผู้จ่ายเงิน (Payer)</p><p className="text-xs text-gray-500">วันที่: ...../...../.......</p></div>
+                                            </div>
+                                            <div className="absolute bottom-4 w-full text-center text-[10px] text-gray-400 left-0"><p>ขอบคุณที่ใช้บริการ ขนำลุงดำ แคมป์ปิ้ง | System Generated</p></div>
                                         </div>
-                                        <div><h1 className="text-2xl font-bold text-green-900">{siteSettings && siteSettings.headerTitle}</h1><p className="text-sm text-gray-600">หมู่ที่ 3 ต.ฉลุง อ.หาดใหญ่ จ.สงขลา 90110</p><p className="text-sm font-bold mt-2 text-black"><i className="fas fa-phone-alt mr-1"></i> โทร: {SHOP_PHONE} (พร้อมเพย์)</p></div>
-                                    </div>
-                                    <div className="text-right"><h2 className="text-3xl font-bold text-gray-800 uppercase tracking-widest">RECEIPT</h2><p className="text-sm text-gray-500">ใบเสร็จรับเงิน</p><div className="mt-4 text-sm"><p><b>เลขที่:</b> {viewBooking.id}</p><p><b>วันที่:</b> {new Date().toLocaleDateString('th-TH')}</p></div></div>
-                                </div>
-                                
-                                <div className="flex w-full justify-between mb-6 bg-gray-50 p-4 rounded border border-gray-200">
-                                    <div className="flex-1 pr-4 border-r border-gray-200"><h3 className="font-bold text-gray-700 mb-2 border-b pb-1">ลูกค้า (Customer)</h3><p className="text-sm mb-1"><b>ชื่อ:</b> {viewBooking.name}</p><p className="text-sm mb-1"><b>เบอร์โทร:</b> {viewBooking.phone}</p><p className="text-sm"><b>LINE ID:</b> {viewBooking.lineProfile}</p></div>
-                                    <div className="flex-1 pl-4 text-right"><h3 className="font-bold text-gray-700 mb-2 border-b pb-1">รายละเอียดการเข้าพัก</h3><p className="text-sm mb-1"><b>เช็คอิน:</b> {formatThaiDate(viewBooking.checkIn)}</p><p className="text-sm mb-1"><b>เช็คเอาท์:</b> {formatThaiDate(viewBooking.checkOut)}</p><p className="text-sm"><b>จำนวน:</b> {viewBooking.totalGuests} ท่าน</p></div>
-                                </div>
+                                    )}
+                                    
+                                    {/* Official Receipt Template */}
+                                    {viewBooking && (
+                                        <div id="official-receipt-print-area">
+                                            <div className="flex justify-between items-start mb-6 border-b-2 border-gray-800 pb-4">
+                                                <div className="flex gap-4 items-center">
+                                                    <div className="w-24 h-24 bg-white rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center">
+                                                        {siteSettings && siteSettings.logoUrl ? ( <img src={siteSettings.logoUrl} className="w-full h-full object-contain" alt="Logo" onError={(e) => e.target.style.display = 'none'} /> ) : <span className="text-gray-400 text-xs">NO LOGO</span>}
+                                                    </div>
+                                                    <div><h1 className="text-2xl font-bold text-green-900">{siteSettings && siteSettings.headerTitle}</h1><p className="text-sm text-gray-600">หมู่ที่ 3 ต.ฉลุง อ.หาดใหญ่ จ.สงขลา 90110</p><p className="text-sm font-bold mt-2 text-black"><i className="fas fa-phone-alt mr-1"></i> โทร: {SHOP_PHONE} (พร้อมเพย์)</p></div>
+                                                </div>
+                                                <div className="text-right"><h2 className="text-3xl font-bold text-gray-800 uppercase tracking-widest">RECEIPT</h2><p className="text-sm text-gray-500">ใบเสร็จรับเงิน</p><div className="mt-4 text-sm"><p><b>เลขที่:</b> {viewBooking.id}</p><p><b>วันที่:</b> {new Date().toLocaleDateString('th-TH')}</p></div></div>
+                                            </div>
+                                            
+                                            <div className="flex w-full justify-between mb-6 bg-gray-50 p-4 rounded border border-gray-200">
+                                                <div className="flex-1 pr-4 border-r border-gray-200"><h3 className="font-bold text-gray-700 mb-2 border-b pb-1">ลูกค้า (Customer)</h3><p className="text-sm mb-1"><b>ชื่อ:</b> {viewBooking.name}</p><p className="text-sm mb-1"><b>เบอร์โทร:</b> {viewBooking.phone}</p><p className="text-sm"><b>LINE ID:</b> {viewBooking.lineProfile}</p></div>
+                                                <div className="flex-1 pl-4 text-right"><h3 className="font-bold text-gray-700 mb-2 border-b pb-1">รายละเอียดการเข้าพัก</h3><p className="text-sm mb-1"><b>เช็คอิน:</b> {formatThaiDate(viewBooking.checkIn)}</p><p className="text-sm mb-1"><b>เช็คเอาท์:</b> {formatThaiDate(viewBooking.checkOut)}</p><p className="text-sm"><b>จำนวน:</b> {viewBooking.totalGuests} ท่าน</p></div>
+                                            </div>
 
-                                <table className="w-full mb-4 border-collapse">
-                                    <thead><tr className="bg-gray-800 text-white text-sm"><th className="py-2 px-3 text-left rounded-tl w-12">#</th><th className="py-2 px-3 text-left">รายการ (Description)</th><th className="py-2 px-3 text-right w-24">จำนวน</th><th className="py-2 px-3 text-right w-32 rounded-tr">จำนวนเงิน</th></tr></thead>
-                                    <tbody className="text-sm">
-                                        {(() => {
-                                            const cart = safeJsonParse(viewBooking.cart, []);
-                                            const roomItems = cart.filter(c => c.type !== 'food'); 
-                                            const foodItems = cart.filter(c => c.type === 'food');
-                                            const foodSum = foodItems.reduce((s, i) => s + ((i.price||0) * (i.qty||1)), 0);
-                                            return ( <>
-                                                {roomItems.length > 0 && ( <tr className="bg-gray-100 font-bold"><td colSpan="4" className="py-1 px-3 text-xs text-gray-600">ค่าที่พัก (Accommodation)</td></tr> )}
-                                                {roomItems.map((item, idx) => { 
-                                                    const price = (item.pricePerNight || item.price || 0); 
-                                                    const nights = item.nights || 1; 
-                                                    const guests = item.guests || 1; 
-                                                    const isPerHead = item.type === 'ground' || item.id === 'Z8' || (item.name && item.name.includes('ลานกาง')); 
-                                                    const total = isPerHead ? (price * nights * guests) : (price * nights); 
-                                                    return ( 
+                                            <table className="w-full mb-4 border-collapse">
+                                                <thead><tr className="bg-gray-800 text-white text-sm"><th className="py-2 px-3 text-left rounded-tl w-12">#</th><th className="py-2 px-3 text-left">รายการ (Description)</th><th className="py-2 px-3 text-right w-24">จำนวน</th><th className="py-2 px-3 text-right w-32 rounded-tr">จำนวนเงิน</th></tr></thead>
+                                                <tbody className="text-sm">
+                                                    {printRoomItems.length > 0 && ( <tr className="bg-gray-100 font-bold"><td colSpan="4" className="py-1 px-3 text-xs text-gray-600">ค่าที่พัก (Accommodation)</td></tr> )}
+                                                    {printRoomItems.map((item, idx) => (
                                                         <tr key={'or'+idx} className="border-b border-gray-200">
                                                             <td className="py-2 px-3 text-center">{idx+1}</td>
                                                             <td className="py-2 px-3">
                                                                 <div className="font-bold text-gray-800">{item.name}</div>
                                                                 <div className="text-xs text-gray-500">
-                                                                    {isPerHead ? `(${guests} ท่าน) x ${nights} คืน` : `(พัก ${guests} ท่าน) x ${nights} คืน`}
+                                                                    {item._isPerHead ? `(${item._guests} ท่าน) x ${item._nights} คืน` : `(พัก ${item._guests} ท่าน) x ${item._nights} คืน`}
                                                                 </div>
                                                             </td>
                                                             <td className="py-2 px-3 text-center">1</td>
-                                                            <td className="py-2 px-3 text-right">{total.toLocaleString()}</td>
-                                                        </tr> 
-                                                    ); 
-                                                })}
-                                                {foodSum > 0 && ( <>
-                                                    <tr className="bg-gray-100 font-bold"><td colSpan="4" className="py-1 px-3 text-xs text-gray-600">ค่าอาหารและบริการ (Food & Services)</td></tr>
-                                                    <tr className="border-b border-gray-200"><td className="py-2 px-3 text-center">1</td><td className="py-2 px-3">รวมค่าอาหารและบริการเสริม</td><td className="py-2 px-3 text-center">-</td><td className="py-2 px-3 text-right">{foodSum.toLocaleString()}</td></tr>
-                                                </> )}
-                                            </> );
-                                        })()}
-                                    </tbody>
-                                    <tfoot>
-                                        {(() => {
-                                            const cart = safeJsonParse(viewBooking.cart, []);
-                                            const roomItems = cart.filter(c => c.type !== 'food'); const foodItems = cart.filter(c => c.type === 'food');
-                                            const roomSum = roomItems.reduce((s, i) => { 
-                                                const p = i.pricePerNight||i.price||0; 
-                                                const n = i.nights||1; 
-                                                const g = i.guests||1; 
-                                                const isPH = i.type === 'ground' || i.id === 'Z8' || (i.name && i.name.includes('ลานกาง')); 
-                                                return s + (isPH ? p * n * g : p * n); 
-                                            }, 0);
-                                            const foodSum = foodItems.reduce((s, i) => s + ((i.price||0) * (i.qty||1)), 0);
-                                            const netPrice = Number(viewBooking.price || 0); 
-                                            const totalCalculated = roomSum + foodSum; const discount = totalCalculated - netPrice;
+                                                            <td className="py-2 px-3 text-right">{item._computedTotal.toLocaleString()}</td>
+                                                        </tr>
+                                                    ))}
+                                                    {printFoodSum > 0 && ( <>
+                                                        <tr className="bg-gray-100 font-bold"><td colSpan="4" className="py-1 px-3 text-xs text-gray-600">ค่าอาหารและบริการ (Food & Services)</td></tr>
+                                                        <tr className="border-b border-gray-200"><td className="py-2 px-3 text-center">1</td><td className="py-2 px-3">รวมค่าอาหารและบริการเสริม</td><td className="py-2 px-3 text-center">-</td><td className="py-2 px-3 text-right">{printFoodSum.toLocaleString()}</td></tr>
+                                                    </> )}
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <td colSpan="2" rowSpan={printDiff !== 0 ? 3 : 2} className="align-top pt-4 pr-4">
+                                                            <div className="border border-gray-300 rounded p-3 text-xs text-gray-600 h-full w-full">
+                                                                <p className="font-bold mb-1">หมายเหตุ:</p>
+                                                                <p>- ขอบคุณที่ใช้บริการขนำลุงดำ</p>
+                                                            </div>
+                                                        </td>
+                                                        <td className="pt-4 text-right font-bold text-gray-700 text-sm">รวมค่าที่พัก</td>
+                                                        <td className="pt-4 text-right font-medium text-sm">{formatMoney(printCalculatedRoomSum)}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className="pt-1 text-right font-bold text-gray-700 text-sm">รวมค่าบริการ</td>
+                                                        <td className="pt-1 text-right font-medium text-sm">{formatMoney(printFoodSum)}</td>
+                                                    </tr>
+                                                    {printDiff > 0 && ( <tr><td className="pt-1 text-right font-bold text-green-600 text-sm">ส่วนลด</td><td className="pt-1 text-right font-medium text-green-600 text-sm">-{formatMoney(printDiff)}</td></tr> )}
+                                                    {printDiff < 0 && ( <tr><td className="pt-1 text-right font-bold text-orange-600 text-sm">ส่วนต่าง/เพิ่มเติม</td><td className="pt-1 text-right font-medium text-orange-600 text-sm">+{formatMoney(Math.abs(printDiff))}</td></tr> )}
+                                                    <tr className="bg-gray-100">
+                                                        <td colSpan="2"></td>
+                                                        <td className="py-2 text-right font-bold text-xl text-gray-800 border-t border-b border-gray-300 mt-1">ยอดสุทธิรวม</td>
+                                                        <td className="py-2 text-right font-bold text-xl text-gray-800 border-t border-b border-gray-300 mt-1 pr-3">{formatMoney(printNetPrice)} ฿</td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
                                             
-                                            const noteRowSpan = discount > 0 ? 3 : 2; 
+                                            <div className="mt-auto pt-8 flex w-full justify-between items-end px-8">
+                                                <div className="text-center flex-1"><div className="border-b border-black w-48 mx-auto mb-2"></div><p className="text-sm font-bold">ผู้รับเงิน (Payee)</p><p className="text-xs text-gray-500">วันที่: ...../...../.......</p></div>
+                                                <div className="text-center flex-1"><div className="border-b border-black w-48 mx-auto mb-2"></div><p className="text-sm font-bold">ผู้จ่ายเงิน (Payer)</p><p className="text-xs text-gray-500">วันที่: ...../...../.......</p></div>
+                                            </div>
+                                            <div className="absolute bottom-4 w-full text-center text-[10px] text-gray-400 left-0"><p>ขอบคุณที่ใช้บริการ ขนำลุงดำ แคมป์ปิ้ง | System Generated</p></div>
+                                        </div>
+                                    )}
+                                </>
+                            );
+                        })()}
+                        {/* ====== END CALCULATE RECEIPT ====== */}
 
-                                            return ( <>
-                                                <tr><td colSpan="2" rowSpan={noteRowSpan} className="align-top pt-4 pr-4"><div className="border border-gray-300 rounded p-3 text-xs text-gray-600 h-full w-full"><p className="font-bold mb-1">หมายเหตุ:</p><p>- ขอบคุณที่ใช้บริการขนำลุงดำ</p></div></td><td className="pt-4 text-right font-bold text-gray-700 text-sm">รวมค่าที่พัก</td><td className="pt-4 text-right font-medium text-sm">{formatMoney(roomSum)}</td></tr>
-                                                <tr><td className="pt-1 text-right font-bold text-gray-700 text-sm">รวมค่าบริการ</td><td className="pt-1 text-right font-medium text-sm">{formatMoney(foodSum)}</td></tr>
-                                                {discount > 0 && ( <tr><td className="pt-1 text-right font-bold text-green-600 text-sm">ส่วนลด</td><td className="pt-1 text-right font-medium text-green-600 text-sm">-{formatMoney(discount)}</td></tr> )}
-                                                <tr className="bg-gray-100"><td colSpan="2"></td><td className="py-2 text-right font-bold text-xl text-gray-800 border-t border-b border-gray-300 mt-1">ยอดสุทธิรวม</td><td className="py-2 text-right font-bold text-xl text-gray-800 border-t border-b border-gray-300 mt-1 pr-3">{formatMoney(netPrice)} ฿</td></tr>
-                                            </> );
-                                        })()}
-                                    </tfoot>
-                                </table>
-                                
-                                <div className="mt-auto pt-8 flex w-full justify-between items-end px-8">
-                                    <div className="text-center flex-1"><div className="border-b border-black w-48 mx-auto mb-2"></div><p className="text-sm font-bold">ผู้รับเงิน (Payee)</p><p className="text-xs text-gray-500">วันที่: ...../...../.......</p></div>
-                                    <div className="text-center flex-1"><div className="border-b border-black w-48 mx-auto mb-2"></div><p className="text-sm font-bold">ผู้จ่ายเงิน (Payer)</p><p className="text-xs text-gray-500">วันที่: ...../...../.......</p></div>
-                                </div>
-                                <div className="absolute bottom-4 w-full text-center text-[10px] text-gray-400 left-0"><p>ขอบคุณที่ใช้บริการ ขนำลุงดำ แคมป์ปิ้ง | System Generated</p></div>
-                            </div>
-                        )}
                     </div>
                     {/* CAMPING LOADING OVERLAY สำหรับ Admin */}
                     {loading && isLoggedIn && <CampingAdminLoader text="กำลังจัดการข้อมูลหลังบ้าน..." />}
@@ -1351,3 +1453,4 @@
     </script>
 </body>
 </html>
+```eof
