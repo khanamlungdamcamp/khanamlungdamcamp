@@ -26,8 +26,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
-    
-    <!-- jsQR Library สำหรับเช็คสลิปโอนเงินฝั่ง Client -->
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     
     <script>
@@ -103,9 +101,6 @@
             });
         }
 
-        // ==========================================
-        // ฟังก์ชันตรวจสอบ QR บนสลิปโอนเงิน
-        // ==========================================
         function checkSlipQR(base64Str, promptpayPhone, callback) {
             if (typeof jsQR === 'undefined') { callback(null); return; }
             const img = new Image();
@@ -119,8 +114,8 @@
                 const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
                 
                 if (code) {
-                    const phoneRaw = promptpayPhone.replace(/\D/g, ''); // ตัดขีดออกเหลือ 0615924262
-                    const phone66 = "66" + phoneRaw.substring(1); // 66615924262
+                    const phoneRaw = promptpayPhone.replace(/\D/g, ''); 
+                    const phone66 = "66" + phoneRaw.substring(1); 
                     if (code.data.includes(phoneRaw) || code.data.includes(phone66)) {
                         callback({ type: 'success', msg: 'slipValid' });
                     } else {
@@ -156,7 +151,7 @@
         const PROMPTPAY_NAME = "อลงกต ทวีผ่อง";
 
         // =====================================
-        // I18N DICTIONARY (ระบบสองภาษา UI)
+        // I18N DICTIONARY
         // =====================================
         const TRANSLATIONS = {
             th: {
@@ -188,10 +183,14 @@
                 foodOrderRule: "🍽️ เงื่อนไข: สั่งล่วงหน้าอย่างน้อย 2 วันก่อนเข้าพัก", selectedItems: "รายการที่เลือก ({count})", total: "รวม",
                 scanToOrder: "สแกนจ่ายเพื่อยืนยันออเดอร์", saveQrBtn: "บันทึกภาพ QR Code", pleaseAttachSlip: "* กรุณาแนบสลิปโอนเงิน",
                 confirmOrderBtn: "ยืนยันการสั่งอาหาร", sendingToKitchen: "กำลังส่งข้อมูล...ให้แม่ครัว", orderFoodSuccess: "สั่งอาหารเรียบร้อย",
-                // Slip Verification Texts
                 slipWarningNoQR: "⚠️ ตรวจไม่พบ QR Code ในสลิป แอดมินจะตรวจสอบอีกครั้ง",
                 slipWarningWrongQR: "⚠️ สลิปนี้อาจไม่ใช่การโอนเข้าบัญชีขนำลุงดำ โปรดตรวจสอบอีกครั้ง!",
-                slipValid: "✅ สลิปถูกต้อง (ตรวจพบ QR Code บัญชีร้านค้า)"
+                slipValid: "✅ สลิปถูกต้อง (ตรวจพบ QR Code บัญชีร้านค้า)",
+                // Calendar Translation
+                selectDates: "เลือกวันเข้าพัก (เช็คอิน - เช็คเอาท์)",
+                clearDates: "ล้างข้อมูล",
+                legendAvailable: "ว่าง", legendSelected: "เลือก", legendSpecial: "วันพิเศษ/เทศกาล", legendClosed: "ปิดบริการ",
+                errCrossClosed: "มีวันปิดทำการอยู่ในช่วงที่คุณเลือก กรุณาเลือกใหม่ครับ"
             },
             en: {
                 back: "Back", cancel: "Cancel", confirm: "Confirm", ok: "OK", delete: "Remove",
@@ -222,26 +221,31 @@
                 foodOrderRule: "🍽️ Policy: Food must be pre-ordered at least 2 days before check-in.", selectedItems: "Selected Items ({count})", total: "Total",
                 scanToOrder: "Scan to pay and confirm order", saveQrBtn: "Save QR Code", pleaseAttachSlip: "* Payment slip is required",
                 confirmOrderBtn: "Confirm Order", sendingToKitchen: "Sending order to kitchen...", orderFoodSuccess: "Food ordered successfully",
-                // Slip Verification Texts
                 slipWarningNoQR: "⚠️ No QR Code detected. Admin will verify manually.",
                 slipWarningWrongQR: "⚠️ This slip might not belong to our account. Please verify!",
-                slipValid: "✅ Valid slip (Merchant QR detected)"
+                slipValid: "✅ Valid slip (Merchant QR detected)",
+                // Calendar Translation
+                selectDates: "Select Dates (Check-in & Check-out)",
+                clearDates: "Clear",
+                legendAvailable: "Available", legendSelected: "Selected", legendSpecial: "High Season", legendClosed: "Closed",
+                errCrossClosed: "Your selected range includes closed dates. Please select again."
             }
         };
 
         const safeJsonParse = (str, fallback = {}) => {
             if (!str || str === '-') return fallback;
             if (typeof str !== 'string') return str;
-            try { 
-                let cleanStr = str.replace(/[“”]/g, '"').replace(/[‘’]/g, "'");
-                return JSON.parse(cleanStr); 
-            } catch (e) { 
-                console.warn('JSON Parse Error:', str); 
-                return fallback; 
-            }
+            try { let cleanStr = str.replace(/[“”]/g, '"').replace(/[‘’]/g, "'"); return JSON.parse(cleanStr); } 
+            catch (e) { return fallback; }
         };
 
         const formatMoney = (val) => Number(val || 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+        
+        // Helper ป้องกันปัญหา Timezone ฝั่ง JS เวลาสร้าง Date()
+        const toLocalISOString = (d) => {
+            const z = n => ('0' + n).slice(-2);
+            return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}`;
+        };
 
         const fetchWithTimeout = async (resource, options = {}) => {
             const { timeout = 30000 } = options;
@@ -269,20 +273,15 @@
                         let width = img.width;
                         let height = img.height;
                         if (width > maxWidth) { height *= maxWidth / width; width = maxWidth; }
-                        canvas.width = width;
-                        canvas.height = height;
+                        canvas.width = width; canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-                        
                         let dataUrl = canvas.toDataURL('image/jpeg', quality);
                         const head = 'data:image/jpeg;base64,';
                         const sizeInBytes = Math.round((dataUrl.length - head.length) * 3 / 4);
-                        
                         if (sizeInBytes > 500000 && quality > 0.3) {
                             resolve(compressImage(file, quality - 0.2, maxWidth * 0.8)); 
-                        } else {
-                            resolve(dataUrl);
-                        }
+                        } else { resolve(dataUrl); }
                     };
                     img.onerror = (err) => reject(err);
                 };
@@ -297,7 +296,6 @@
             logoUrl: 'https://lh3.googleusercontent.com/pw/AP1GczPi_rYAbsNGi4X96mW5koYl0JJ3BN9ipRf6UgsXAOQgkyhrs2ChGcZlbsuQ3OLJOYnYhSTYJhWUuu2hwWtPqlt4MUfdUDSS3s4RdRLeD36gPLiK-8OhYLXWmqxVLh2eOtkLIx7pQxrQA6ZnqBYHOftH=w913-h913-s-no-gm?authuser=0',
             roomImages: {}, foodMenu: [], roomDescriptions: {}
         };
-
         const DEFAULT_POSITIONS = { 'R1': {x: 20, y: 30}, 'R2': {x: 40, y: 50}, 'R3': {x: 60, y: 50}, 'T1': {x: 25, y: 70}, 'T2': {x: 35, y: 75}, 'K1': {x: 70, y: 70}, 'K2': {x: 80, y: 70}, 'Z8': {x: 50, y: 20} };
 
         const CampingLoaderOverlay = ({ text }) => (
@@ -318,16 +316,172 @@
                 </div>
             </div>
         );
+
+        // ==========================================
+        // COMPONENT: Custom Date Range Picker Calendar
+        // ==========================================
+        const DateRangePicker = ({ dates, setDates, closedDates, specialDates, lang, t, setModalAlert }) => {
+            const [viewDate, setViewDate] = React.useState(new Date());
+            
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const todayStr = toLocalISOString(today);
+            
+            const monthNamesTH = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+            const monthNamesEN = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const dayNamesTH = ["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส"];
+            const dayNamesEN = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+            
+            const months = lang === 'en' ? monthNamesEN : monthNamesTH;
+            const days = lang === 'en' ? dayNamesEN : dayNamesTH;
+            const yearOffset = lang === 'en' ? 0 : 543;
+            
+            const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
+            const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
+            
+            const handlePrevMonth = () => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1));
+            const handleNextMonth = () => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1));
+            
+            const handleDateClick = (dateObj) => {
+                const dateStr = toLocalISOString(dateObj);
+                
+                // Block clicking on closed dates
+                if (closedDates.some(c => c.date === dateStr)) return;
+                // Block clicking past dates (except today if you allow same-day booking, but usually we allow >= tomorrow)
+                if (dateStr <= todayStr) return; // Allow booking from tomorrow
+                
+                if (!dates.checkIn || (dates.checkIn && dates.checkOut)) {
+                    setDates({ checkIn: dateStr, checkOut: '' });
+                } else {
+                    if (dateStr > dates.checkIn) {
+                        // Validate if range crosses any closed date
+                        let current = new Date(dates.checkIn);
+                        let end = new Date(dateStr);
+                        let hasClosed = false;
+                        
+                        // temp fix for timezone
+                        current = new Date(current.getTime() + Math.abs(current.getTimezoneOffset() * 60000));
+                        end = new Date(end.getTime() + Math.abs(end.getTimezoneOffset() * 60000));
+
+                        while(current < end) {
+                            const dStr = toLocalISOString(current);
+                            if (closedDates.some(c => c.date === dStr)) {
+                                hasClosed = true; break;
+                            }
+                            current.setDate(current.getDate() + 1);
+                        }
+                        
+                        if(hasClosed) {
+                            setModalAlert({ show: true, type: 'error', title: t('error'), text: t('errCrossClosed') });
+                            setDates({ checkIn: dateStr, checkOut: '' });
+                        } else {
+                            setDates({ ...dates, checkOut: dateStr });
+                        }
+                    } else {
+                        // User clicked a date before checkIn -> reset checkIn
+                        setDates({ checkIn: dateStr, checkOut: '' });
+                    }
+                }
+            };
+
+            const renderCalendar = () => {
+                const year = viewDate.getFullYear();
+                const month = viewDate.getMonth();
+                const daysInMonth = getDaysInMonth(year, month);
+                const firstDay = getFirstDayOfMonth(year, month);
+                
+                const grid = [];
+                for (let i = 0; i < firstDay; i++) grid.push(<div key={`empty-${i}`} className="w-9 h-9"></div>);
+                
+                for (let i = 1; i <= daysInMonth; i++) {
+                    const dateObj = new Date(year, month, i);
+                    const dateStr = toLocalISOString(dateObj);
+                    
+                    const isPast = dateStr <= todayStr;
+                    const isClosed = closedDates.some(c => c.date === dateStr);
+                    const isSpecial = specialDates.some(s => s.date === dateStr);
+                    
+                    const isCheckIn = dates.checkIn === dateStr;
+                    const isCheckOut = dates.checkOut === dateStr;
+                    const isInBetween = dates.checkIn && dates.checkOut && dateStr > dates.checkIn && dateStr < dates.checkOut;
+                    
+                    let baseClasses = "w-9 h-9 flex flex-col items-center justify-center text-sm rounded-full relative transition-all duration-200 cursor-pointer ";
+                    
+                    if (isPast) {
+                        baseClasses += "text-gray-300 dark:text-gray-600 cursor-not-allowed ";
+                    } else if (isClosed) {
+                        baseClasses += "bg-red-50 dark:bg-red-900/30 text-red-400 dark:text-red-500 line-through cursor-not-allowed ";
+                    } else if (isCheckIn || isCheckOut) {
+                        baseClasses += "bg-green-600 text-white font-bold shadow-md transform scale-110 ";
+                    } else if (isInBetween) {
+                        baseClasses += "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 ";
+                    } else {
+                        baseClasses += "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 ";
+                    }
+
+                    grid.push(
+                        <div key={i} className="flex justify-center items-center py-1">
+                            <div className={baseClasses} onClick={() => handleDateClick(dateObj)}>
+                                <span className="z-10">{i}</span>
+                                {isSpecial && !isCheckIn && !isCheckOut && !isPast && !isClosed && (
+                                    <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-orange-400 rounded-full"></div>
+                                )}
+                            </div>
+                        </div>
+                    );
+                }
+                return grid;
+            };
+
+            return (
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-100 dark:border-gray-700 p-4 mb-4 select-none">
+                    <div className="flex justify-between items-center mb-4">
+                        <p className="font-bold text-gray-800 dark:text-white text-sm"><i className="fas fa-calendar-alt text-green-600 mr-2"></i>{t('selectDates')}</p>
+                        <button onClick={() => setDates({checkIn:'', checkOut:''})} className="text-xs text-red-500 hover:text-red-700 underline">{t('clearDates')}</button>
+                    </div>
+                    
+                    {/* Month Nav */}
+                    <div className="flex justify-between items-center mb-2 px-2">
+                        <button onClick={handlePrevMonth} className="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300"><i className="fas fa-chevron-left"></i></button>
+                        <div className="font-bold text-gray-800 dark:text-white">{months[viewDate.getMonth()]} {viewDate.getFullYear() + yearOffset}</div>
+                        <button onClick={handleNextMonth} className="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300"><i className="fas fa-chevron-right"></i></button>
+                    </div>
+
+                    {/* Days Header */}
+                    <div className="grid grid-cols-7 gap-1 mb-2">
+                        {days.map((d, idx) => (
+                            <div key={idx} className="text-center text-xs font-bold text-gray-400 dark:text-gray-500">{d}</div>
+                        ))}
+                    </div>
+
+                    {/* Calendar Grid */}
+                    <div className="grid grid-cols-7 gap-y-1 gap-x-1">
+                        {renderCalendar()}
+                    </div>
+
+                    {/* Selected Info & Legend */}
+                    <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700 flex flex-col gap-2">
+                        <div className="flex justify-between text-xs text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 p-2 rounded">
+                            <span><b>In:</b> {dates.checkIn ? formatDateLocalized(dates.checkIn) : '-'}</span>
+                            <span><b>Out:</b> {dates.checkOut ? formatDateLocalized(dates.checkOut) : '-'}</span>
+                        </div>
+                        <div className="flex justify-center gap-3 text-[10px] text-gray-500 dark:text-gray-400 mt-1">
+                            <span className="flex items-center"><div className="w-2 h-2 rounded-full bg-green-600 mr-1"></div>{t('legendSelected')}</span>
+                            <span className="flex items-center"><div className="w-2 h-2 rounded-full bg-orange-400 mr-1"></div>{t('legendSpecial')}</span>
+                            <span className="flex items-center"><div className="w-2 h-2 rounded-full bg-red-100 border border-red-300 mr-1"></div>{t('legendClosed')}</span>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
         
         const App = () => {
             const [isDark, setIsDark] = React.useState(true);
-            
-            // --- Auto-Detect Language (Quick Win 1) ---
             const [lang, setLang] = React.useState(() => {
                 const saved = localStorage.getItem('khanam_lang');
                 if (saved) return saved;
                 const browserLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
-                return browserLang.includes('th') ? 'th' : 'en'; // ถ้าเครื่องไม่ใช่ไทย จะตั้งต้นเป็น EN อัตโนมัติ
+                return browserLang.includes('th') ? 'th' : 'en'; 
             });
 
             const [step, setStep] = React.useState(1);
@@ -352,9 +506,8 @@
             const [discount, setDiscount] = React.useState({ code: '', val: 0, type: '', message: '', status: '' });
             const [checkingDiscount, setCheckingDiscount] = React.useState(false);
             
-            // สเตทเก็บข้อมูลสลิป
             const [slipImg, setSlipImg] = React.useState(null);
-            const [slipStatus, setSlipStatus] = React.useState(null); // เช็คสถานะ QR สลิปหน้าจอง
+            const [slipStatus, setSlipStatus] = React.useState(null); 
             
             const [bookingResult, setBookingResult] = React.useState(null);
             const [agreed, setAgreed] = React.useState(false);
@@ -376,7 +529,6 @@
             const [manageTab, setManageTab] = React.useState('info'); 
             const [addOnCart, setAddOnCart] = React.useState([]); 
             
-            // สเตทสลิปสั่งอาหารเพิ่ม
             const [addOnSlip, setAddOnSlip] = React.useState(null);
             const [addOnSlipStatus, setAddOnSlipStatus] = React.useState(null);
 
@@ -734,18 +886,15 @@
                         {/* FLOATING ACTION BUTTONS (Top-Right Stack) */}
                         <div className="fixed top-4 right-4 z-50 flex flex-col gap-3">
                             
-                            {/* LANGUAGE TOGGLE */}
                             <button onClick={toggleLanguage} className="bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-12 h-12 flex flex-col items-center justify-center transition-transform hover:scale-110 text-blue-600 dark:text-blue-400">
                                 <i className="fas fa-globe text-sm mb-0.5"></i>
                                 <span className="text-[10px] font-bold leading-none">{lang === 'th' ? 'EN' : 'TH'}</span>
                             </button>
 
-                            {/* THEME TOGGLE */}
                             <button onClick={() => setIsDark(!isDark)} className="bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-12 h-12 flex items-center justify-center transition-transform hover:scale-110 text-gray-800 dark:text-white"> 
                                 {isDark ? '☀️' : '🌙'} 
                             </button>
                             
-                            {/* MODE TOGGLE (Manage/Booking) */}
                             <button onClick={() => { setMode(mode === 'booking' ? 'manage' : 'booking'); setStep(1); setManageData(null); setManageTab('info'); }} className="bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-12 h-12 flex items-center justify-center transition-transform hover:scale-110 text-gray-800 dark:text-white"> 
                                 {mode === 'booking' ? <i className="fas fa-search"></i> : <i className="fas fa-home"></i>} 
                             </button>
@@ -954,17 +1103,25 @@
 
                         {/* --- MODE: BOOKING --- */}
                         {mode === 'booking' && step === 1 && (
-                            <div className="max-w-md mx-auto bg-white dark:bg-gray-800 shadow-xl rounded-xl mt-20 border dark:border-gray-700 overflow-hidden">
+                            <div className="max-w-md mx-auto bg-white dark:bg-gray-800 shadow-xl rounded-xl mt-20 border dark:border-gray-700 overflow-hidden pb-4">
                                 <div className="h-48 relative"><img src={siteConfig.bannerUrl} referrerPolicy="no-referrer" className="w-full h-full object-cover" /><div className="absolute inset-0 bg-black bg-opacity-10"></div></div>
-                                <div className="p-6 -mt-24 relative z-10">
-                                    <img src={siteConfig.logoUrl} referrerPolicy="no-referrer" className="w-48 h-48 mx-auto rounded-full border-4 border-white dark:border-gray-800 object-cover bg-white shadow-lg mb-4"/>
+                                <div className="p-4 -mt-24 relative z-10">
+                                    <img src={siteConfig.logoUrl} referrerPolicy="no-referrer" className="w-32 h-32 mx-auto rounded-full border-4 border-white dark:border-gray-800 object-cover bg-white shadow-lg mb-4"/>
                                     <h1 className="text-xl text-center mb-2 text-green-800 dark:text-green-400 font-bold">{tData(siteConfig.headerTitle)}</h1>
-                                    <p className="block text-center mb-4 text-gray-700 dark:text-gray-300 text-sm whitespace-pre-line">{tData(siteConfig.headerDesc)}</p>
-                                    <div className="space-y-4">
-                                        <div><label className="block text-gray-700 dark:text-green-400 font-bold mb-1">{t('checkInDate')}</label><input type="date" min={getTommorow()} className="w-full border p-2 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white" onChange={e => setDates({...dates, checkIn: e.target.value})} /></div>
-                                        <div><label className="block text-gray-700 dark:text-red-300 font-bold mb-1">{t('checkOutDate')}</label><input type="date" min={dates.checkIn || getTommorow()} className="w-full border p-2 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white" onChange={e => setDates({...dates, checkOut: e.target.value})} /></div>
-                                        <button onClick={handleSearch} disabled={loading} className="w-full bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition font-bold shadow-lg mt-2">{loading ? t('searching') : t('searchRooms')}</button>
-                                    </div>
+                                    <p className="block text-center mb-6 text-gray-700 dark:text-gray-300 text-sm whitespace-pre-line px-2">{tData(siteConfig.headerDesc)}</p>
+                                    
+                                    {/* --- CUSTOM CALENDAR REPLACES NATIVE DATE INPUTS --- */}
+                                    <DateRangePicker 
+                                        dates={dates} 
+                                        setDates={setDates} 
+                                        closedDates={systemSettings.closed || []} 
+                                        specialDates={systemSettings.special || []} 
+                                        lang={lang} 
+                                        t={t}
+                                        setModalAlert={setModalAlert}
+                                    />
+                                    
+                                    <button onClick={handleSearch} disabled={loading} className="w-full bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition font-bold shadow-lg mt-2">{loading ? t('searching') : t('searchRooms')}</button>
                                 </div>
                             </div>
                         )}
