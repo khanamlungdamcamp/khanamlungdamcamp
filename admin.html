@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบหลังบ้าน - ขนำลุงดำ แคมป์ปิ้ง (God Mode)</title>
     
+    <!-- Preconnect ช่วยเพิ่มความเร็วในการโหลดทรัพยากร -->
+    <link rel="preconnect" href="https://script.google.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+    <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
+
     <!-- React & Libs -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -221,6 +227,25 @@
             React.useEffect(() => {
                 if(isLoggedIn && password) {
                     setLoading(true);
+
+                    // 1. ดึง Cache ของระบบตั้งค่า (โหลดหน้าต่างไวขึ้น)
+                    const cachedAdminInit = sessionStorage.getItem('admin_init_data');
+                    if(cachedAdminInit) {
+                        try {
+                            const initRes = JSON.parse(cachedAdminInit);
+                            setSettings(initRes.settings);
+                            setSiteSettings(initRes.siteConfig);
+                            setRoomConfig(initRes.roomConfig);
+                            setMapConfig(initRes.mapConfig);
+                            if (initRes.siteConfig?.roomImages?.['MAP_BG'] && initRes.siteConfig.roomImages['MAP_BG'].length > 0) {
+                                setMapBackground(initRes.siteConfig.roomImages['MAP_BG'][0]);
+                            }
+                            const loadedIds = Object.keys(initRes.roomConfig);
+                            if (loadedIds.length > 0) { ROOM_IDS = loadedIds; ROOM_NAMES = {}; loadedIds.forEach(id => ROOM_NAMES[id] = initRes.roomConfig[id].name); }
+                        } catch(e) {}
+                    }
+
+                    // 2. ดึงข้อมูลจริงจากเซิร์ฟเวอร์
                     Promise.all([
                         fetchWithTimeout(`${GOOGLE_SCRIPT_URL}?action=getInitialData`).then(r => r.json()),
                         fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'getAdminData', password: password }) }).then(r=>r.json())
@@ -236,6 +261,9 @@
                             }
                             const loadedIds = Object.keys(roomConfig);
                             if (loadedIds.length > 0) { ROOM_IDS = loadedIds; ROOM_NAMES = {}; loadedIds.forEach(id => ROOM_NAMES[id] = roomConfig[id].name); }
+                            
+                            // บันทึก Cache เผื่อโหลดครั้งถัดไป
+                            sessionStorage.setItem('admin_init_data', JSON.stringify(initRes.data));
                         }
                         if(adminRes.status === 'success') {
                             setBookings(adminRes.data);
@@ -349,6 +377,7 @@
             }
 
             const fetchData = () => { setLoading(true); fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'getAdminData', password: password }) }).then(r => r.json()).then(res => { setLoading(false); if (res.status === 'success') setBookings(res.data); }).catch(e=>setLoading(false)); };
+            
             const fetchInitialData = () => {
                 setLoading(true);
                 fetchWithTimeout(`${GOOGLE_SCRIPT_URL}?action=getInitialData`).then(r => r.json()).then(res => {
@@ -359,6 +388,7 @@
                         if (siteConfig?.roomImages?.['MAP_BG'] && siteConfig.roomImages['MAP_BG'].length > 0) {
                             setMapBackground(siteConfig.roomImages['MAP_BG'][0]);
                         }
+                        sessionStorage.setItem('admin_init_data', JSON.stringify(res.data));
                     }
                 }).catch(e=>setLoading(false));
             };
