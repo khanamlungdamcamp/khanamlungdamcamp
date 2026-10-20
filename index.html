@@ -683,20 +683,26 @@
                 <div className={isDark ? "dark" : ""}>
                     <div className="min-h-screen bg-[#f3f4f6] dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-300 relative">
                         
-                        {/* LANGUAGE TOGGLE (Top-Left) */}
-                        <button onClick={toggleLanguage} className="fixed top-4 left-4 z-50 bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-12 h-12 flex items-center justify-center transition-transform hover:scale-110 font-bold text-sm text-blue-600 dark:text-blue-400">
-                            <i className="fas fa-globe mr-1"></i> {lang === 'th' ? 'EN' : 'TH'}
-                        </button>
+                        {/* FLOATING ACTION BUTTONS (Top-Right Stack) */}
+                        <div className="fixed top-4 right-4 z-50 flex flex-col gap-3">
+                            
+                            {/* LANGUAGE TOGGLE */}
+                            <button onClick={toggleLanguage} className="bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-12 h-12 flex flex-col items-center justify-center transition-transform hover:scale-110 text-blue-600 dark:text-blue-400">
+                                <i className="fas fa-globe text-sm mb-0.5"></i>
+                                <span className="text-[10px] font-bold leading-none">{lang === 'th' ? 'EN' : 'TH'}</span>
+                            </button>
 
-                        {/* THEME TOGGLE (Top-Right) */}
-                        <button onClick={() => setIsDark(!isDark)} className="fixed top-4 right-4 z-50 bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-12 h-12 flex items-center justify-center transition-transform hover:scale-110 text-gray-800 dark:text-white"> 
-                            {isDark ? '☀️' : '🌙'} 
-                        </button>
-                        
-                        {/* MODE TOGGLE (Manage/Booking) */}
-                        <button onClick={() => { setMode(mode === 'booking' ? 'manage' : 'booking'); setStep(1); setManageData(null); setManageTab('info'); }} className="fixed top-20 right-4 z-50 bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-12 h-12 flex items-center justify-center transition-transform hover:scale-110 text-gray-800 dark:text-white"> 
-                            {mode === 'booking' ? <i className="fas fa-search"></i> : <i className="fas fa-home"></i>} 
-                        </button>
+                            {/* THEME TOGGLE */}
+                            <button onClick={() => setIsDark(!isDark)} className="bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-12 h-12 flex items-center justify-center transition-transform hover:scale-110 text-gray-800 dark:text-white"> 
+                                {isDark ? '☀️' : '🌙'} 
+                            </button>
+                            
+                            {/* MODE TOGGLE (Manage/Booking) */}
+                            <button onClick={() => { setMode(mode === 'booking' ? 'manage' : 'booking'); setStep(1); setManageData(null); setManageTab('info'); }} className="bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-12 h-12 flex items-center justify-center transition-transform hover:scale-110 text-gray-800 dark:text-white"> 
+                                {mode === 'booking' ? <i className="fas fa-search"></i> : <i className="fas fa-home"></i>} 
+                            </button>
+
+                        </div>
 
                         {/* --- MANAGE MODE --- */}
                         {mode === 'manage' && (
@@ -891,7 +897,7 @@
                         {mode === 'booking' && step === 2 && (
                             <div className="max-w-4xl mx-auto p-4 relative">
                                 <div className="flex justify-between items-center mb-4"><div className="flex items-center gap-2"><button onClick={()=>setStep(1)} className="text-gray-500 dark:text-gray-300 hover:text-green-600 font-bold"><i className="fas fa-chevron-left"></i> {t('back')}</button><h2 className="text-xl font-bold dark:text-white">{t('selectRoom')}</h2></div></div>
-                                <div className="map-container bg-blue-100 dark:bg-gray-700 mb-6" style={{paddingBottom: '56.22%'}}>
+                                <div className="map-container bg-blue-100 dark:bg-gray-700 mb-6" style={{paddingBottom: '100%'}}>
                                     <img src={siteConfig?.roomImages?.['MAP_BG']?.[0] || "https://img2.pic.in.th/3d539b84-44ce-4336-ad90-bd2f84b13eca.jpg"} referrerPolicy="no-referrer" className="absolute top-0 left-0 w-full h-full object-cover" alt="Camp Map" />
                                     {Object.keys(pinPos).map(key => {
                                         if (!roomConfig[key]) return null;
