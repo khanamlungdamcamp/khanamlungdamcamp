@@ -5,46 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ขนำลุงดำ แคมป์ปิ้ง - จองที่พัก</title>
     
-    <!-- ========================================== -->
-    <!-- 1. Open Graph Tags (สำหรับแชร์ลิงก์ให้สวยงาม) -->
-    <!-- ========================================== -->
+    <!-- Open Graph Tags (เพิ่มรูปพรีวิวตอนแชร์ลิงก์) -->
     <meta property="og:title" content="ขนำลุงดำ แคมป์ปิ้ง - จองที่พัก" />
     <meta property="og:description" content="🏕️ ขนำลุงดำ แคมป์ปิ้ง ดั้งเดิมมาจากหนำปู่ บริการที่พัก ลานกางเต็นท์ ริมน้ำ บรรยากาศสุดชิล สงขลา" />
     <meta property="og:image" content="https://img5.pic.in.th/file/secure-sv1/LINE_ALBUM__240916_14dd72f9bd7de4facf.jpg" />
-    <meta property="og:url" content="https://khanamlungdamcamp.github.io/khanamlungdamcamp/index.html" />
     <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
 
-    <!-- ========================================== -->
-    <!-- 2. PWA & Web App Meta Tags (เปลี่ยนเว็บเป็นแอป) -->
-    <!-- ========================================== -->
+    <!-- Web App & PWA Meta Tags (รองรับการตั้งเป็นแอปในมือถือ) -->
     <meta name="theme-color" content="#16a34a" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="ขนำลุงดำ" />
-    <!-- โลโก้แอปสำหรับ iOS / Android (Add to Home Screen) -->
     <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/pw/AP1GczPi_rYAbsNGi4X96mW5koYl0JJ3BN9ipRf6UgsXAOQgkyhrs2ChGcZlbsuQ3OLJOYnYhSTYJhWUuu2hwWtPqlt4MUfdUDSS3s4RdRLeD36gPLiK-8OhYLXWmqxVLh2eOtkLIx7pQxrQA6ZnqBYHOftH=w913-h913-s-no-gm" />
-    <!-- ข้อมูล PWA Manifest แบบ Inline (ฝังไฟล์ ไม่ต้องโหลดเพิ่ม) -->
-    <link rel="manifest" href='data:application/manifest+json,{"name":"ขนำลุงดำ แคมป์ปิ้ง","short_name":"ขนำลุงดำ","display":"standalone","background_color":"#f3f4f6","theme_color":"#16a34a","start_url":".","icons":[{"src":"https://lh3.googleusercontent.com/pw/AP1GczPi_rYAbsNGi4X96mW5koYl0JJ3BN9ipRf6UgsXAOQgkyhrs2ChGcZlbsuQ3OLJOYnYhSTYJhWUuu2hwWtPqlt4MUfdUDSS3s4RdRLeD36gPLiK-8OhYLXWmqxVLh2eOtkLIx7pQxrQA6ZnqBYHOftH=w913-h913-s-no-gm","sizes":"512x512","type":"image/png"}]}' />
-
-    <!-- Preconnect ช่วยเพิ่มความเร็วในการโหลดทรัพยากร -->
+    
+    <!-- Preconnect -->
     <link rel="preconnect" href="https://script.google.com" crossorigin>
     <link rel="preconnect" href="https://unpkg.com" crossorigin>
     <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
     <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
 
-    <!-- React & ReactDOM -->
+    <!-- React & Libs -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <!-- Tailwind CSS & Config -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class', 
-        }
-    </script>
+    <script> tailwind.config = { darkMode: 'class' } </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
@@ -72,52 +57,28 @@
             return new Promise((resolve) => {
                 const qr = new QRious({ value: payload, size: size, level: 'H' });
                 const qrBase64 = qr.toDataURL();
-                
                 const canvas = document.createElement('canvas');
-                canvas.width = size;
-                canvas.height = size;
+                canvas.width = size; canvas.height = size;
                 const ctx = canvas.getContext('2d');
-                
                 const qrImg = new Image();
                 qrImg.onload = () => {
                     ctx.drawImage(qrImg, 0, 0);
-                    
                     const drawLogo = (imgSrc, isFallback = false) => {
                         const logoImg = new Image();
                         logoImg.crossOrigin = "Anonymous";
                         logoImg.onload = () => {
                             const logoSize = size * 0.22;
-                            const x = (size - logoSize) / 2;
-                            const y = (size - logoSize) / 2;
-                            const pad = 6;
-                            
+                            const x = (size - logoSize) / 2; const y = (size - logoSize) / 2; const pad = 6;
                             ctx.fillStyle = 'white';
-                            if (ctx.roundRect) {
-                                ctx.beginPath();
-                                ctx.roundRect(x - pad, y - pad, logoSize + pad * 2, logoSize + pad * 2, 8);
-                                ctx.fill();
-                            } else {
-                                ctx.fillRect(x - pad, y - pad, logoSize + pad * 2, logoSize + pad * 2);
-                            }
-                            
+                            if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(x - pad, y - pad, logoSize + pad * 2, logoSize + pad * 2, 8); ctx.fill(); } 
+                            else { ctx.fillRect(x - pad, y - pad, logoSize + pad * 2, logoSize + pad * 2); }
                             ctx.drawImage(logoImg, x, y, logoSize, logoSize);
                             resolve(canvas.toDataURL('image/png'));
                         };
-                        logoImg.onerror = () => {
-                            if (!isFallback) {
-                                drawLogo("https://upload.wikimedia.org/wikipedia/commons/e/e0/PromptPay-logo.png", true);
-                            } else {
-                                resolve(qrBase64);
-                            }
-                        };
+                        logoImg.onerror = () => { if (!isFallback) { drawLogo("https://upload.wikimedia.org/wikipedia/commons/e/e0/PromptPay-logo.png", true); } else { resolve(qrBase64); } };
                         logoImg.src = imgSrc;
                     };
-                    
-                    if (shopLogoUrl) {
-                        drawLogo(shopLogoUrl);
-                    } else {
-                        drawLogo("https://upload.wikimedia.org/wikipedia/commons/e/e0/PromptPay-logo.png", true);
-                    }
+                    if (shopLogoUrl) drawLogo(shopLogoUrl); else drawLogo("https://upload.wikimedia.org/wikipedia/commons/e/e0/PromptPay-logo.png", true);
                 };
                 qrImg.src = qrBase64;
             });
@@ -129,23 +90,16 @@
             img.onload = () => {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d', { willReadFrequently: true });
-                canvas.width = img.width;
-                canvas.height = img.height;
+                canvas.width = img.width; canvas.height = img.height;
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                 const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                 const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
-                
                 if (code) {
                     const phoneRaw = promptpayPhone.replace(/\D/g, ''); 
                     const phone66 = "66" + phoneRaw.substring(1); 
-                    if (code.data.includes(phoneRaw) || code.data.includes(phone66)) {
-                        callback({ type: 'success', msg: 'slipValid' });
-                    } else {
-                        callback({ type: 'error', msg: 'slipWarningWrongQR' });
-                    }
-                } else {
-                    callback({ type: 'warning', msg: 'slipWarningNoQR' });
-                }
+                    if (code.data.includes(phoneRaw) || code.data.includes(phone66)) callback({ type: 'success', msg: 'slipValid' });
+                    else callback({ type: 'error', msg: 'slipWarningWrongQR' });
+                } else callback({ type: 'warning', msg: 'slipWarningNoQR' });
             };
             img.src = base64Str;
         }
@@ -153,12 +107,12 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap');
-        body { font-family: 'Kanit', sans-serif; }
+        body { font-family: 'Kanit', sans-serif; margin: 0; padding: 0; }
         .map-container { position: relative; overflow: hidden; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         .animate-pop { animation: fadeIn 0.3s ease-out forwards; }
         .map-pin-responsive { transition: transform 0.2s; }
-        @media (max-width: 640px) { .map-pin-responsive { transform: translate(-50%, -50%) scale(0.8) !important; } }
+        @media (max-width: 640px) { .map-pin-responsive { transform: translate(-50%, -50%) scale(0.85) !important; } }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(156, 163, 175, 0.5); border-radius: 4px; }
     </style>
@@ -178,7 +132,7 @@
         const TRANSLATIONS = {
             th: {
                 back: "ย้อนกลับ", cancel: "ยกเลิก", confirm: "ยืนยัน", ok: "ตกลง", delete: "ลบ",
-                loadingPrepare: "กำลังเตรียมพื้นที่กางเต็นท์...", loadingWait: "กำลังดำเนินการ...", loadingData: "กำลังกางเต็นท์ข้อมูล...",
+                loadingPrepare: "กำลังเตรียมพื้นที่กางเต็นท์...", loadingWait: "กำลังดำเนินการ...", loadingData: "กำลังโหลดข้อมูล...",
                 notice: "แจ้งเตือน", success: "สำเร็จ!", error: "เกิดข้อผิดพลาด",
                 checkInDate: "วันที่เข้าพัก", checkOutDate: "วันที่ออก", searchRooms: "ค้นหาที่พักว่าง", searching: "กำลังตรวจสอบ...",
                 selectRoom: "เลือกที่พัก", noDesc: "ไม่มีคำอธิบาย", persons: "คน",
@@ -204,16 +158,13 @@
                 newCheckIn: "เช็คอินใหม่", newCheckOut: "เช็คเอาท์ใหม่", confirmRescheduleBtn: "ยืนยันการเลื่อน", working: "กำลังทำงาน...", rescheduleSuccess: "เลื่อนวันเรียบร้อย",
                 foodOrderRule: "🍽️ เงื่อนไข: สั่งล่วงหน้าอย่างน้อย 2 วันก่อนเข้าพัก", selectedItems: "รายการที่เลือก ({count})", total: "รวม",
                 scanToOrder: "สแกนจ่ายเพื่อยืนยันออเดอร์", saveQrBtn: "บันทึกภาพ QR Code", pleaseAttachSlip: "* กรุณาแนบสลิปโอนเงิน",
-                confirmOrderBtn: "ยืนยันการสั่งอาหาร", sendingToKitchen: "กำลังส่งข้อมูล...ให้แม่ครัว", orderFoodSuccess: "สั่งอาหารเรียบร้อย",
+                confirmOrderBtn: "ยืนยันการสั่งอาหาร", sendingToKitchen: "กำลังส่งข้อมูล...", orderFoodSuccess: "สั่งอาหารเรียบร้อย",
                 slipWarningNoQR: "⚠️ ตรวจไม่พบ QR Code ในสลิป แอดมินจะตรวจสอบอีกครั้ง",
                 slipWarningWrongQR: "⚠️ สลิปนี้อาจไม่ใช่การโอนเข้าบัญชีขนำลุงดำ โปรดตรวจสอบอีกครั้ง!",
                 slipValid: "✅ สลิปถูกต้อง (ตรวจพบ QR Code บัญชีร้านค้า)",
-                // Calendar Translation
-                selectDates: "เลือกวันเข้าพัก (เช็คอิน - เช็คเอาท์)",
-                clearDates: "ล้างข้อมูล",
+                selectDates: "เลือกวันเข้าพัก (เช็คอิน - เช็คเอาท์)", clearDates: "ล้างข้อมูล",
                 legendAvailable: "ว่าง", legendSelected: "เลือก", legendSpecial: "วันพิเศษ/เทศกาล", legendClosed: "ปิดบริการ", legendFull: "ที่พักเต็ม",
-                errCrossClosed: "มีวันปิดทำการอยู่ในช่วงที่คุณเลือก กรุณาเลือกใหม่ครับ",
-                errFullyBookedDate: "วันที่คุณเลือกที่พักเต็มหมดแล้วครับ กรุณาเลือกวันอื่น",
+                errCrossClosed: "มีวันปิดทำการอยู่ในช่วงที่คุณเลือก กรุณาเลือกใหม่ครับ", errFullyBookedDate: "วันที่คุณเลือกที่พักเต็มหมดแล้วครับ",
                 mapView: "ดูแผนที่", listView: "ดูรายการ", fullyBooked: "เต็มแล้ว"
             },
             en: {
@@ -244,14 +195,13 @@
                 newCheckIn: "New Check-in", newCheckOut: "New Check-out", confirmRescheduleBtn: "Confirm Reschedule", working: "Working...", rescheduleSuccess: "Reschedule successful",
                 foodOrderRule: "🍽️ Policy: Food must be pre-ordered at least 2 days before check-in.", selectedItems: "Selected Items ({count})", total: "Total",
                 scanToOrder: "Scan to pay and confirm order", saveQrBtn: "Save QR Code", pleaseAttachSlip: "* Payment slip is required",
-                confirmOrderBtn: "Confirm Order", sendingToKitchen: "Sending order to kitchen...", orderFoodSuccess: "Food ordered successfully",
+                confirmOrderBtn: "Confirm Order", sendingToKitchen: "Sending order...", orderFoodSuccess: "Food ordered successfully",
                 slipWarningNoQR: "⚠️ No QR Code detected. Admin will verify manually.",
                 slipWarningWrongQR: "⚠️ This slip might not belong to our account. Please verify!",
                 slipValid: "✅ Valid slip (Merchant QR detected)",
                 selectDates: "Select Dates (Check-in & Check-out)", clearDates: "Clear",
                 legendAvailable: "Available", legendSelected: "Selected", legendSpecial: "High Season", legendClosed: "Closed", legendFull: "Fully Booked",
-                errCrossClosed: "Your selected range includes closed dates. Please select again.",
-                errFullyBookedDate: "The selected date is fully booked. Please select another date.",
+                errCrossClosed: "Your selected range includes closed dates. Please select again.", errFullyBookedDate: "The selected date is fully booked.",
                 mapView: "Map View", listView: "List View", fullyBooked: "Fully Booked"
             }
         };
@@ -276,11 +226,9 @@
             const id = setTimeout(() => controller.abort(), timeout);
             try {
                 const response = await fetch(resource, { ...options, signal: controller.signal });
-                clearTimeout(id);
-                return response;
+                clearTimeout(id); return response;
             } catch (error) {
-                clearTimeout(id);
-                throw error;
+                clearTimeout(id); throw error;
             }
         };
 
@@ -293,8 +241,7 @@
                     img.src = event.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
+                        let width = img.width; let height = img.height;
                         if (width > maxWidth) { height *= maxWidth / width; width = maxWidth; }
                         canvas.width = width; canvas.height = height;
                         const ctx = canvas.getContext('2d');
@@ -302,9 +249,8 @@
                         let dataUrl = canvas.toDataURL('image/jpeg', quality);
                         const head = 'data:image/jpeg;base64,';
                         const sizeInBytes = Math.round((dataUrl.length - head.length) * 3 / 4);
-                        if (sizeInBytes > 500000 && quality > 0.3) {
-                            resolve(compressImage(file, quality - 0.2, maxWidth * 0.8)); 
-                        } else { resolve(dataUrl); }
+                        if (sizeInBytes > 500000 && quality > 0.3) resolve(compressImage(file, quality - 0.2, maxWidth * 0.8)); 
+                        else resolve(dataUrl);
                     };
                     img.onerror = (err) => reject(err);
                 };
@@ -503,7 +449,6 @@
         
         const App = () => {
             const [isDark, setIsDark] = React.useState(true);
-            
             const [lang, setLang] = React.useState(() => {
                 const saved = localStorage.getItem('khanam_lang');
                 if (saved) return saved;
@@ -516,7 +461,6 @@
                 const params = new URLSearchParams(window.location.search);
                 return params.get('mode') === 'manage' ? 'manage' : 'booking';
             }); 
-            
             const [viewStyle, setViewStyle] = React.useState('map'); 
 
             const [isInitializing, setIsInitializing] = React.useState(true); 
@@ -537,7 +481,6 @@
             
             const [slipImg, setSlipImg] = React.useState(null);
             const [slipStatus, setSlipStatus] = React.useState(null); 
-            
             const [bookingResult, setBookingResult] = React.useState(null);
             const [agreed, setAgreed] = React.useState(false);
             const [qrUrl, setQrUrl] = React.useState(null);
@@ -557,25 +500,19 @@
             const [rescheduleDates, setRescheduleDates] = React.useState({ checkIn: '', checkOut: '' });
             const [manageTab, setManageTab] = React.useState('info'); 
             const [addOnCart, setAddOnCart] = React.useState([]); 
-            
             const [addOnSlip, setAddOnSlip] = React.useState(null);
             const [addOnSlipStatus, setAddOnSlipStatus] = React.useState(null);
-
             const [addOnQr, setAddOnQr] = React.useState(null);
             const [manageForm, setManageForm] = React.useState({ bookingId: '', phone: '' });
 
             const [modalAlert, setModalAlert] = React.useState({ show: false, type: 'info', title: '', text: '' }); 
             const [modalConfirm, setModalConfirm] = React.useState({ show: false, title: '', text: '', onConfirm: null });
 
-            React.useEffect(() => {
-                window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-            }, [step, mode, manageTab]);
+            React.useEffect(() => { window.scrollTo({ top: 0, left: 0, behavior: 'smooth' }); }, [step, mode, manageTab]);
 
             const t = (key, params = {}) => {
                 let text = TRANSLATIONS[lang][key] || key;
-                for (let k in params) {
-                    text = text.replace(`{${k}}`, params[k]);
-                }
+                for (let k in params) text = text.replace(`{${k}}`, params[k]);
                 return text;
             };
 
@@ -583,9 +520,7 @@
                 if (!text) return "";
                 const parts = String(text).split('|');
                 const targetLang = forceLang || lang;
-                if (targetLang === 'en' && parts.length > 1) {
-                    return parts[1].trim();
-                }
+                if (targetLang === 'en' && parts.length > 1) return parts[1].trim();
                 return parts[0].trim();
             };
 
@@ -597,13 +532,10 @@
                         const th = parts[0].trim();
                         let en = parts[1].trim();
                         let suffix = '';
-                        
                         const match = en.match(/(x\d+|\(\d+\s*ท่าน\)|\(\d+\s*คน\))$/);
                         if (match) {
                             let rawSuffix = match[1];
-                            if (lang === 'en') {
-                                rawSuffix = rawSuffix.replace('ท่าน', 'Guests').replace('คน', 'Guests');
-                            }
+                            if (lang === 'en') rawSuffix = rawSuffix.replace('ท่าน', 'Guests').replace('คน', 'Guests');
                             suffix = ' ' + rawSuffix;
                             en = en.replace(match[1], '').trim();
                         }
@@ -660,33 +592,23 @@
             
             const getPricing = () => {
                 const nights = calculateNights(); let roomTotal = 0; let foodTotal = 0; let z8Total = 0;
-                
                 cart.forEach(item => { 
                     if (item.type === 'food') foodTotal += Number(item.price||0) * Number(item.qty||1); 
                     else if (item.isPerHead) z8Total += Number(item.pricePerNight||0) * nights * Number(item.guests||1); 
                     else roomTotal += Number(item.pricePerNight||0) * nights; 
                 });
-                
                 let discountAmt = 0; if (discount.type === 'FIXED') discountAmt = Number(discount.val||0); if (discount.type === 'PERCENT') discountAmt = (roomTotal * Number(discount.val||0)) / 100; if (discountAmt > roomTotal) discountAmt = roomTotal; 
                 const totalBefore = roomTotal + z8Total + foodTotal; const netTotal = totalBefore - discountAmt;
-                
                 let deposit = 0; const isHigh = checkDateOverlapHighSeason(dates.checkIn, dates.checkOut);
-                
-                if (isHigh) {
-                    deposit = netTotal; 
-                } else { 
-                    const roomDeposit = (roomTotal - discountAmt) * 0.5; 
-                    deposit = roomDeposit + z8Total + foodTotal; 
-                }
+                if (isHigh) deposit = netTotal; 
+                else { const roomDeposit = (roomTotal - discountAmt) * 0.5; deposit = roomDeposit + z8Total + foodTotal; }
                 return { total: totalBefore, discount: discountAmt, netTotal: netTotal, deposit: Math.ceil(deposit), isHighSeason: isHigh };
             };
             
             const isBookingPast = (dateStr) => {
                 if(!dateStr) return false;
-                const today = new Date();
-                today.setHours(0,0,0,0);
-                const checkOutDate = new Date(dateStr);
-                checkOutDate.setHours(0,0,0,0);
+                const today = new Date(); today.setHours(0,0,0,0);
+                const checkOutDate = new Date(dateStr); checkOutDate.setHours(0,0,0,0);
                 return checkOutDate < today;
             };
 
@@ -698,17 +620,12 @@
                 if (LIFF_ID) {
                     liff.init({ liffId: LIFF_ID }).then(() => {
                         setIsLiffReady(true);
-                        if (liff.isLoggedIn()) {
-                            liff.getProfile().then(profile => {
-                                setCustomer(prev => ({...prev, userId: profile.userId, lineDisplayName: profile.displayName}));
-                            });
-                        } else {
-                            liff.login({ redirectUri: window.location.href });
-                        }
+                        if (liff.isLoggedIn()) { liff.getProfile().then(profile => { setCustomer(prev => ({...prev, userId: profile.userId, lineDisplayName: profile.displayName})); }); } 
+                        else { liff.login({ redirectUri: window.location.href }); }
                     }).catch(err => { console.error('LIFF Error', err); setIsLiffReady(true); });
                 } else { setIsLiffReady(true); }
                 
-                const cachedData = sessionStorage.getItem('khanam_init_data');
+                const cachedData = sessionStorage.getItem('khanam_init_data_v2');
                 if (cachedData) {
                     try {
                         const parsed = JSON.parse(cachedData);
@@ -717,9 +634,7 @@
                         setRoomConfig(parsed.roomConfig);
                         setPinPos(parsed.mapConfig);
                         setIsInitializing(false); 
-                    } catch(e) {
-                        console.error('Cache parsing error', e);
-                    }
+                    } catch(e) {}
                 }
 
                 fetchWithTimeout(`${GOOGLE_SCRIPT_URL}?action=getInitialData`).then(r => r.json()).then(res => {
@@ -729,13 +644,10 @@
                         setSiteConfig(prev => ({ ...prev, ...siteConfig }));
                         setRoomConfig(roomConfig);
                         setPinPos(mapConfig);
-                        sessionStorage.setItem('khanam_init_data', JSON.stringify(res.data));
+                        sessionStorage.setItem('khanam_init_data_v2', JSON.stringify(res.data));
                     }
                     setIsInitializing(false);
-                }).catch(e=>{
-                    console.error(e);
-                    setIsInitializing(false);
-                });
+                }).catch(e=>{ setIsInitializing(false); });
             }, []);
 
             React.useEffect(() => {
@@ -759,23 +671,15 @@
                 if (mode === 'manage' && isLiffReady && customer.userId && !manageData) {
                     setLoading(true);
                     fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'findBooking', userId: customer.userId }) })
-                    .then(r => r.json())
-                    .then(res => {
+                    .then(r => r.json()).then(res => {
                         setLoading(false);
                         if(res.status === 'success' && res.bookings && res.bookings.length > 0) { 
                             setBookingList(res.bookings); 
                             const params = new URLSearchParams(window.location.search);
                             const targetId = params.get('id');
-                            if (targetId) {
-                                const targetBooking = res.bookings.find(b => b.id === targetId);
-                                if (targetBooking) {
-                                    selectBookingToManage(targetBooking);
-                                }
-                            }
+                            if (targetId) { const targetBooking = res.bookings.find(b => b.id === targetId); if (targetBooking) selectBookingToManage(targetBooking); }
                         } else { setBookingList([]); }
-                    }).catch(e => {
-                        setLoading(false);
-                    });
+                    }).catch(e => { setLoading(false); });
                 }
             }, [mode, isLiffReady, customer.userId, manageData]);
 
@@ -790,16 +694,11 @@
             };
 
             const openRoomModal = (roomId) => { 
-                const room = roomConfig[roomId]; 
-                if (!room) return; 
+                const room = roomConfig[roomId]; if (!room) return; 
                 const searchStr = (room.type + " " + room.name).toLowerCase();
                 const isSharedZone = room.type === 'ground' || roomId === 'Z8' || roomId === 'R6528' || searchStr.includes('ลานกาง') || searchStr.includes('ground');
-                
-                if(isSharedZone) setGuestCount(1); 
-                else setGuestCount(parseInt(room.min) || 1); 
-                
-                setCurrentImgIdx(0); 
-                setSelectedRoomId(roomId); 
+                if(isSharedZone) setGuestCount(1); else setGuestCount(parseInt(room.min) || 1); 
+                setCurrentImgIdx(0); setSelectedRoomId(roomId); 
             };
 
             const openFoodModal = (food) => { setSelectedFood(food); setFoodCount(1); setFoodNote(''); };
@@ -807,69 +706,37 @@
             const confirmFoodSelection = () => {
                 const targetCart = mode === 'manage' ? addOnCart : cart; 
                 const setTargetCart = mode === 'manage' ? setAddOnCart : setCart;
-                
-                const finalName = foodNote.trim() 
-                    ? `${tData(selectedFood.name, 'th')} (${foodNote.trim()}) | ${tData(selectedFood.name, 'en')} (${foodNote.trim()})` 
-                    : selectedFood.name;
-
+                const finalName = foodNote.trim() ? `${tData(selectedFood.name, 'th')} (${foodNote.trim()}) | ${tData(selectedFood.name, 'en')} (${foodNote.trim()})` : selectedFood.name;
                 const existIndex = targetCart.findIndex(c => c.id === selectedFood.id && c.name === finalName && c.type === 'food');
-                
-                if (existIndex > -1) {
-                    const newCart = [...targetCart];
-                    newCart[existIndex].qty += foodCount;
-                    setTargetCart(newCart);
-                } else { 
-                    setTargetCart([...targetCart, { ...selectedFood, name: finalName, type: 'food', qty: foodCount }]);
-                }
-                
-                setSelectedFood(null);
-                setFoodNote('');
+                if (existIndex > -1) { const newCart = [...targetCart]; newCart[existIndex].qty += foodCount; setTargetCart(newCart); } 
+                else { setTargetCart([...targetCart, { ...selectedFood, name: finalName, type: 'food', qty: foodCount }]); }
+                setSelectedFood(null); setFoodNote('');
             };
 
             const nextImage = () => { if(!selectedRoomId) return; const images = siteConfig.roomImages[selectedRoomId] || []; setCurrentImgIdx((prev) => (prev + 1) % images.length); };
             const prevImage = () => { if(!selectedRoomId) return; const images = siteConfig.roomImages[selectedRoomId] || []; setCurrentImgIdx((prev) => (prev - 1 + images.length) % images.length); };
             
             const confirmRoomSelection = () => {
-                const roomId = selectedRoomId; 
-                const guests = guestCount; 
-                const roomInfo = roomConfig[roomId];
+                const roomId = selectedRoomId; const guests = guestCount; const roomInfo = roomConfig[roomId];
                 if (!roomInfo) { alert("พบปัญหาข้อมูลห้องพักไม่สมบูรณ์"); setSelectedRoomId(null); return; }
-                
                 const searchStr = (roomInfo.type + " " + roomInfo.name).toLowerCase();
                 const isSharedZone = roomInfo.type === 'ground' || roomId === 'Z8' || roomId === 'R6528' || searchStr.includes('ลานกาง') || searchStr.includes('ground');
-                
                 let limit = parseInt(roomInfo.maxCap) || 10;
                 
                 if (isSharedZone) {
                     let avail = limit;
-                    if (availability && availability.roomAvailableCount && availability.roomAvailableCount[roomId] !== undefined) {
-                         avail = parseInt(availability.roomAvailableCount[roomId]);
-                    } else if (availability) {
-                         avail = availability.tentAvailable && availability.tentAvailable[roomId] !== undefined ? parseInt(availability.tentAvailable[roomId]) : parseInt(availability.zone8Available || limit);
-                    }
+                    if (availability && availability.roomAvailableCount && availability.roomAvailableCount[roomId] !== undefined) { avail = parseInt(availability.roomAvailableCount[roomId]); } 
+                    else if (availability) { avail = availability.tentAvailable && availability.tentAvailable[roomId] !== undefined ? parseInt(availability.tentAvailable[roomId]) : parseInt(availability.zone8Available || limit); }
                     const currentInCart = cart.filter(c => c.id === roomId).reduce((sum, c) => sum + parseInt(c.guests || 1), 0);
                     limit = Math.max(0, avail - currentInCart);
                 }
+                if (isSharedZone && guests > limit) { setModalAlert({ show: true, type: 'warning', title: t('quotaFullTitle'), text: t('quotaFullDesc', { limit: limit }) }); return; }
                 
-                if (isSharedZone && guests > limit) {
-                    setModalAlert({ show: true, type: 'warning', title: t('quotaFullTitle'), text: t('quotaFullDesc', { limit: limit }) });
-                    return;
-                }
-                
-                let price = 0; 
-                const pricingInfo = typeof roomInfo.pricing === 'string' ? safeJsonParse(roomInfo.pricing, {}) : (roomInfo.pricing || {});
+                let price = 0; const pricingInfo = typeof roomInfo.pricing === 'string' ? safeJsonParse(roomInfo.pricing, {}) : (roomInfo.pricing || {});
                 const isPerHead = isSharedZone || pricingInfo.priceHead !== undefined;
                 
-                if (isPerHead) { 
-                    price = Number(pricingInfo.priceHead || (pricingInfo.tiers && pricingInfo.tiers.length > 0 ? pricingInfo.tiers[0].price : 150)); 
-                } else { 
-                    const tiers = pricingInfo.tiers || [];
-                    if (tiers.length > 0) {
-                        const tier = tiers.find(t => guests <= t.max); 
-                        if (!tier) { const maxTier = tiers[tiers.length - 1]; price = Number(maxTier ? maxTier.price : 0); } 
-                        else { price = Number(tier.price); } 
-                    }
-                }
+                if (isPerHead) { price = Number(pricingInfo.priceHead || (pricingInfo.tiers && pricingInfo.tiers.length > 0 ? pricingInfo.tiers[0].price : 150)); } 
+                else { const tiers = pricingInfo.tiers || []; if (tiers.length > 0) { const tier = tiers.find(t => guests <= t.max); if (!tier) { const maxTier = tiers[tiers.length - 1]; price = Number(maxTier ? maxTier.price : 0); } else { price = Number(tier.price); } } }
                 
                 setCart([...cart, { id: roomId, name: roomInfo.name, type: roomInfo.type, guests: guests, pricePerNight: price, nights: calculateNights(), isPerHead }]); 
                 setSelectedRoomId(null);
@@ -897,7 +764,6 @@
                 const diffTime = currentCheckIn.getTime() - today.getTime();
                 const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24));
                 if (diffDays < 7) return setModalAlert({ show: true, type: 'warning', title: t('notice'), text: lang === 'en' ? `Must reschedule at least 7 days in advance (${diffDays} days left)` : `ต้องทำการเลื่อนล่วงหน้าอย่างน้อย 7 วัน (เหลืออีก ${diffDays} วัน)` });
-
                 setModalConfirm({ show: true, title: lang === 'en' ? 'Confirm Reschedule' : 'ยืนยันการเลื่อนวัน', text: `${lang==='en'?'Change to:':'เปลี่ยนเป็น'}\n${formatDateLocalized(rescheduleDates.checkIn)} - ${formatDateLocalized(rescheduleDates.checkOut)}`, onConfirm: () => { setModalConfirm({ ...modalConfirm, show: false }); executeReschedule(); } });
             };
 
@@ -926,110 +792,104 @@
 
             return (
                 <div className={isDark ? "dark" : ""}>
-                    <div className="min-h-screen bg-[#f3f4f6] dark:bg-gray-900 pb-10 text-gray-800 dark:text-gray-100 transition-colors duration-300 relative">
+                    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-300">
                         
-                        {/* FLOATING ACTION BUTTONS (Top-Right Stack) */}
-                        <div className="fixed top-4 right-4 z-50 flex flex-col gap-3">
-                            
-                            <button onClick={toggleLanguage} className="bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-12 h-12 flex flex-col items-center justify-center transition-transform hover:scale-110 text-blue-600 dark:text-blue-400">
+                        {/* FLOATING ACTION BUTTONS */}
+                        <div className="fixed top-3 right-3 z-50 flex flex-col gap-2">
+                            <button onClick={toggleLanguage} className="bg-white/90 backdrop-blur dark:bg-gray-700/90 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-11 h-11 flex flex-col items-center justify-center transition-transform hover:scale-110 text-blue-600 dark:text-blue-400">
                                 <i className="fas fa-globe text-sm mb-0.5"></i>
-                                <span className="text-[10px] font-bold leading-none">{lang === 'th' ? 'EN' : 'TH'}</span>
+                                <span className="text-[9px] font-bold leading-none">{lang === 'th' ? 'EN' : 'TH'}</span>
                             </button>
-
-                            <button onClick={() => setIsDark(!isDark)} className="bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-12 h-12 flex items-center justify-center transition-transform hover:scale-110 text-gray-800 dark:text-white"> 
+                            <button onClick={() => setIsDark(!isDark)} className="bg-white/90 backdrop-blur dark:bg-gray-700/90 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-11 h-11 flex items-center justify-center transition-transform hover:scale-110 text-gray-800 dark:text-white"> 
                                 {isDark ? '☀️' : '🌙'} 
                             </button>
-                            
-                            <button onClick={() => { setMode(mode === 'booking' ? 'manage' : 'booking'); setStep(1); setManageData(null); setManageTab('info'); }} className="bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-12 h-12 flex items-center justify-center transition-transform hover:scale-110 text-gray-800 dark:text-white"> 
+                            <button onClick={() => { setMode(mode === 'booking' ? 'manage' : 'booking'); setStep(1); setManageData(null); setManageTab('info'); }} className="bg-white/90 backdrop-blur dark:bg-gray-700/90 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-11 h-11 flex items-center justify-center transition-transform hover:scale-110 text-gray-800 dark:text-white"> 
                                 {mode === 'booking' ? <i className="fas fa-search"></i> : <i className="fas fa-home"></i>} 
                             </button>
-
                         </div>
 
                         {/* --- MANAGE MODE --- */}
                         {mode === 'manage' && (
-                            <div className="max-w-md mx-auto p-4 sm:pt-8">
-                                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 min-h-[500px]">
-                                    <h2 className="text-xl font-bold mb-4 text-center text-blue-600 dark:text-blue-400">{t('manageTitle')}</h2>
-                                    
-                                    {!manageData ? (
-                                        <div className="animate-pop">
-                                            {loading ? (
-                                                <div className="flex flex-col items-center justify-center py-10">
-                                                    <i className="fas fa-campground text-5xl text-green-600 animate-bounce mb-4"></i>
-                                                    <p className="text-gray-500 dark:text-gray-400 font-bold">{t('loadingData')}</p>
+                            <div className="w-full max-w-lg mx-auto bg-white dark:bg-gray-800 min-h-screen shadow-2xl p-6 pt-16 flex flex-col">
+                                <h2 className="text-xl font-bold mb-6 text-center text-blue-600 dark:text-blue-400">{t('manageTitle')}</h2>
+                                
+                                {!manageData ? (
+                                    <div className="animate-pop flex-1">
+                                        {loading ? (
+                                            <div className="flex flex-col items-center justify-center py-20">
+                                                <i className="fas fa-campground text-5xl text-green-600 animate-bounce mb-4"></i>
+                                                <p className="text-gray-500 dark:text-gray-400 font-bold">{t('loadingData')}</p>
+                                            </div>
+                                        ) : (
+                                            !isLiffReady ? (
+                                                <div className="text-center py-20">
+                                                    <p className="text-gray-500">{t('connectingLine')}</p>
                                                 </div>
                                             ) : (
-                                                !isLiffReady ? (
-                                                    <div className="text-center py-10">
-                                                        <p className="text-gray-500">{t('connectingLine')}</p>
+                                                !customer.userId ? (
+                                                    <div className="text-center py-20">
+                                                        <div className="text-4xl mb-4">⚠️</div>
+                                                        <p className="text-gray-500">{t('noLineUser')}</p>
+                                                        <p className="text-xs text-gray-400 mt-2">{t('noLineUserDesc')}</p>
+                                                        <button onClick={() => liff.login({ redirectUri: window.location.href })} className="mt-4 bg-green-500 text-white px-6 py-2 rounded-full font-bold shadow hover:bg-green-600 transition">{t('loginLine')}</button>
                                                     </div>
                                                 ) : (
-                                                    !customer.userId ? (
-                                                        <div className="text-center py-10">
-                                                            <div className="text-4xl mb-4">⚠️</div>
-                                                            <p className="text-gray-500">{t('noLineUser')}</p>
-                                                            <p className="text-xs text-gray-400 mt-2">{t('noLineUserDesc')}</p>
-                                                            <button onClick={() => liff.login({ redirectUri: window.location.href })} className="mt-4 bg-green-500 text-white px-6 py-2 rounded-full font-bold shadow hover:bg-green-600 transition">{t('loginLine')}</button>
+                                                    bookingList.length > 0 ? (
+                                                        <div className="space-y-4 animate-pop">
+                                                            <p className="text-sm text-gray-500 text-center mb-4">{t('foundBookings', { count: bookingList.length })}</p>
+                                                            {bookingList.map(b => {
+                                                                const isPast = isBookingPast(b.checkOut);
+                                                                return (
+                                                                    <div key={b.id} className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">
+                                                                        <div onClick={() => selectBookingToManage(b, 'info')} className="p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600 transition">
+                                                                            <div className="flex justify-between items-start mb-2">
+                                                                                 <span className="font-bold text-blue-600 dark:text-blue-400 text-lg">{b.id}</span>
+                                                                                 <span className={`text-xs px-2 py-1 rounded-full font-bold ${isPast ? 'bg-gray-200 text-gray-600' : 'bg-green-100 text-green-800'}`}>{isPast ? t('statusPast') : b.status}</span>
+                                                                            </div>
+                                                                            <div className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                                                                                <div className="flex items-center"><i className="fas fa-calendar-day w-5 text-center mr-2 text-gray-400"></i> {formatDateLocalized(b.checkIn)}</div>
+                                                                                <div className="flex items-center"><i className="fas fa-home w-5 text-center mr-2 text-gray-400"></i> {tDataList(b.rooms)}</div>
+                                                                            </div>
+                                                                        </div>
+                                                                        {!isPast ? (
+                                                                            <div className="flex border-t border-gray-100 dark:border-gray-600 divide-x divide-gray-100 dark:divide-gray-600 bg-gray-50 dark:bg-gray-800">
+                                                                                <button onClick={() => selectBookingToManage(b, 'reschedule')} className="flex-1 py-3 text-sm font-bold text-orange-600 hover:bg-orange-50 dark:hover:bg-gray-700 transition flex items-center justify-center gap-2">
+                                                                                    <i className="fas fa-calendar-alt"></i> {t('btnReschedule')}
+                                                                                </button>
+                                                                                <button onClick={() => selectBookingToManage(b, 'food')} className="flex-1 py-3 text-sm font-bold text-green-600 hover:bg-green-50 dark:hover:bg-gray-700 transition flex items-center justify-center gap-2">
+                                                                                    <i className="fas fa-utensils"></i> {t('btnOrderFood')}
+                                                                                </button>
+                                                                            </div>
+                                                                        ) : (
+                                                                            <div className="bg-gray-50 dark:bg-gray-800 p-3 text-center text-xs text-gray-400 border-t border-gray-100 dark:border-gray-600">
+                                                                                <i className="fas fa-check-circle mr-1"></i> {t('checkedOut')}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                );
+                                                            })}
                                                         </div>
                                                     ) : (
-                                                        bookingList.length > 0 ? (
-                                                            <div className="space-y-4 animate-pop">
-                                                                <p className="text-sm text-gray-500 text-center mb-4">{t('foundBookings', { count: bookingList.length })}</p>
-                                                                {bookingList.map(b => {
-                                                                    const isPast = isBookingPast(b.checkOut);
-                                                                    return (
-                                                                        <div key={b.id} className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">
-                                                                            <div onClick={() => selectBookingToManage(b, 'info')} className="p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600 transition">
-                                                                                <div className="flex justify-between items-start mb-2">
-                                                                                     <span className="font-bold text-blue-600 dark:text-blue-400 text-lg">{b.id}</span>
-                                                                                     <span className={`text-xs px-2 py-1 rounded-full font-bold ${isPast ? 'bg-gray-200 text-gray-600' : 'bg-green-100 text-green-800'}`}>{isPast ? t('statusPast') : b.status}</span>
-                                                                                </div>
-                                                                                <div className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
-                                                                                    <div className="flex items-center"><i className="fas fa-calendar-day w-5 text-center mr-2 text-gray-400"></i> {formatDateLocalized(b.checkIn)}</div>
-                                                                                    <div className="flex items-center"><i className="fas fa-home w-5 text-center mr-2 text-gray-400"></i> {tDataList(b.rooms)}</div>
-                                                                                </div>
-                                                                            </div>
-                                                                            {!isPast ? (
-                                                                                <div className="flex border-t border-gray-100 dark:border-gray-600 divide-x divide-gray-100 dark:divide-gray-600 bg-gray-50 dark:bg-gray-800">
-                                                                                    <button onClick={() => selectBookingToManage(b, 'reschedule')} className="flex-1 py-3 text-sm font-bold text-orange-600 hover:bg-orange-50 dark:hover:bg-gray-700 transition flex items-center justify-center gap-2">
-                                                                                        <i className="fas fa-calendar-alt"></i> {t('btnReschedule')}
-                                                                                    </button>
-                                                                                    <button onClick={() => selectBookingToManage(b, 'food')} className="flex-1 py-3 text-sm font-bold text-green-600 hover:bg-green-50 dark:hover:bg-gray-700 transition flex items-center justify-center gap-2">
-                                                                                        <i className="fas fa-utensils"></i> {t('btnOrderFood')}
-                                                                                    </button>
-                                                                                </div>
-                                                                            ) : (
-                                                                                <div className="bg-gray-50 dark:bg-gray-800 p-3 text-center text-xs text-gray-400 border-t border-gray-100 dark:border-gray-600">
-                                                                                    <i className="fas fa-check-circle mr-1"></i> {t('checkedOut')}
-                                                                                </div>
-                                                                            )}
-                                                                        </div>
-                                                                    );
-                                                                })}
-                                                            </div>
-                                                        ) : (
-                                                            <div className="text-center py-10 animate-pop">
-                                                                <div className="text-6xl mb-4">🔍</div>
-                                                                <p className="text-gray-500">{t('noBookings')}</p>
-                                                                <p className="text-xs text-gray-400 mt-2">{t('noBookingsDesc')}</p>
-                                                                <button onClick={() => window.location.reload()} className="mt-4 text-blue-600 text-sm underline">{t('tryAgain')}</button>
-                                                            </div>
-                                                        )
+                                                        <div className="text-center py-20 animate-pop">
+                                                            <div className="text-6xl mb-4">🔍</div>
+                                                            <p className="text-gray-500">{t('noBookings')}</p>
+                                                            <p className="text-xs text-gray-400 mt-2">{t('noBookingsDesc')}</p>
+                                                            <button onClick={() => window.location.reload()} className="mt-4 text-blue-600 text-sm underline">{t('tryAgain')}</button>
+                                                        </div>
                                                     )
                                                 )
                                             )}
                                         </div>
                                     ) : (
-                                        <div className="animate-pop">
-                                            <div className="flex items-center mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
+                                        <div className="animate-pop flex-1">
+                                            <div className="flex items-center mb-6 border-b border-gray-200 dark:border-gray-700 pb-3">
                                                 <button onClick={() => setManageData(null)} className="mr-3 text-gray-500 hover:text-blue-600 p-1"><i className="fas fa-arrow-left text-lg"></i></button>
                                                 <span className="font-bold text-gray-700 dark:text-gray-200">ID: {manageData.id}</span>
                                             </div>
                                             {(() => {
                                                 const isPast = isBookingPast(manageData.checkOut);
                                                 return !isPast ? (
-                                                    <div className="flex border-b border-gray-200 dark:border-gray-700 mb-4">
+                                                    <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6">
                                                         <button onClick={() => setManageTab('info')} className={`flex-1 py-2 text-sm font-bold ${manageTab === 'info' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}>{t('tabInfo')}</button>
                                                         <button onClick={() => setManageTab('reschedule')} className={`flex-1 py-2 text-sm font-bold ${manageTab === 'reschedule' ? 'text-orange-600 border-b-2 border-orange-600' : 'text-gray-500'}`}>{t('tabReschedule')}</button>
                                                         <button onClick={() => setManageTab('food')} className={`flex-1 py-2 text-sm font-bold ${manageTab === 'food' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-500'}`}>{t('tabFood')}</button>
@@ -1038,16 +898,16 @@
                                             })()}
 
                                             {manageTab === 'info' && (
-                                                <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 p-4 rounded-lg mb-6 animate-pop">
-                                                    <div className="text-center mb-2"><span className="bg-blue-600 text-white px-2 py-1 rounded text-xs">{manageData.status}</span></div>
-                                                    <h3 className="text-lg font-bold text-center mb-4 text-gray-800 dark:text-white">{manageData.name}</h3>
-                                                    <div className="text-sm space-y-2 text-gray-700 dark:text-gray-300">
+                                                <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 p-5 rounded-xl mb-6 animate-pop">
+                                                    <div className="text-center mb-3"><span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm">{manageData.status}</span></div>
+                                                    <h3 className="text-xl font-bold text-center mb-5 text-gray-800 dark:text-white">{manageData.name}</h3>
+                                                    <div className="text-sm space-y-3 text-gray-700 dark:text-gray-300">
                                                         <div className="flex justify-between"><span>{t('checkIn')}</span> <b>{formatDateLocalized(manageData.checkIn)}</b></div>
                                                         <div className="flex justify-between"><span>{t('checkOut')}</span> <b>{formatDateLocalized(manageData.checkOut)}</b></div>
                                                         <div className="flex justify-between"><span>{t('guestsCount')}</span> <b>{manageData.guests} {t('persons')}</b></div>
                                                         <div className="flex justify-between"><span>{t('roomsList')}</span> <span className="text-right whitespace-pre-line">{tDataList(manageData.rooms)}</span></div>
                                                     </div>
-                                                    <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-700">
+                                                    <div className="mt-5 pt-4 border-t border-blue-200 dark:border-blue-700">
                                                         <h4 className="font-bold text-sm text-blue-800 dark:text-blue-300 mb-2">{t('orderedFood')}</h4>
                                                         <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">{tDataList(manageData.food)}</p>
                                                     </div>
@@ -1055,20 +915,20 @@
                                             )}
 
                                             {manageTab === 'reschedule' && (
-                                                <div className="space-y-3 animate-pop">
-                                                    <div className="bg-yellow-50 dark:bg-yellow-900/20 text-xs p-2 rounded mb-4 text-yellow-800 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-800">
+                                                <div className="space-y-4 animate-pop">
+                                                    <div className="bg-yellow-50 dark:bg-yellow-900/20 text-xs p-3 rounded-lg mb-2 text-yellow-800 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-800 leading-relaxed">
                                                         {t('rescheduleRule')}
                                                     </div>
-                                                    <div><label className="block text-xs font-bold mb-1 text-gray-700 dark:text-gray-300">{t('newCheckIn')}</label><input type="date" min={getTommorow()} className="w-full border p-2 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white" onChange={e => setRescheduleDates({...rescheduleDates, checkIn: e.target.value})} /></div>
-                                                    <div><label className="block text-xs font-bold mb-1 text-gray-700 dark:text-gray-300">{t('newCheckOut')}</label><input type="date" min={rescheduleDates.checkIn || getTommorow()} className="w-full border p-2 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white" onChange={e => setRescheduleDates({...rescheduleDates, checkOut: e.target.value})} /></div>
-                                                    <button onClick={handleCustomerReschedule} disabled={loading} className="w-full bg-orange-600 text-white py-3 rounded-lg font-bold shadow hover:bg-orange-700 transition mt-4">{loading ? t('working') : t('confirmRescheduleBtn')}</button>
+                                                    <div><label className="block text-sm font-bold mb-1.5 text-gray-700 dark:text-gray-300">{t('newCheckIn')}</label><input type="date" min={getTommorow()} className="w-full border p-3 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white" onChange={e => setRescheduleDates({...rescheduleDates, checkIn: e.target.value})} /></div>
+                                                    <div><label className="block text-sm font-bold mb-1.5 text-gray-700 dark:text-gray-300">{t('newCheckOut')}</label><input type="date" min={rescheduleDates.checkIn || getTommorow()} className="w-full border p-3 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white" onChange={e => setRescheduleDates({...rescheduleDates, checkOut: e.target.value})} /></div>
+                                                    <button onClick={handleCustomerReschedule} disabled={loading} className="w-full bg-orange-600 text-white py-3.5 rounded-xl font-bold shadow-lg hover:bg-orange-700 transition mt-4 text-lg">{loading ? t('working') : t('confirmRescheduleBtn')}</button>
                                                 </div>
                                             )}
 
                                             {manageTab === 'food' && (
                                                 <div className="space-y-4 animate-pop">
-                                                    <div className="bg-green-50 dark:bg-green-900/20 text-xs p-2 rounded mb-4 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-800">{t('foodOrderRule')}</div>
-                                                    <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto custom-scrollbar">
+                                                    <div className="bg-green-50 dark:bg-green-900/20 text-xs p-3 rounded-lg mb-2 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-800 leading-relaxed">{t('foodOrderRule')}</div>
+                                                    <div className="grid grid-cols-2 gap-3 max-h-60 overflow-y-auto custom-scrollbar pr-1">
                                                         {siteConfig.foodMenu.map(f => {
                                                             const inCart = addOnCart.find(c => c.id === f.id);
                                                             return (
@@ -1082,29 +942,32 @@
                                                                         return;
                                                                     }
                                                                     openFoodModal(f);
-                                                                }} className={`cursor-pointer rounded-lg overflow-hidden border-2 transition-all shadow-sm relative ${inCart ? 'border-green-500 bg-green-50 dark:bg-green-900 dark:border-green-500' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700'}`}>
-                                                                    <img src={f.img} className="w-full h-20 object-cover" />
-                                                                    <div className="p-1"><h4 className="font-bold text-xs line-clamp-1">{tData(f.name)}</h4><div className="flex justify-between items-center mt-1"><span className="text-green-600 text-xs font-bold">{f.price}.-</span>{inCart && <span className="bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">x{inCart.qty}</span>}</div></div>
+                                                                }} className={`cursor-pointer rounded-xl overflow-hidden border-2 transition-all shadow-sm relative ${inCart ? 'border-green-500 bg-green-50 dark:bg-green-900 dark:border-green-500' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700'}`}>
+                                                                    <img src={f.img} className="w-full h-24 object-cover" />
+                                                                    <div className="p-2"><h4 className="font-bold text-xs line-clamp-1">{tData(f.name)}</h4><div className="flex justify-between items-center mt-1"><span className="text-green-600 text-xs font-bold">{f.price}.-</span>{inCart && <span className="bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">x{inCart.qty}</span>}</div></div>
                                                                 </div>
                                                             );
                                                         })}
                                                     </div>
                                                     {addOnCart.length > 0 && (
-                                                        <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded mb-4">
-                                                            <h4 className="font-bold text-xs mb-2">{t('selectedItems', { count: addOnCart.length })}</h4>
-                                                            {addOnCart.map((c,i)=><div key={i} className="flex justify-between text-xs mt-1"><span>{tData(c.name)} x{c.qty}</span><button onClick={()=>setAddOnCart(addOnCart.filter((_,idx)=>idx!==i))} className="text-red-500">{t('delete')}</button></div>)}
-                                                            <div className="mt-2 pt-2 border-t text-right font-bold text-sm text-green-600 mb-2">{t('total')} {formatMoney(addOnCart.reduce((sum,c)=>sum+(c.price*c.qty),0))} ฿</div>
-                                                            <div className="bg-white dark:bg-gray-800 p-3 rounded border border-gray-200 dark:border-gray-600">
-                                                                <p className="text-xs font-bold mb-2 text-center">{t('scanToOrder')}</p>
+                                                        <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-xl mb-4 shadow-sm border border-gray-200 dark:border-gray-600">
+                                                            <h4 className="font-bold text-sm mb-3 border-b pb-2">{t('selectedItems', { count: addOnCart.length })}</h4>
+                                                            {addOnCart.map((c,i)=><div key={i} className="flex justify-between text-sm mt-2"><span>{tData(c.name)} x{c.qty}</span><button onClick={()=>setAddOnCart(addOnCart.filter((_,idx)=>idx!==i))} className="text-red-500 hover:text-red-700 font-bold">{t('delete')}</button></div>)}
+                                                            <div className="mt-4 pt-3 border-t text-right font-bold text-lg text-green-600 mb-4">{t('total')} {formatMoney(addOnCart.reduce((sum,c)=>sum+(c.price*c.qty),0))} ฿</div>
+                                                            
+                                                            <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-600">
+                                                                <p className="text-sm font-bold mb-3 text-center">{t('scanToOrder')}</p>
                                                                 {addOnQr && (
-                                                                    <div className="flex flex-col items-center mb-3">
-                                                                        <img src={addOnQr} className="mx-auto border-2 border-gray-200 dark:border-gray-600 rounded-xl mb-3 shadow-sm p-2 bg-white" alt="QR Code" style={{ width: '150px', height: '150px' }} />
-                                                                        <a href={addOnQr} download={`qr-food-${manageData.id}.png`} className="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-2 shadow-sm">
+                                                                    <div className="flex flex-col items-center mb-4">
+                                                                        <img src={addOnQr} className="mx-auto border-2 border-gray-200 dark:border-gray-600 rounded-xl mb-3 shadow-md p-2 bg-white" alt="QR Code" style={{ width: '180px', height: '180px' }} />
+                                                                        <a href={addOnQr} download={`qr-food-${manageData.id}.png`} className="bg-blue-100 hover:bg-blue-200 text-blue-700 px-5 py-2.5 rounded-full text-xs font-bold transition flex items-center gap-2 shadow-sm">
                                                                             <i className="fas fa-download"></i> {t('saveQrBtn')}
                                                                         </a>
                                                                     </div>
                                                                 )}
-                                                                <div className="text-[10px] text-center mb-2 text-gray-500">{PROMPTPAY_NAME} - {PROMPTPAY_PHONE}</div>
+                                                                <div className="text-xs text-center mb-3 text-gray-500 font-mono tracking-wider">{PROMPTPAY_NAME} - {PROMPTPAY_PHONE}</div>
+                                                                
+                                                                <label className="block mb-1 text-xs font-bold text-gray-600 dark:text-gray-300">{t('pleaseAttachSlip')}</label> 
                                                                 <input type="file" accept="image/*" onChange={async (e) => { 
                                                                     const f = e.target.files[0]; 
                                                                     if (f) { 
@@ -1113,31 +976,27 @@
                                                                             const resizedBase64 = await compressImage(f); 
                                                                             setAddOnSlip(resizedBase64); 
 
-                                                                            // Client-Side Slip Verification
                                                                             checkSlipQR(resizedBase64, PROMPTPAY_PHONE, (res) => {
                                                                                 setAddOnSlipStatus(res);
                                                                             });
                                                                         } catch (err) { alert('Upload Error'); } 
                                                                     } 
-                                                                }} className="text-xs w-full mb-1" />
+                                                                }} className="text-sm w-full mb-1 border p-2 rounded bg-gray-50 dark:bg-gray-900 dark:border-gray-700" />
                                                                 
-                                                                {/* สถานะเช็คสลิป */}
                                                                 {addOnSlipStatus && addOnSlipStatus.type !== 'loading' && (
-                                                                    <p className={`text-[10px] mt-2 p-1.5 rounded ${addOnSlipStatus.type === 'success' ? 'bg-green-100 text-green-700' : addOnSlipStatus.type === 'error' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                                                    <p className={`text-[10px] mt-2 p-2 rounded font-bold ${addOnSlipStatus.type === 'success' ? 'bg-green-100 text-green-700' : addOnSlipStatus.type === 'error' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
                                                                         {t(addOnSlipStatus.msg)}
                                                                     </p>
                                                                 )}
                                                                 {addOnSlipStatus && addOnSlipStatus.type === 'loading' && (
-                                                                    <p className="text-[10px] mt-2 p-1.5 rounded bg-blue-100 text-blue-700">
-                                                                        <i className="fas fa-spinner fa-spin mr-1"></i> {addOnSlipStatus.msg}
+                                                                    <p className="text-[10px] mt-2 p-2 rounded font-bold bg-blue-100 text-blue-700 flex items-center justify-center">
+                                                                        <i className="fas fa-spinner fa-spin mr-2"></i> {addOnSlipStatus.msg}
                                                                     </p>
                                                                 )}
-
-                                                                {!addOnSlip && <div className="text-red-500 text-[10px] text-center">{t('pleaseAttachSlip')}</div>}
                                                             </div>
                                                         </div>
                                                     )}
-                                                    <button onClick={handleCustomerAddFood} disabled={loading || (addOnCart.length > 0 && !addOnSlip)} className={`w-full py-3 rounded-lg font-bold shadow transition ${loading || (addOnCart.length > 0 && !addOnSlip) ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700'}`}>{loading ? t('sendingToKitchen') : t('confirmOrderBtn')}</button>
+                                                    <button onClick={handleCustomerAddFood} disabled={loading || (addOnCart.length > 0 && !addOnSlip)} className={`w-full py-3.5 rounded-xl font-bold shadow-lg transition text-lg ${loading || (addOnCart.length > 0 && !addOnSlip) ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700'}`}>{loading ? t('sendingToKitchen') : t('confirmOrderBtn')}</button>
                                                 </div>
                                             )}
                                         </div>
@@ -1146,22 +1005,21 @@
                             </div>
                         )}
 
-                        {/* --- MODE: BOOKING --- */}
+                        {/* --- STEP 1: HOME --- */}
                         {mode === 'booking' && step === 1 && (
-                            <div className="max-w-md mx-auto bg-white dark:bg-gray-800 shadow-xl sm:rounded-2xl sm:mt-8 border-0 sm:border dark:border-gray-700 overflow-hidden pb-6 min-h-screen sm:min-h-[auto] flex flex-col">
-                                <div className="h-56 sm:h-64 relative flex-shrink-0">
+                            <div className="w-full max-w-lg mx-auto bg-white dark:bg-gray-800 min-h-screen flex flex-col shadow-2xl">
+                                <div className="h-64 sm:h-72 relative flex-shrink-0">
                                     <img src={siteConfig.bannerUrl} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                                 </div>
-                                <div className="px-5 relative z-10 flex-1 flex flex-col">
-                                    <div className="flex justify-center -mt-16 mb-3">
-                                        <img src={siteConfig.logoUrl} referrerPolicy="no-referrer" className="w-32 h-32 rounded-full border-4 border-white dark:border-gray-800 object-cover bg-white shadow-md"/>
+                                <div className="px-6 relative z-10 flex-1 flex flex-col pb-8">
+                                    <div className="flex justify-center -mt-16 mb-4">
+                                        <img src={siteConfig.logoUrl} referrerPolicy="no-referrer" className="w-32 h-32 rounded-full border-4 border-white dark:border-gray-800 object-cover bg-white shadow-xl"/>
                                     </div>
                                     <h1 className="text-2xl text-center mb-1 text-green-800 dark:text-green-400 font-bold">{tData(siteConfig.headerTitle)}</h1>
-                                    <p className="block text-center mb-6 text-gray-600 dark:text-gray-300 text-sm whitespace-pre-line px-2 leading-relaxed">{tData(siteConfig.headerDesc)}</p>
+                                    <p className="block text-center mb-6 text-gray-600 dark:text-gray-300 text-sm whitespace-pre-line leading-relaxed">{tData(siteConfig.headerDesc)}</p>
                                     
                                     <div className="mt-auto">
-                                        {/* --- CUSTOM CALENDAR REPLACES NATIVE DATE INPUTS --- */}
                                         <DateRangePicker 
                                             dates={dates} 
                                             setDates={setDates} 
@@ -1174,294 +1032,340 @@
                                             formatDateLocalized={formatDateLocalized}
                                         />
                                         
-                                        <button onClick={handleSearch} disabled={loading} className="w-full bg-green-600 text-white p-3.5 rounded-xl hover:bg-green-700 transition font-bold shadow-lg mt-2 text-lg">{loading ? t('searching') : t('searchRooms')}</button>
+                                        <button onClick={handleSearch} disabled={loading} className="w-full bg-green-600 text-white p-4 rounded-xl hover:bg-green-700 transition font-bold shadow-lg mt-2 text-lg">
+                                            {loading ? <><i className="fas fa-spinner fa-spin mr-2"></i>{t('searching')}</> : <><i className="fas fa-search mr-2"></i>{t('searchRooms')}</>}
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         )}
 
+                        {/* --- STEP 2: SELECT ROOM --- */}
                         {mode === 'booking' && step === 2 && (
-                            <div className="max-w-4xl mx-auto p-4 pt-6 sm:pt-8 relative min-h-screen bg-white dark:bg-gray-800 sm:rounded-2xl sm:my-8 shadow-xl">
-                                <div className="flex justify-between items-center mb-4">
-                                    <div className="flex items-center gap-2">
-                                        <button onClick={()=>setStep(1)} className="text-gray-500 dark:text-gray-300 hover:text-green-600 font-bold">
-                                            <i className="fas fa-chevron-left"></i> {t('back')}
-                                        </button>
-                                        <h2 className="text-xl font-bold dark:text-white hidden sm:block">{t('selectRoom')}</h2>
-                                    </div>
+                            <div className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 min-h-screen flex flex-col shadow-2xl">
+                                
+                                {/* Sticky Header */}
+                                <div className="flex items-center gap-3 p-4 pt-5 sticky top-0 z-40 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-100 dark:border-gray-700">
+                                    <button onClick={()=>setStep(1)} className="text-gray-500 dark:text-gray-300 hover:text-green-600 font-bold text-lg p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        <i className="fas fa-chevron-left"></i>
+                                    </button>
+                                    <h2 className="text-xl font-bold dark:text-white truncate">{t('selectRoom')}</h2>
                                 </div>
                                 
-                                {/* --- MAP VIEW --- */}
-                                {viewStyle === 'map' && (
-                                    <div className="map-container bg-blue-100 dark:bg-gray-700 mb-3 animate-pop" style={{paddingBottom: '100%'}}>
-                                        <img src={siteConfig?.roomImages?.['MAP_BG']?.[0] || "https://img2.pic.in.th/3d539b84-44ce-4336-ad90-bd2f84b13eca.jpg"} referrerPolicy="no-referrer" className="absolute top-0 left-0 w-full h-full object-cover" alt="Camp Map" />
-                                        {Object.keys(pinPos).map(key => {
-                                            if (!roomConfig[key]) return null;
-                                            const rConf = roomConfig[key];
-                                            const searchStr = rConf ? (rConf.type + " " + rConf.name).toLowerCase() : '';
-                                            const isSharedZone = rConf ? (rConf.type === 'ground') : (key === 'Z8' || key === 'R6528' || searchStr.includes('ลานกาง') || searchStr.includes('ground'));
-                                            
-                                            let available = 1;
-                                            if (availability && availability.roomAvailableCount && availability.roomAvailableCount[key] !== undefined) {
-                                                available = parseInt(availability.roomAvailableCount[key]);
-                                            } else if (availability) {
-                                                 available = isSharedZone ? (availability.tentAvailable && availability.tentAvailable[key] !== undefined ? parseInt(availability.tentAvailable[key]) : parseInt(availability.zone8Available || 20)) : (availability.bookedRooms.includes(key) ? 0 : 1);
-                                            }
-                                            
-                                            const currentInCart = cart.filter(c => c.id === key).reduce((sum, c) => sum + parseInt(c.guests || 1), 0);
-                                            const remaining = isSharedZone ? Math.max(0, available - currentInCart) : available;
-                                            
-                                            const isBooked = availability && availability.bookedRooms && availability.bookedRooms.includes(key);
-                                            const inCart = cart.find(c => c.id === key);
-                                            
-                                            const disable = isBooked || (isSharedZone && remaining <= 0) || (!isSharedZone && inCart);
+                                <div className="p-4 flex-1">
+                                    
+                                    {/* --- MAP VIEW --- */}
+                                    {viewStyle === 'map' && (
+                                        <div className="map-container bg-blue-100 dark:bg-gray-700 animate-pop" style={{paddingBottom: '100%'}}>
+                                            <img src={siteConfig?.roomImages?.['MAP_BG']?.[0] || "https://img2.pic.in.th/3d539b84-44ce-4336-ad90-bd2f84b13eca.jpg"} referrerPolicy="no-referrer" className="absolute top-0 left-0 w-full h-full object-cover" alt="Camp Map" />
+                                            {Object.keys(pinPos).map(key => {
+                                                if (!roomConfig[key]) return null;
+                                                const rConf = roomConfig[key];
+                                                const searchStr = rConf ? (rConf.type + " " + rConf.name).toLowerCase() : '';
+                                                const isSharedZone = rConf ? (rConf.type === 'ground') : (key === 'Z8' || key === 'R6528' || searchStr.includes('ลานกาง') || searchStr.includes('ground'));
+                                                
+                                                let available = 1;
+                                                if (availability && availability.roomAvailableCount && availability.roomAvailableCount[key] !== undefined) {
+                                                    available = parseInt(availability.roomAvailableCount[key]);
+                                                } else if (availability) {
+                                                     available = isSharedZone ? (availability.tentAvailable && availability.tentAvailable[key] !== undefined ? parseInt(availability.tentAvailable[key]) : parseInt(availability.zone8Available || 20)) : (availability.bookedRooms.includes(key) ? 0 : 1);
+                                                }
+                                                
+                                                const currentInCart = cart.filter(c => c.id === key).reduce((sum, c) => sum + parseInt(c.guests || 1), 0);
+                                                const remaining = isSharedZone ? Math.max(0, available - currentInCart) : available;
+                                                
+                                                const isBooked = availability && availability.bookedRooms && availability.bookedRooms.includes(key);
+                                                const inCart = cart.find(c => c.id === key);
+                                                
+                                                const disable = isBooked || (isSharedZone && remaining <= 0) || (!isSharedZone && inCart);
 
-                                            let circleClasses = "w-12 h-12 rounded-full flex items-center justify-center text-center text-[8px] font-bold border-2 shadow-lg p-1 leading-tight transition-all duration-300";
-                                            if (disable) circleClasses += " bg-gray-400 text-white border-gray-500 cursor-not-allowed opacity-80 grayscale";
-                                            else if (inCart) circleClasses += " bg-yellow-400 text-black border-yellow-600 scale-110 shadow-xl z-20";
-                                            else circleClasses += " bg-white dark:bg-gray-800 text-green-800 dark:text-green-400 border-green-600 hover:scale-110 z-10";
-                                            return ( 
-                                                <div key={key} className="absolute transform -translate-x-1/2 -translate-y-1/2 map-pin-responsive" style={{left: `${pinPos[key].x}%`, top: `${pinPos[key].y}%`}} 
-                                                    onClick={() => { 
-                                                        if(disable) return; 
+                                                let circleClasses = "w-12 h-12 rounded-full flex items-center justify-center text-center text-[8px] font-bold border-2 shadow-lg p-1 leading-tight transition-all duration-300";
+                                                if (disable) circleClasses += " bg-gray-400 text-white border-gray-500 cursor-not-allowed opacity-80 grayscale";
+                                                else if (inCart) circleClasses += " bg-yellow-400 text-black border-yellow-600 scale-110 shadow-xl z-20";
+                                                else circleClasses += " bg-white dark:bg-gray-800 text-green-800 dark:text-green-400 border-green-600 hover:scale-110 z-10";
+                                                return ( 
+                                                    <div key={key} className="absolute transform -translate-x-1/2 -translate-y-1/2 map-pin-responsive" style={{left: `${pinPos[key].x}%`, top: `${pinPos[key].y}%`}} 
+                                                        onClick={() => { 
+                                                            if(disable) return; 
+                                                            if(inCart && !isSharedZone) setCart(cart.filter(c => c.id !== key)); 
+                                                            else openRoomModal(key); 
+                                                        }}> 
+                                                        <div className={circleClasses}> <div> {tData(roomConfig[key].name)} </div> </div> 
+                                                    </div> 
+                                                )
+                                            })}
+                                        </div>
+                                    )}
+
+                                    {/* --- LIST VIEW --- */}
+                                    {viewStyle === 'list' && (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-pop">
+                                            {Object.keys(roomConfig).map(key => {
+                                                const rConf = roomConfig[key];
+                                                const searchStr = rConf ? (rConf.type + " " + rConf.name).toLowerCase() : '';
+                                                const isSharedZone = rConf ? (rConf.type === 'ground') : (key === 'Z8' || key === 'R6528' || searchStr.includes('ลานกาง') || searchStr.includes('ground'));
+                                                
+                                                let available = 1;
+                                                if (availability && availability.roomAvailableCount && availability.roomAvailableCount[key] !== undefined) {
+                                                    available = parseInt(availability.roomAvailableCount[key]);
+                                                } else if (availability) {
+                                                     available = isSharedZone ? (availability.tentAvailable && availability.tentAvailable[key] !== undefined ? parseInt(availability.tentAvailable[key]) : parseInt(availability.zone8Available || 20)) : (availability.bookedRooms.includes(key) ? 0 : 1);
+                                                }
+                                                
+                                                const currentInCart = cart.filter(c => c.id === key).reduce((sum, c) => sum + parseInt(c.guests || 1), 0);
+                                                const remaining = isSharedZone ? Math.max(0, available - currentInCart) : available;
+                                                
+                                                const isBooked = availability && availability.bookedRooms && availability.bookedRooms.includes(key);
+                                                const inCart = cart.find(c => c.id === key);
+                                                
+                                                const disable = isBooked || (isSharedZone && remaining <= 0) || (!isSharedZone && inCart);
+                                                
+                                                const priceInfo = typeof rConf.pricing === 'string' ? safeJsonParse(rConf.pricing, {}) : (rConf.pricing || {});
+                                                const startPrice = priceInfo.priceHead || (priceInfo.tiers && priceInfo.tiers.length > 0 ? priceInfo.tiers[0].price : 0);
+
+                                                return (
+                                                    <div key={key} onClick={() => {
+                                                        if(disable) return;
                                                         if(inCart && !isSharedZone) setCart(cart.filter(c => c.id !== key)); 
-                                                        else openRoomModal(key); 
-                                                    }}> 
-                                                    <div className={circleClasses}> <div> {tData(roomConfig[key].name)} </div> </div> 
-                                                </div> 
-                                            )
-                                        })}
-                                    </div>
-                                )}
-
-                                {/* --- LIST VIEW --- */}
-                                {viewStyle === 'list' && (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 animate-pop">
-                                        {Object.keys(roomConfig).map(key => {
-                                            const rConf = roomConfig[key];
-                                            const searchStr = rConf ? (rConf.type + " " + rConf.name).toLowerCase() : '';
-                                            const isSharedZone = rConf ? (rConf.type === 'ground') : (key === 'Z8' || key === 'R6528' || searchStr.includes('ลานกาง') || searchStr.includes('ground'));
-                                            
-                                            let available = 1;
-                                            if (availability && availability.roomAvailableCount && availability.roomAvailableCount[key] !== undefined) {
-                                                available = parseInt(availability.roomAvailableCount[key]);
-                                            } else if (availability) {
-                                                 available = isSharedZone ? (availability.tentAvailable && availability.tentAvailable[key] !== undefined ? parseInt(availability.tentAvailable[key]) : parseInt(availability.zone8Available || 20)) : (availability.bookedRooms.includes(key) ? 0 : 1);
-                                            }
-                                            
-                                            const currentInCart = cart.filter(c => c.id === key).reduce((sum, c) => sum + parseInt(c.guests || 1), 0);
-                                            const remaining = isSharedZone ? Math.max(0, available - currentInCart) : available;
-                                            
-                                            const isBooked = availability && availability.bookedRooms && availability.bookedRooms.includes(key);
-                                            const inCart = cart.find(c => c.id === key);
-                                            
-                                            const disable = isBooked || (isSharedZone && remaining <= 0) || (!isSharedZone && inCart);
-                                            
-                                            const priceInfo = typeof rConf.pricing === 'string' ? safeJsonParse(rConf.pricing, {}) : (rConf.pricing || {});
-                                            const startPrice = priceInfo.priceHead || (priceInfo.tiers && priceInfo.tiers.length > 0 ? priceInfo.tiers[0].price : 0);
-
-                                            return (
-                                                <div key={key} onClick={() => {
-                                                    if(disable) return;
-                                                    if(inCart && !isSharedZone) setCart(cart.filter(c => c.id !== key)); 
-                                                    else openRoomModal(key);
-                                                }} className={`flex bg-white dark:bg-gray-700 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-600 transition-all ${disable ? 'opacity-60 grayscale cursor-not-allowed' : inCart && !isSharedZone ? 'border-yellow-400 bg-yellow-50 dark:bg-yellow-900 cursor-pointer' : 'hover:shadow-md cursor-pointer hover:border-green-300'}`}>
-                                                    <div className="w-1/3 min-h-[100px] bg-gray-200 dark:bg-gray-600 relative">
-                                                        <img src={(siteConfig.roomImages[key]||[])[0] || 'https://via.placeholder.com/150?text=No+Image'} className="w-full h-full object-cover absolute inset-0" />
-                                                        {disable && <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-bold text-xs">{t('fullyBooked')}</div>}
-                                                    </div>
-                                                    <div className="w-2/3 p-3 flex flex-col justify-between">
-                                                        <div>
-                                                            <h3 className="font-bold text-sm text-gray-800 dark:text-white line-clamp-1">{tData(rConf.name)}</h3>
-                                                            <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mt-1">{tData(siteConfig.roomDescriptions?.[key]) || t('noDesc')}</p>
+                                                        else openRoomModal(key);
+                                                    }} className={`flex bg-white dark:bg-gray-700 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-600 transition-all ${disable ? 'opacity-60 grayscale cursor-not-allowed' : inCart && !isSharedZone ? 'border-yellow-400 bg-yellow-50 dark:bg-yellow-900 cursor-pointer' : 'hover:shadow-md cursor-pointer hover:border-green-300'}`}>
+                                                        <div className="w-1/3 min-h-[110px] bg-gray-200 dark:bg-gray-600 relative">
+                                                            <img src={(siteConfig.roomImages[key]||[])[0] || 'https://via.placeholder.com/150?text=No+Image'} className="w-full h-full object-cover absolute inset-0" />
+                                                            {disable && <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-bold text-xs">{t('fullyBooked')}</div>}
                                                         </div>
-                                                        <div className="flex justify-between items-end mt-2">
-                                                            <div className="text-green-600 dark:text-green-400 font-bold text-sm">{formatMoney(startPrice)}฿<span className="text-[10px] font-normal text-gray-500 dark:text-gray-400">/{isSharedZone ? t('persons') : t('nightsUnit')}</span></div>
-                                                            {!disable ? (
-                                                                inCart && !isSharedZone ? (
-                                                                    <span className="text-xs text-yellow-600 font-bold"><i className="fas fa-check"></i> {t('legendSelected')}</span>
+                                                        <div className="w-2/3 p-3 flex flex-col justify-between">
+                                                            <div>
+                                                                <h3 className="font-bold text-sm text-gray-800 dark:text-white line-clamp-1">{tData(rConf.name)}</h3>
+                                                                <p className="text-[11px] text-gray-500 dark:text-gray-400 line-clamp-2 mt-1 leading-snug">{tData(siteConfig.roomDescriptions?.[key]) || t('noDesc')}</p>
+                                                            </div>
+                                                            <div className="flex justify-between items-end mt-2">
+                                                                <div className="text-green-600 dark:text-green-400 font-bold text-sm">{formatMoney(startPrice)}฿<span className="text-[10px] font-normal text-gray-500 dark:text-gray-400">/{isSharedZone ? t('persons') : t('nightsUnit')}</span></div>
+                                                                {!disable ? (
+                                                                    inCart && !isSharedZone ? (
+                                                                        <span className="text-xs text-yellow-600 font-bold"><i className="fas fa-check"></i> {t('legendSelected')}</span>
+                                                                    ) : (
+                                                                        <button className="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-3 py-1 rounded-lg text-xs font-bold shadow-sm">{t('selectRoom')}</button>
+                                                                    )
                                                                 ) : (
-                                                                    <button className="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-3 py-1 rounded text-xs font-bold">{t('selectRoom')}</button>
-                                                                )
-                                                            ) : (
-                                                                <span className="text-xs text-red-500 font-bold">{t('fullyBooked')}</span>
-                                                            )}
+                                                                    <span className="text-xs text-red-500 font-bold">{t('fullyBooked')}</span>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            )
-                                        })}
-                                    </div>
-                                )}
+                                                )
+                                            })}
+                                        </div>
+                                    )}
 
-                                {/* --- TOGGLE VIEW BUTTONS --- */}
-                                <div className="flex justify-center mb-8">
-                                    <div className="flex bg-gray-200 dark:bg-gray-700 p-1 rounded-xl shadow-inner">
-                                        <button onClick={() => setViewStyle('map')} className={`px-6 py-2 text-sm rounded-lg font-bold transition-all flex items-center ${viewStyle === 'map' ? 'bg-white dark:bg-gray-800 text-green-700 dark:text-green-400 shadow-md' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>
-                                            <i className="fas fa-map-marked-alt mr-2"></i> {t('mapView')}
-                                        </button>
-                                        <button onClick={() => setViewStyle('list')} className={`px-6 py-2 text-sm rounded-lg font-bold transition-all flex items-center ${viewStyle === 'list' ? 'bg-white dark:bg-gray-800 text-green-700 dark:text-green-400 shadow-md' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>
-                                            <i className="fas fa-th-list mr-2"></i> {t('listView')}
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {selectedRoomId && roomConfig[selectedRoomId] && (
-                                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-sm relative animate-pop">
-                                            <div className="relative w-full h-48 mb-4 rounded-lg overflow-hidden bg-gray-200">
-                                                <img src={(siteConfig.roomImages[selectedRoomId]||[])[currentImgIdx] || "https://via.placeholder.com/600x400?text=No+Image"} className="w-full h-full object-cover transition-opacity duration-300" />
-                                                {(siteConfig.roomImages[selectedRoomId]||[]).length > 1 && ( <> <button onClick={prevImage} className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-full hover:bg-opacity-70"><i className="fas fa-chevron-left"></i></button> <button onClick={nextImage} className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-full hover:bg-opacity-70"><i className="fas fa-chevron-right"></i></button> </> )}
-                                            </div>
-                                            <h3 className="text-xl font-bold mb-2 text-green-800 dark:text-green-400">{tData(roomConfig[selectedRoomId].name)}</h3>
-                                            <p className="text-gray-500 dark:text-gray-300 text-sm mb-4 h-16 overflow-y-auto custom-scrollbar"> {tData(siteConfig.roomDescriptions?.[selectedRoomId]) || t('noDesc')} </p>
-                                            <div className="flex items-center justify-between mb-6 bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
-                                                <button onClick={() => setGuestCount(Math.max((parseInt(roomConfig[selectedRoomId].min)||1), guestCount - 1))} className="w-10 h-10 bg-green-600 hover:bg-green-700 text-white rounded shadow text-xl font-bold transition-colors">-</button>
-                                                <div className="text-center"> <div className="text-2xl font-bold dark:text-white">{guestCount}</div> <div className="text-xs text-gray-500 dark:text-gray-400">{t('persons')}</div> </div>
-                                                <button onClick={() => { 
-                                                    const rConf = roomConfig[selectedRoomId];
-                                                    const searchStr = rConf ? (rConf.type + " " + rConf.name).toLowerCase() : '';
-                                                    const isSharedZone = rConf ? (rConf.type === 'ground') : (selectedRoomId === 'Z8' || selectedRoomId === 'R6528' || searchStr.includes('ลานกาง') || searchStr.includes('ground'));
-                                                    
-                                                    let limit = parseInt(rConf.maxCap) || 10; 
-                                                    
-                                                    if (isSharedZone) {
-                                                        let avail = limit;
-                                                        if (availability && availability.roomAvailableCount && availability.roomAvailableCount[selectedRoomId] !== undefined) {
-                                                             avail = parseInt(availability.roomAvailableCount[selectedRoomId]);
-                                                        } else if (availability) {
-                                                             avail = availability.tentAvailable && availability.tentAvailable[selectedRoomId] !== undefined ? parseInt(availability.tentAvailable[selectedRoomId]) : parseInt(availability.zone8Available || limit);
-                                                        }
-                                                        
-                                                        const currentInCart = cart.filter(c => c.id === selectedRoomId).reduce((sum, c) => sum + parseInt(c.guests || 1), 0);
-                                                        limit = Math.max(1, avail - currentInCart);
-                                                    }
-                                                    
-                                                    if (guestCount < limit) {
-                                                        setGuestCount(guestCount + 1);
-                                                    } else {
-                                                        setModalAlert({ show: true, type: 'warning', title: t('quotaFullTitle'), text: t('quotaFullDesc', { limit: limit }) });
-                                                    }
-                                                }} className="w-10 h-10 bg-green-600 hover:bg-green-700 text-white rounded shadow text-xl font-bold transition-colors">+</button>
-                                            </div>
-                                            <div className="flex gap-2"> <button onClick={() => setSelectedRoomId(null)} className="flex-1 py-3 text-gray-500 bg-gray-200 dark:bg-gray-600 dark:text-gray-300 rounded-lg font-bold">{t('cancel')}</button> <button onClick={confirmRoomSelection} className="flex-1 py-3 text-white bg-green-600 hover:bg-green-700 rounded-lg font-bold shadow-lg">{t('confirm')}</button> </div>
+                                    {/* --- TOGGLE VIEW BUTTONS --- */}
+                                    <div className="flex justify-center mt-4 mb-8">
+                                        <div className="flex bg-gray-100 dark:bg-gray-700 p-1.5 rounded-full shadow-inner">
+                                            <button onClick={() => setViewStyle('map')} className={`px-6 py-2 text-sm rounded-full font-bold transition-all flex items-center ${viewStyle === 'map' ? 'bg-white dark:bg-gray-800 text-green-700 dark:text-green-400 shadow-md' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>
+                                                <i className="fas fa-map-marked-alt mr-2"></i> {t('mapView')}
+                                            </button>
+                                            <button onClick={() => setViewStyle('list')} className={`px-6 py-2 text-sm rounded-full font-bold transition-all flex items-center ${viewStyle === 'list' ? 'bg-white dark:bg-gray-800 text-green-700 dark:text-green-400 shadow-md' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>
+                                                <i className="fas fa-th-list mr-2"></i> {t('listView')}
+                                            </button>
                                         </div>
                                     </div>
-                                )}
-                                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-4">
-                                    <h3 className="font-bold mb-4 dark:text-white text-lg">{t('preOrderFood')}</h3>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        {siteConfig.foodMenu.map(f => {
-                                            const inCartItems = cart.filter(c => c.id === f.id && c.type === 'food');
-                                            const inCartCount = inCartItems.reduce((sum, item) => sum + item.qty, 0);
-                                            
-                                            return ( 
-                                                <div key={f.id} onClick={() => openFoodModal(f)} className={`cursor-pointer rounded-lg overflow-hidden border-2 transition-all shadow-sm relative ${inCartCount > 0 ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900 dark:border-yellow-500' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 hover:border-green-400'}`} > 
-                                                    <img src={f.img} className="w-full h-24 object-cover" /> 
-                                                    <div className="p-2"> 
-                                                        <h4 className="font-bold text-sm text-gray-800 dark:text-white line-clamp-1">{tData(f.name)}</h4> 
-                                                        {f.desc && <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 my-1">{tData(f.desc)}</p>} 
-                                                        <div className="flex justify-between items-center mt-1"> 
-                                                            <span className="text-green-600 dark:text-green-400 text-sm font-bold">{f.price}.-</span> 
-                                                            {inCartCount > 0 && <span className="bg-yellow-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">x{inCartCount}</span>} 
+
+                                    {/* --- PRE-ORDER FOOD --- */}
+                                    <div className="bg-gray-50 dark:bg-gray-700/50 p-4 -mx-4 sm:mx-0 sm:rounded-2xl mb-8">
+                                        <h3 className="font-bold mb-4 dark:text-white text-lg px-2"><i className="fas fa-utensils text-orange-500 mr-2"></i>{t('preOrderFood')}</h3>
+                                        <div className="grid grid-cols-2 gap-3 px-2 sm:px-0">
+                                            {siteConfig.foodMenu.map(f => {
+                                                const inCartItems = cart.filter(c => c.id === f.id && c.type === 'food');
+                                                const inCartCount = inCartItems.reduce((sum, item) => sum + item.qty, 0);
+                                                
+                                                return ( 
+                                                    <div key={f.id} onClick={() => openFoodModal(f)} className={`cursor-pointer rounded-xl overflow-hidden border transition-all shadow-sm relative ${inCartCount > 0 ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900 dark:border-yellow-500' : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-green-400'}`} > 
+                                                        <img src={f.img} className="w-full h-24 object-cover" /> 
+                                                        <div className="p-2.5"> 
+                                                            <h4 className="font-bold text-sm text-gray-800 dark:text-white line-clamp-1">{tData(f.name)}</h4> 
+                                                            {f.desc && <p className="text-[10px] text-gray-500 dark:text-gray-400 line-clamp-1 my-1">{tData(f.desc)}</p>} 
+                                                            <div className="flex justify-between items-center mt-1.5"> 
+                                                                <span className="text-green-600 dark:text-green-400 text-sm font-bold">{f.price} ฿</span> 
+                                                                {inCartCount > 0 ? (
+                                                                    <span className="bg-yellow-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">x{inCartCount}</span>
+                                                                ) : (
+                                                                    <span className="text-gray-300 dark:text-gray-500 text-xs"><i className="fas fa-plus-circle"></i></span>
+                                                                )}
+                                                            </div> 
                                                         </div> 
                                                     </div> 
-                                                </div> 
-                                            );
-                                        })}
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    {/* --- CART SUMMARY --- */}
+                                    <div className="bg-gray-100 dark:bg-gray-700/80 p-5 rounded-2xl mb-8 border border-gray-200 dark:border-gray-600">
+                                        <h3 className="font-bold dark:text-white text-lg mb-3 border-b border-gray-200 dark:border-gray-600 pb-2">{t('cart')} ({cart.length})</h3> 
+                                        {cart.length === 0 && <p className="text-sm text-gray-400 text-center py-4">ตะกร้าว่างเปล่า</p>}
+                                        {cart.map((c,i)=>
+                                            <div key={i} className="flex justify-between items-center text-sm mt-2 dark:text-gray-200 bg-white dark:bg-gray-800 p-2.5 rounded-lg shadow-sm">
+                                                <span className="font-medium">{tData(c.name)} {c.type==='food'?<span className="text-orange-500 font-bold ml-1">x{c.qty}</span>:<span className="text-blue-500 ml-1">({c.guests} {t('persons')})</span>}</span>
+                                                <button onClick={()=>setCart(cart.filter((_,idx)=>idx!==i))} className="text-red-500 hover:text-red-700 w-8 h-8 flex items-center justify-center bg-red-50 dark:bg-red-900/30 rounded-full"><i className="fas fa-trash-alt"></i></button>
+                                            </div>
+                                        )} 
+                                    </div>
+                                    
+                                    <button onClick={() => { const hasRoom = cart.some(c => c.type !== 'food'); if (!hasRoom) { setShowRoomRequiredModal(true); return; } setStep(3); }} className="w-full bg-green-600 text-white p-4 rounded-xl font-bold shadow-lg text-lg hover:bg-green-700 transition transform active:scale-95"> 
+                                        {t('continueBtn')} <i className="fas fa-arrow-right ml-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* ROOM MODAL */}
+                        {selectedRoomId && roomConfig[selectedRoomId] && (
+                            <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm transition-opacity">
+                                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm relative animate-pop overflow-hidden">
+                                    <div className="relative w-full h-56 -mt-6 -mx-6 mb-4 bg-gray-200">
+                                        <img src={(siteConfig.roomImages[selectedRoomId]||[])[currentImgIdx] || "https://via.placeholder.com/600x400?text=No+Image"} className="w-full h-full object-cover transition-opacity duration-300" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                                        {(siteConfig.roomImages[selectedRoomId]||[]).length > 1 && ( <> <button onClick={prevImage} className="absolute left-3 top-1/2 transform -translate-y-1/2 bg-white/20 backdrop-blur text-white w-8 h-8 rounded-full hover:bg-white/40 flex items-center justify-center"><i className="fas fa-chevron-left"></i></button> <button onClick={nextImage} className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-white/20 backdrop-blur text-white w-8 h-8 rounded-full hover:bg-white/40 flex items-center justify-center"><i className="fas fa-chevron-right"></i></button> </> )}
+                                    </div>
+                                    <h3 className="text-2xl font-bold mb-1 text-gray-800 dark:text-white">{tData(roomConfig[selectedRoomId].name)}</h3>
+                                    <p className="text-gray-500 dark:text-gray-400 text-sm mb-5 h-16 overflow-y-auto custom-scrollbar leading-relaxed"> {tData(siteConfig.roomDescriptions?.[selectedRoomId]) || t('noDesc')} </p>
+                                    
+                                    <div className="flex items-center justify-between mb-6 bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                                        <button onClick={() => setGuestCount(Math.max((parseInt(roomConfig[selectedRoomId].min)||1), guestCount - 1))} className="w-12 h-12 bg-white dark:bg-gray-600 hover:bg-gray-100 dark:hover:bg-gray-500 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-500 rounded-full shadow-sm text-xl font-bold transition-colors">-</button>
+                                        <div className="text-center"> <div className="text-3xl font-bold text-green-600 dark:text-green-400">{guestCount}</div> <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">{t('persons')}</div> </div>
+                                        <button onClick={() => { 
+                                            const rConf = roomConfig[selectedRoomId];
+                                            const searchStr = rConf ? (rConf.type + " " + rConf.name).toLowerCase() : '';
+                                            const isSharedZone = rConf ? (rConf.type === 'ground') : (selectedRoomId === 'Z8' || selectedRoomId === 'R6528' || searchStr.includes('ลานกาง') || searchStr.includes('ground'));
+                                            
+                                            let limit = parseInt(rConf.maxCap) || 10; 
+                                            
+                                            if (isSharedZone) {
+                                                let avail = limit;
+                                                if (availability && availability.roomAvailableCount && availability.roomAvailableCount[selectedRoomId] !== undefined) {
+                                                     avail = parseInt(availability.roomAvailableCount[selectedRoomId]);
+                                                } else if (availability) {
+                                                     avail = availability.tentAvailable && availability.tentAvailable[selectedRoomId] !== undefined ? parseInt(availability.tentAvailable[selectedRoomId]) : parseInt(availability.zone8Available || limit);
+                                                }
+                                                const currentInCart = cart.filter(c => c.id === selectedRoomId).reduce((sum, c) => sum + parseInt(c.guests || 1), 0);
+                                                limit = Math.max(1, avail - currentInCart);
+                                            }
+                                            
+                                            if (guestCount < limit) {
+                                                setGuestCount(guestCount + 1);
+                                            } else {
+                                                setModalAlert({ show: true, type: 'warning', title: t('quotaFullTitle'), text: t('quotaFullDesc', { limit: limit }) });
+                                            }
+                                        }} className="w-12 h-12 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-md text-xl font-bold transition-colors">+</button>
+                                    </div>
+                                    <div className="flex gap-3"> 
+                                        <button onClick={() => setSelectedRoomId(null)} className="flex-1 py-3.5 text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl font-bold hover:bg-gray-200 transition">{t('cancel')}</button> 
+                                        <button onClick={confirmRoomSelection} className="flex-1 py-3.5 text-white bg-green-600 hover:bg-green-700 rounded-xl font-bold shadow-lg transition">{t('confirm')}</button> 
                                     </div>
                                 </div>
-                                <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded mb-4"><h3 className="font-bold dark:text-white">{t('cart')} ({cart.length})</h3> {cart.map((c,i)=><div key={i} className="flex justify-between text-sm mt-1 dark:text-gray-200"><span>{tData(c.name)} {c.type==='food'?`x${c.qty}`:`(${c.guests} ${t('persons')})`}</span><button onClick={()=>setCart(cart.filter((_,idx)=>idx!==i))} className="text-red-500">{t('delete')}</button></div>)} </div>
-                                <button onClick={() => { const hasRoom = cart.some(c => c.type !== 'food'); if (!hasRoom) { setShowRoomRequiredModal(true); return; } setStep(3); }} className="w-full bg-green-600 text-white p-3 rounded-lg font-bold shadow-lg text-lg"> {t('continueBtn')} </button>
                             </div>
                         )}
 
+                        {/* --- STEP 3: PAYMENT --- */}
                         {mode === 'booking' && step === 3 && (
-                            <div className="max-w-md mx-auto p-6 pt-16 bg-white dark:bg-gray-800 shadow-xl sm:rounded-2xl sm:my-8 min-h-screen sm:min-h-[auto]">
-                                <div className="flex items-center gap-2 mb-4"><button onClick={()=>setStep(2)} className="text-gray-500 dark:text-gray-300 hover:text-green-600 font-bold text-sm"><i className="fas fa-chevron-left"></i> {t('back')}</button><h2 className="text-xl font-bold dark:text-white">{t('summaryPayment')}</h2></div>
-                                <div className="space-y-2 mb-4 text-sm dark:text-gray-200">
-                                    <p><strong>{t('checkIn')}</strong> {formatDateLocalized(dates.checkIn)}</p>
-                                    <p><strong>{t('checkOut')}</strong> {formatDateLocalized(dates.checkOut)}</p>
-                                    <p><strong>{t('nights')}</strong> {calculateNights()} {t('nightsUnit')}</p>
-                                    {pricing.isHighSeason && <div className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 p-1 rounded">{t('highSeasonNotice')}</div>}
-                                    <hr className="dark:border-gray-600"/>
-                                    {cart.map((c, i) => <div key={i} className="flex justify-between"><span>{tData(c.name)} {c.type !== 'food' && `(${c.guests} ${t('persons')})`}</span><span>{formatMoney(c.type==='food' ? Number(c.price||0)*Number(c.qty||1) : (c.isPerHead ? Number(c.pricePerNight||0) * calculateNights() * Number(c.guests||1) : Number(c.pricePerNight||0)*calculateNights()))} ฿</span></div>)}
-                                    <hr className="dark:border-gray-600"/>
-                                    {pricing.discount > 0 && <div className="flex justify-between text-red-500 font-bold"><span>{t('discountRoom')}</span><span>-{formatMoney(pricing.discount)} ฿</span></div>}
-                                    <div className="flex justify-between font-bold text-lg"><span>{t('netTotal')}</span><span>{formatMoney(pricing.netTotal)} ฿</span></div>
-                                    <div className="bg-yellow-100 dark:bg-yellow-900 p-2 rounded text-center border border-yellow-300 dark:border-yellow-700 mt-2"><span className="block text-sm text-yellow-800 dark:text-yellow-200">{t('depositRequired')}</span><span className="text-2xl font-bold text-red-600 dark:text-red-400">{formatMoney(pricing.deposit)} ฿</span></div>
-                                </div>
-                                <div className="mb-4">
-                                    <div className="flex gap-2"> <input placeholder={t('enterDiscount')} className="border p-2 rounded flex-1 dark:bg-gray-700 dark:border-gray-600 dark:text-white" onChange={e => setDiscount({...discount, code: e.target.value})} /> <button className="bg-gray-800 dark:bg-gray-600 text-white px-4 rounded" onClick={checkDiscountCode}>{t('applyCode')}</button> </div>
-                                    {discount.message && <p className={`text-xs mt-1 ${discount.status==='success'?'text-green-600 dark:text-green-400':'text-red-500 dark:text-red-400'}`}>{discount.message}</p>}
-                                </div>
-                                <div className="space-y-3 mb-6">
-                                    <input placeholder={t('bookerName')} className="w-full border p-2 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white" value={customer.name} onChange={e => setCustomer({...customer, name: e.target.value})} />
-                                    <input placeholder={t('phoneNumber')} className="w-full border p-2 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white" type="tel" value={customer.phone} onChange={e => setCustomer({...customer, phone: e.target.value})} />
+                            <div className="w-full max-w-lg mx-auto bg-white dark:bg-gray-800 min-h-screen shadow-2xl flex flex-col p-6 pt-8 sm:rounded-2xl sm:my-8 sm:min-h-[auto]">
+                                <div className="flex items-center gap-3 mb-6 border-b border-gray-100 dark:border-gray-700 pb-4">
+                                    <button onClick={()=>setStep(2)} className="text-gray-500 dark:text-gray-300 hover:text-green-600 font-bold text-lg w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 dark:bg-gray-700">
+                                        <i className="fas fa-chevron-left"></i>
+                                    </button>
+                                    <h2 className="text-xl font-bold dark:text-white">{t('summaryPayment')}</h2>
                                 </div>
                                 
-                                <div className="text-center mb-6">
-                                    <p className="mb-2 font-bold dark:text-white">{t('scanPromptpay')}</p>
+                                <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl space-y-3 mb-6 text-sm dark:text-gray-200 border border-gray-100 dark:border-gray-600">
+                                    <div className="flex justify-between"><span>{t('checkIn')}</span> <span className="font-bold text-gray-800 dark:text-white">{formatDateLocalized(dates.checkIn)}</span></div>
+                                    <div className="flex justify-between"><span>{t('checkOut')}</span> <span className="font-bold text-gray-800 dark:text-white">{formatDateLocalized(dates.checkOut)}</span></div>
+                                    <div className="flex justify-between"><span>{t('nights')}</span> <span className="font-bold text-gray-800 dark:text-white">{calculateNights()} {t('nightsUnit')}</span></div>
+                                    {pricing.isHighSeason && <div className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 p-2 rounded-lg text-center mt-2 font-medium">{t('highSeasonNotice')}</div>}
+                                    
+                                    <div className="border-t border-gray-200 dark:border-gray-600 pt-3 mt-3"></div>
+                                    {cart.map((c, i) => <div key={i} className="flex justify-between text-gray-600 dark:text-gray-300"><span>{tData(c.name)} {c.type !== 'food' && <span className="text-xs ml-1 bg-gray-200 dark:bg-gray-600 px-1.5 rounded text-gray-600 dark:text-gray-300">{c.guests} {t('persons')}</span>}</span><span className="font-medium">{formatMoney(c.type==='food' ? Number(c.price||0)*Number(c.qty||1) : (c.isPerHead ? Number(c.pricePerNight||0) * calculateNights() * Number(c.guests||1) : Number(c.pricePerNight||0)*calculateNights()))} ฿</span></div>)}
+                                    
+                                    <div className="border-t border-gray-200 dark:border-gray-600 pt-3 mt-3"></div>
+                                    {pricing.discount > 0 && <div className="flex justify-between text-red-500 font-bold"><span>{t('discountRoom')}</span><span>-{formatMoney(pricing.discount)} ฿</span></div>}
+                                    <div className="flex justify-between font-bold text-lg text-gray-800 dark:text-white"><span>{t('netTotal')}</span><span>{formatMoney(pricing.netTotal)} ฿</span></div>
+                                    
+                                    <div className="bg-yellow-50 dark:bg-yellow-900/30 p-3 rounded-lg text-center border border-yellow-200 dark:border-yellow-700/50 mt-4 shadow-sm">
+                                        <span className="block text-sm text-yellow-800 dark:text-yellow-400 font-bold mb-1">{t('depositRequired')}</span>
+                                        <span className="text-3xl font-bold text-red-600 dark:text-red-400">{formatMoney(pricing.deposit)} <span className="text-lg">฿</span></span>
+                                    </div>
+                                </div>
+
+                                <div className="mb-6">
+                                    <div className="flex gap-2"> 
+                                        <input placeholder={t('enterDiscount')} className="border p-3 rounded-xl flex-1 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-green-500 outline-none transition" onChange={e => setDiscount({...discount, code: e.target.value})} /> 
+                                        <button className="bg-gray-800 dark:bg-gray-600 text-white px-5 rounded-xl font-bold shadow-md hover:bg-gray-700 transition" onClick={checkDiscountCode}>{t('applyCode')}</button> 
+                                    </div>
+                                    {discount.message && <p className={`text-xs mt-2 font-medium ${discount.status==='success'?'text-green-600 dark:text-green-400':'text-red-500 dark:text-red-400'}`}>{discount.message}</p>}
+                                </div>
+
+                                <div className="space-y-4 mb-8">
+                                    <div><label className="block text-xs font-bold text-gray-500 mb-1 px-1">{t('bookerName')}</label><input className="w-full border p-3 rounded-xl dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-green-500 outline-none transition" value={customer.name} onChange={e => setCustomer({...customer, name: e.target.value})} /></div>
+                                    <div><label className="block text-xs font-bold text-gray-500 mb-1 px-1">{t('phoneNumber')}</label><input className="w-full border p-3 rounded-xl dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-green-500 outline-none transition" type="tel" value={customer.phone} onChange={e => setCustomer({...customer, phone: e.target.value})} /></div>
+                                </div>
+                                
+                                <div className="bg-white dark:bg-gray-700 border-2 border-blue-100 dark:border-blue-900 rounded-2xl p-6 text-center mb-6 shadow-sm relative overflow-hidden">
+                                    <div className="absolute top-0 left-0 w-full h-2 bg-blue-500"></div>
+                                    <p className="mb-3 font-bold text-gray-800 dark:text-white text-lg">{t('scanPromptpay')}</p>
                                     {qrUrl ? ( 
                                         <div className="flex flex-col items-center"> 
-                                            <img src={qrUrl} className="mx-auto border-2 border-gray-200 dark:border-gray-600 rounded-xl mb-3 shadow-sm p-2 bg-white" alt="QR Code" style={{ width: '200px', height: '200px' }} /> 
-                                            <p className="text-sm text-blue-600 dark:text-blue-400 font-bold mt-1"> {t('saveQrNote')}</p> 
+                                            <img src={qrUrl} className="mx-auto border border-gray-200 dark:border-gray-500 rounded-xl mb-3 shadow-md p-2 bg-white w-48 h-48 object-contain" alt="QR Code" /> 
+                                            <p className="text-xs text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-900/30 px-3 py-1 rounded-full"> {t('saveQrNote')}</p> 
                                         </div> 
-                                    ) : ( <div className="h-[200px] flex items-center justify-center text-gray-400">{t('generatingQr')}</div> )}
-                                    <div className="mt-4 bg-gray-50 dark:bg-gray-700 p-2 rounded"> <p className="text-sm font-bold text-gray-800 dark:text-white">{PROMPTPAY_NAME}</p> <p className="text-xs text-gray-500 dark:text-gray-400 font-mono tracking-wider">{PROMPTPAY_PHONE}</p> </div>
+                                    ) : ( <div className="h-48 flex items-center justify-center text-gray-400"><i className="fas fa-spinner fa-spin mr-2"></i>{t('generatingQr')}</div> )}
+                                    <div className="mt-5 bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-600"> 
+                                        <p className="text-sm font-bold text-gray-800 dark:text-white mb-0.5">{PROMPTPAY_NAME}</p> 
+                                        <p className="text-sm text-blue-600 dark:text-blue-400 font-mono tracking-widest font-bold">{PROMPTPAY_PHONE}</p> 
+                                    </div>
                                 </div>
                                 
-                                <div className="mb-4"> 
-                                    <label className="block mb-1 text-sm dark:text-gray-300">{t('uploadSlip')} <span className="text-red-500">*</span></label> 
-                                    <input type="file" accept="image/*" onChange={async (e) => { 
-                                        const f = e.target.files[0]; 
-                                        if (f) { 
-                                            try { 
-                                                setSlipStatus({ type: 'loading', msg: lang === 'en' ? 'Checking slip...' : 'กำลังตรวจสอบสลิป...' });
-                                                const resizedBase64 = await compressImage(f); 
-                                                setSlipImg(resizedBase64); 
-                                                
-                                                // Client-Side Slip Verification
-                                                checkSlipQR(resizedBase64, PROMPTPAY_PHONE, (res) => {
-                                                    setSlipStatus(res);
-                                                });
-                                            } catch (err) { alert('Upload error'); } 
-                                        } 
-                                    }} className="w-full text-sm dark:text-gray-300" /> 
+                                <div className="mb-6 bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl border border-gray-200 dark:border-gray-600"> 
+                                    <label className="block mb-2 text-sm font-bold dark:text-gray-200">{t('uploadSlip')} <span className="text-red-500">*</span></label> 
+                                    <div className="relative">
+                                        <input type="file" accept="image/*" onChange={async (e) => { 
+                                            const f = e.target.files[0]; 
+                                            if (f) { 
+                                                try { 
+                                                    setSlipStatus({ type: 'loading', msg: lang === 'en' ? 'Checking slip...' : 'กำลังตรวจสอบสลิป...' });
+                                                    const resizedBase64 = await compressImage(f); 
+                                                    setSlipImg(resizedBase64); 
+                                                    checkSlipQR(resizedBase64, PROMPTPAY_PHONE, (res) => { setSlipStatus(res); });
+                                                } catch (err) { alert('Upload error'); } 
+                                            } 
+                                        }} className="w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" /> 
+                                    </div>
                                     
-                                    {/* สถานะเช็คสลิป */}
                                     {slipStatus && slipStatus.type !== 'loading' && (
-                                        <p className={`text-[10px] mt-2 p-1.5 rounded ${slipStatus.type === 'success' ? 'bg-green-100 text-green-700' : slipStatus.type === 'error' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                                            {t(slipStatus.msg)}
-                                        </p>
+                                        <div className={`mt-3 p-2.5 rounded-lg text-xs font-bold flex items-start gap-2 ${slipStatus.type === 'success' ? 'bg-green-100 text-green-700 border border-green-200' : slipStatus.type === 'error' ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-yellow-100 text-yellow-800 border border-yellow-300'}`}>
+                                            <i className={`mt-0.5 fas ${slipStatus.type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'}`}></i>
+                                            <span>{t(slipStatus.msg)}</span>
+                                        </div>
                                     )}
                                     {slipStatus && slipStatus.type === 'loading' && (
-                                        <p className="text-[10px] mt-2 p-1.5 rounded bg-blue-100 text-blue-700">
-                                            <i className="fas fa-spinner fa-spin mr-1"></i> {slipStatus.msg}
-                                        </p>
+                                        <div className="mt-3 p-2.5 rounded-lg text-xs font-bold bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
+                                            <i className="fas fa-spinner fa-spin mr-2"></i> {slipStatus.msg}
+                                        </div>
                                     )}
                                 </div>
 
-                                <div className="flex items-start gap-2 mb-4 text-xs text-gray-600 dark:text-gray-400"> <input type="checkbox" className="mt-1" checked={agreed} onChange={e => setAgreed(e.target.checked)} /> <p>{t('agreeTerms')}</p> </div>
-                                <button onClick={handleSubmit} disabled={loading || !canSubmit} className={`w-full p-3 rounded-lg font-bold text-white transition ${loading || !canSubmit ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 shadow-lg'}`}>{loading ? t('confirmingBtn') : t('confirmBookingBtn')}</button>
-                            </div>
-                        )}
-
-                        {mode === 'booking' && step === 5 && (
-                            <div className="max-w-md mx-auto p-8 pt-16 text-center bg-white dark:bg-gray-800 shadow-xl sm:rounded-2xl sm:my-8 min-h-screen sm:min-h-[auto] flex flex-col justify-center">
-                                <div className="w-20 h-20 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-6 text-green-500 text-4xl shadow-inner animate-pop"><i className="fas fa-check"></i></div>
-                                <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">{t('bookingSuccessTitle')}</h2>
-                                <p className="text-gray-600 dark:text-gray-300 mb-6">{t('bookingIdText')} <span className="font-bold text-green-600">{bookingResult}</span></p>
-                                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg text-sm text-gray-700 dark:text-gray-300 mb-6 whitespace-pre-line">
-                                    {t('successMessage')}
+                                <div className="mt-auto">
+                                    <div className="flex items-start gap-3 mb-6 p-3 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-100 dark:border-green-800"> 
+                                        <input type="checkbox" className="mt-1 w-4 h-4 text-green-600 rounded focus:ring-green-500 cursor-pointer" checked={agreed} onChange={e => setAgreed(e.target.checked)} id="agree" /> 
+                                        <label htmlFor="agree" className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed cursor-pointer font-medium">{t('agreeTerms')}</label> 
+                                    </div>
+                                    <button onClick={handleSubmit} disabled={loading || !canSubmit} className={`w-full p-4 rounded-xl font-bold text-white transition-all text-lg shadow-lg ${loading || !canSubmit ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 hover:shadow-green-500/30 transform active:scale-95'}`}>
+                                        {loading ? <><i className="fas fa-spinner fa-spin mr-2"></i>{t('confirmingBtn')}</> : <><i className="fas fa-check-circle mr-2"></i>{t('confirmBookingBtn')}</>}
+                                    </button>
                                 </div>
-                                <button onClick={() => window.location.reload()} className="w-full bg-gray-800 dark:bg-gray-600 text-white p-3 rounded-lg hover:bg-gray-700 transition font-bold shadow">{t('backToHome')}</button>
                             </div>
                         )}
 
-                        {/* --- MODALS --- */}
+                        {/* --- MODALS (Food, etc.) --- */}
                         {selectedFood && (
-                            <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm transition-opacity">
+                            <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm transition-opacity">
                                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm relative animate-pop overflow-hidden">
                                     <button onClick={() => setSelectedFood(null)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10 w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm"><i className="fas fa-times text-lg"></i></button>
                                     <div className="w-full h-48 -mt-6 -mx-6 mb-4 relative"><img src={selectedFood.img} className="w-full h-full object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div></div>
@@ -1478,7 +1382,7 @@
                                     
                                     <div className="mb-4">
                                         <textarea 
-                                            className="w-full border border-gray-200 dark:border-gray-600 rounded-lg p-2 text-sm bg-white dark:bg-gray-700 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-green-500 outline-none" 
+                                            className="w-full border border-gray-200 dark:border-gray-600 rounded-lg p-3 text-sm bg-white dark:bg-gray-700 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-green-500 outline-none resize-none" 
                                             placeholder={t('foodNotePlaceholder')} 
                                             rows="2"
                                             value={foodNote}
@@ -1486,29 +1390,56 @@
                                         ></textarea>
                                     </div>
 
-                                    <button onClick={confirmFoodSelection} className="w-full bg-green-600 text-white py-3 rounded-xl font-bold shadow-lg hover:bg-green-700 transition flex items-center justify-center gap-2"><i className="fas fa-cart-plus"></i> {t('addCart')}</button>
+                                    <button onClick={confirmFoodSelection} className="w-full bg-green-600 text-white py-3.5 rounded-xl font-bold shadow-lg hover:bg-green-700 transition flex items-center justify-center gap-2 text-lg"><i className="fas fa-cart-plus"></i> {t('addCart')}</button>
                                 </div>
                             </div>
                         )}
                         
                         {showRoomRequiredModal && (
-                            <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-6">
+                            <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-6 backdrop-blur-sm">
                                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center relative animate-pop">
                                     <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center mx-auto mb-4"><i className="fas fa-campground text-3xl text-yellow-500 dark:text-yellow-300"></i></div>
                                     <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{t('roomRequiredTitle')}</h3>
                                     <p className="text-gray-600 dark:text-gray-300 mb-6 text-sm">{t('roomRequiredDesc')}</p>
-                                    <button onClick={() => setShowRoomRequiredModal(false)} className="w-full bg-yellow-500 text-white py-3 rounded-xl font-bold hover:bg-yellow-600 transition shadow">{t('acknowledge')}</button>
+                                    <button onClick={() => setShowRoomRequiredModal(false)} className="w-full bg-yellow-500 text-white py-3.5 rounded-xl font-bold hover:bg-yellow-600 transition shadow text-lg">{t('acknowledge')}</button>
                                 </div>
                             </div>
                         )}
                         
-                        {closedModal && ( <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-6"> <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center relative animate-pop"> <div className="w-16 h-16 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center mx-auto mb-4"> <i className="fas fa-ban text-3xl text-red-500 dark:text-red-300"></i> </div> <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">วันปิดให้บริการ</h3> <p className="text-gray-600 dark:text-gray-300 mb-1">วันที่ <strong>{formatDateLocalized(closedModal.date)}</strong></p> <p className="text-red-500 dark:text-red-400 font-medium mb-6">"{closedModal.reason}"</p> <button onClick={() => setClosedModal(null)} className="w-full bg-gray-800 dark:bg-gray-600 text-white py-3 rounded-xl font-bold hover:bg-gray-700 transition">เลือกวันใหม่</button> </div> </div> )}
+                        {modalAlert.show && ( 
+                            <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity"> 
+                                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-pop"> 
+                                    <div className={`p-6 text-center ${modalAlert.type==='error'?'bg-red-50 dark:bg-red-900/20':''}`}> 
+                                        <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${modalAlert.type==='error'?'bg-red-100 text-red-500': modalAlert.type==='success'?'bg-green-100 text-green-500':'bg-yellow-100 text-yellow-500'}`}> 
+                                            <i className={`fas ${modalAlert.type==='error'?'fa-times':modalAlert.type==='success'?'fa-check':'fa-exclamation'} text-3xl`}></i> 
+                                        </div> 
+                                        <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{modalAlert.title}</h3> 
+                                        <p className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-wrap leading-relaxed">{modalAlert.text}</p> 
+                                    </div> 
+                                    <div className="p-4 bg-gray-50 dark:bg-gray-700/50"> 
+                                        <button onClick={() => setModalAlert({ ...modalAlert, show: false })} className="w-full py-3 bg-gray-800 dark:bg-gray-600 text-white rounded-xl font-bold hover:bg-gray-700 transition text-lg">{t('ok')}</button> 
+                                    </div> 
+                                </div> 
+                            </div> 
+                        )}
                         
-                        {searchError && ( <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-6"> <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center relative animate-pop"> <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center mx-auto mb-4"> <i className="fas fa-exclamation-triangle text-3xl text-yellow-500 dark:text-yellow-300"></i> </div> <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{t('notice')}</h3> <p className="text-gray-600 dark:text-gray-300 mb-6 text-sm">{searchError}</p> <button onClick={() => setSearchError(null)} className="w-full bg-yellow-500 text-white py-3 rounded-xl font-bold hover:bg-yellow-600 transition">{t('ok')}</button> </div> </div> )}
-                        
-                        {modalAlert.show && ( <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-60 backdrop-blur-sm transition-opacity"> <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-xs overflow-hidden animate-pop"> <div className={`p-6 text-center ${modalAlert.type==='error'?'bg-red-50 dark:bg-red-900/20':''}`}> <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${modalAlert.type==='error'?'bg-red-100 text-red-500': modalAlert.type==='success'?'bg-green-100 text-green-500':'bg-yellow-100 text-yellow-500'}`}> <i className={`fas ${modalAlert.type==='error'?'fa-times':modalAlert.type==='success'?'fa-check':'fa-exclamation'} text-2xl`}></i> </div> <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{modalAlert.title}</h3> <p className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-wrap">{modalAlert.text}</p> </div> <div className="p-4 bg-gray-50 dark:bg-gray-700"> <button onClick={() => setModalAlert({ ...modalAlert, show: false })} className="w-full py-2.5 bg-gray-800 dark:bg-gray-600 text-white rounded-xl font-bold hover:bg-gray-700 transition">{t('ok')}</button> </div> </div> </div> )}
-                        
-                        {modalConfirm.show && ( <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-60 backdrop-blur-sm transition-opacity"> <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-xs overflow-hidden animate-pop"> <div className="p-6 text-center"> <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-blue-100 text-blue-500"> <i className="fas fa-question text-3xl"></i> </div> <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{modalConfirm.title}</h3> <p className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-wrap">{modalConfirm.text}</p> </div> <div className="p-4 bg-gray-50 dark:bg-gray-700 flex gap-2"> <button onClick={() => setModalConfirm({ ...modalConfirm, show: false })} className="flex-1 py-2.5 bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-200 rounded-xl font-bold hover:bg-gray-50 transition">{t('cancel')}</button> <button onClick={modalConfirm.onConfirm} className="flex-1 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition shadow">{t('confirm')}</button> </div> </div> </div> )}
+                        {modalConfirm.show && ( 
+                            <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity"> 
+                                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-pop"> 
+                                    <div className="p-6 text-center"> 
+                                        <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-blue-100 text-blue-500"> 
+                                            <i className="fas fa-question text-3xl"></i> 
+                                        </div> 
+                                        <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{modalConfirm.title}</h3> 
+                                        <p className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-wrap leading-relaxed">{modalConfirm.text}</p> 
+                                    </div> 
+                                    <div className="p-4 bg-gray-50 dark:bg-gray-700/50 flex gap-3"> 
+                                        <button onClick={() => setModalConfirm({ ...modalConfirm, show: false })} className="flex-1 py-3 bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-200 rounded-xl font-bold hover:bg-gray-50 transition">{t('cancel')}</button> 
+                                        <button onClick={modalConfirm.onConfirm} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition shadow">{t('confirm')}</button> 
+                                    </div> 
+                                </div> 
+                            </div> 
+                        )}
 
                         {/* --- CAMPING LOADING OVERLAY --- */}
                         {(loading || isInitializing) && <CampingLoaderOverlay text={isInitializing ? t('loadingPrepare') : t('loadingWait')} />}
