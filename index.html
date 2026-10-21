@@ -2,31 +2,9 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ขนำลุงดำ แคมป์ปิ้ง - จองที่พัก</title>
     
-    <!-- ========================================== -->
-    <!-- 1. Open Graph Tags (เพิ่มรูปพรีวิวตอนแชร์ลิงก์) -->
-    <!-- ========================================== -->
-    <meta property="og:title" content="ขนำลุงดำ แคมป์ปิ้ง - จองที่พัก" />
-    <meta property="og:description" content="🏕️ ขนำลุงดำ แคมป์ปิ้ง ดั้งเดิมมาจากหนำปู่ บริการที่พัก ลานกางเต็นท์ ริมน้ำ บรรยากาศสุดชิล สงขลา" />
-    <meta property="og:image" content="https://img5.pic.in.th/file/secure-sv1/LINE_ALBUM__240916_14dd72f9bd7de4facf.jpg" />
-    <meta property="og:url" content="https://khanamlungdamcamp.github.io/khanamlungdamcamp/index.html" />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
-
-    <!-- ========================================== -->
-    <!-- 2. PWA & Web App Meta Tags (เปลี่ยนเว็บเป็นแอป) -->
-    <!-- ========================================== -->
-    <meta name="theme-color" content="#16a34a" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="ขนำลุงดำ" />
-    <!-- โลโก้แอปสำหรับ iOS / Android (Add to Home Screen) -->
-    <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/pw/AP1GczPi_rYAbsNGi4X96mW5koYl0JJ3BN9ipRf6UgsXAOQgkyhrs2ChGcZlbsuQ3OLJOYnYhSTYJhWUuu2hwWtPqlt4MUfdUDSS3s4RdRLeD36gPLiK-8OhYLXWmqxVLh2eOtkLIx7pQxrQA6ZnqBYHOftH=w913-h913-s-no-gm" />
-    <!-- ข้อมูล PWA Manifest แบบ Inline (ฝังไฟล์ ไม่ต้องโหลดเพิ่ม) -->
-    <link rel="manifest" href='data:application/manifest+json,{"name":"ขนำลุงดำ แคมป์ปิ้ง","short_name":"ขนำลุงดำ","display":"standalone","background_color":"#f3f4f6","theme_color":"#16a34a","start_url":".","icons":[{"src":"https://lh3.googleusercontent.com/pw/AP1GczPi_rYAbsNGi4X96mW5koYl0JJ3BN9ipRf6UgsXAOQgkyhrs2ChGcZlbsuQ3OLJOYnYhSTYJhWUuu2hwWtPqlt4MUfdUDSS3s4RdRLeD36gPLiK-8OhYLXWmqxVLh2eOtkLIx7pQxrQA6ZnqBYHOftH=w913-h913-s-no-gm","sizes":"512x512","type":"image/png"}]}' />
-
     <!-- Preconnect ช่วยเพิ่มความเร็วในการโหลดทรัพยากร -->
     <link rel="preconnect" href="https://script.google.com" crossorigin>
     <link rel="preconnect" href="https://unpkg.com" crossorigin>
@@ -207,7 +185,14 @@
                 confirmOrderBtn: "ยืนยันการสั่งอาหาร", sendingToKitchen: "กำลังส่งข้อมูล...ให้แม่ครัว", orderFoodSuccess: "สั่งอาหารเรียบร้อย",
                 slipWarningNoQR: "⚠️ ตรวจไม่พบ QR Code ในสลิป แอดมินจะตรวจสอบอีกครั้ง",
                 slipWarningWrongQR: "⚠️ สลิปนี้อาจไม่ใช่การโอนเข้าบัญชีขนำลุงดำ โปรดตรวจสอบอีกครั้ง!",
-                slipValid: "✅ สลิปถูกต้อง (ตรวจพบ QR Code บัญชีร้านค้า)"
+                slipValid: "✅ สลิปถูกต้อง (ตรวจพบ QR Code บัญชีร้านค้า)",
+                // Calendar Translation
+                selectDates: "เลือกวันเข้าพัก (เช็คอิน - เช็คเอาท์)",
+                clearDates: "ล้างข้อมูล",
+                legendAvailable: "ว่าง", legendSelected: "เลือก", legendSpecial: "วันพิเศษ/เทศกาล", legendClosed: "ปิดบริการ", legendFull: "ที่พักเต็ม",
+                errCrossClosed: "มีวันปิดทำการอยู่ในช่วงที่คุณเลือก กรุณาเลือกใหม่ครับ",
+                errFullyBookedDate: "วันที่คุณเลือกที่พักเต็มหมดแล้วครับ กรุณาเลือกวันอื่น",
+                mapView: "ดูแผนที่", listView: "ดูรายการ", fullyBooked: "เต็มแล้ว"
             },
             en: {
                 back: "Back", cancel: "Cancel", confirm: "Confirm", ok: "OK", delete: "Remove",
@@ -240,23 +225,31 @@
                 confirmOrderBtn: "Confirm Order", sendingToKitchen: "Sending order to kitchen...", orderFoodSuccess: "Food ordered successfully",
                 slipWarningNoQR: "⚠️ No QR Code detected. Admin will verify manually.",
                 slipWarningWrongQR: "⚠️ This slip might not belong to our account. Please verify!",
-                slipValid: "✅ Valid slip (Merchant QR detected)"
+                slipValid: "✅ Valid slip (Merchant QR detected)",
+                // Calendar Translation
+                selectDates: "Select Dates (Check-in & Check-out)",
+                clearDates: "Clear",
+                legendAvailable: "Available", legendSelected: "Selected", legendSpecial: "High Season", legendClosed: "Closed", legendFull: "Fully Booked",
+                errCrossClosed: "Your selected range includes closed dates. Please select again.",
+                errFullyBookedDate: "The selected date is fully booked. Please select another date.",
+                mapView: "Map View", listView: "List View", fullyBooked: "Fully Booked"
             }
         };
 
         const safeJsonParse = (str, fallback = {}) => {
             if (!str || str === '-') return fallback;
             if (typeof str !== 'string') return str;
-            try { 
-                let cleanStr = str.replace(/[“”]/g, '"').replace(/[‘’]/g, "'");
-                return JSON.parse(cleanStr); 
-            } catch (e) { 
-                console.warn('JSON Parse Error:', str); 
-                return fallback; 
-            }
+            try { let cleanStr = str.replace(/[“”]/g, '"').replace(/[‘’]/g, "'"); return JSON.parse(cleanStr); } 
+            catch (e) { return fallback; }
         };
 
         const formatMoney = (val) => Number(val || 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+        
+        // Helper ป้องกันปัญหา Timezone ฝั่ง JS เวลาสร้าง Date()
+        const toLocalISOString = (d) => {
+            const z = n => ('0' + n).slice(-2);
+            return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}`;
+        };
 
         const fetchWithTimeout = async (resource, options = {}) => {
             const { timeout = 30000 } = options;
@@ -284,20 +277,15 @@
                         let width = img.width;
                         let height = img.height;
                         if (width > maxWidth) { height *= maxWidth / width; width = maxWidth; }
-                        canvas.width = width;
-                        canvas.height = height;
+                        canvas.width = width; canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-                        
                         let dataUrl = canvas.toDataURL('image/jpeg', quality);
                         const head = 'data:image/jpeg;base64,';
                         const sizeInBytes = Math.round((dataUrl.length - head.length) * 3 / 4);
-                        
                         if (sizeInBytes > 500000 && quality > 0.3) {
                             resolve(compressImage(file, quality - 0.2, maxWidth * 0.8)); 
-                        } else {
-                            resolve(dataUrl);
-                        }
+                        } else { resolve(dataUrl); }
                     };
                     img.onerror = (err) => reject(err);
                 };
@@ -312,7 +300,6 @@
             logoUrl: 'https://lh3.googleusercontent.com/pw/AP1GczPi_rYAbsNGi4X96mW5koYl0JJ3BN9ipRf6UgsXAOQgkyhrs2ChGcZlbsuQ3OLJOYnYhSTYJhWUuu2hwWtPqlt4MUfdUDSS3s4RdRLeD36gPLiK-8OhYLXWmqxVLh2eOtkLIx7pQxrQA6ZnqBYHOftH=w913-h913-s-no-gm?authuser=0',
             roomImages: {}, foodMenu: [], roomDescriptions: {}
         };
-
         const DEFAULT_POSITIONS = { 'R1': {x: 20, y: 30}, 'R2': {x: 40, y: 50}, 'R3': {x: 60, y: 50}, 'T1': {x: 25, y: 70}, 'T2': {x: 35, y: 75}, 'K1': {x: 70, y: 70}, 'K2': {x: 80, y: 70}, 'Z8': {x: 50, y: 20} };
 
         const CampingLoaderOverlay = ({ text }) => (
@@ -333,17 +320,189 @@
                 </div>
             </div>
         );
+
+        // ==========================================
+        // COMPONENT: Custom Date Range Picker Calendar
+        // ==========================================
+        const DateRangePicker = ({ dates, setDates, closedDates, specialDates, fullyBookedDates, lang, t, setModalAlert, formatDateLocalized }) => {
+            const [viewDate, setViewDate] = React.useState(new Date());
+            
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const todayStr = toLocalISOString(today);
+            
+            const monthNamesTH = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+            const monthNamesEN = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const dayNamesTH = ["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส"];
+            const dayNamesEN = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+            
+            const months = lang === 'en' ? monthNamesEN : monthNamesTH;
+            const days = lang === 'en' ? dayNamesEN : dayNamesTH;
+            const yearOffset = lang === 'en' ? 0 : 543;
+            
+            const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
+            const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
+            
+            const handlePrevMonth = () => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1));
+            const handleNextMonth = () => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1));
+            
+            const handleDateClick = (dateObj) => {
+                const dateStr = toLocalISOString(dateObj);
+                
+                if (closedDates.some(c => c.date === dateStr)) return;
+                if (dateStr <= todayStr) return; 
+                
+                if (!dates.checkIn || (dates.checkIn && dates.checkOut)) {
+                    // คลิกครั้งแรก (เลือกวัน Check-In) -> ถ้าวันนั้นเต็มห้ามคลิก
+                    if (fullyBookedDates.includes(dateStr)) {
+                        setModalAlert({ show: true, type: 'warning', title: t('notice'), text: t('errFullyBookedDate') });
+                        return;
+                    }
+                    setDates({ checkIn: dateStr, checkOut: '' });
+                } else {
+                    // คลิกครั้งที่สอง (เลือกวัน Check-Out)
+                    if (dateStr > dates.checkIn) {
+                        let current = new Date(dates.checkIn);
+                        let end = new Date(dateStr);
+                        let hasIssue = false;
+                        
+                        current = new Date(current.getTime() + Math.abs(current.getTimezoneOffset() * 60000));
+                        end = new Date(end.getTime() + Math.abs(end.getTimezoneOffset() * 60000));
+
+                        while(current < end) {
+                            const dStr = toLocalISOString(current);
+                            // ถ้าช่วงที่ลากคร่อมมีวันปิดร้าน หรือ วันที่เต็มแล้ว ให้แจ้งเตือนและยกเลิก
+                            if (closedDates.some(c => c.date === dStr) || fullyBookedDates.includes(dStr)) {
+                                hasIssue = true; break;
+                            }
+                            current.setDate(current.getDate() + 1);
+                        }
+                        
+                        if(hasIssue) {
+                            setModalAlert({ show: true, type: 'error', title: t('error'), text: t('errCrossClosed') });
+                            setDates({ checkIn: dateStr, checkOut: '' }); // รีเซ็ตให้เลือกใหม่
+                        } else {
+                            setDates({ ...dates, checkOut: dateStr });
+                        }
+                    } else {
+                        // เลือดย้อนหลัง -> รีเซ็ตเป็นวัน Check-In ใหม่
+                        if (fullyBookedDates.includes(dateStr)) {
+                            setModalAlert({ show: true, type: 'warning', title: t('notice'), text: t('errFullyBookedDate') });
+                            return;
+                        }
+                        setDates({ checkIn: dateStr, checkOut: '' });
+                    }
+                }
+            };
+
+            const renderCalendar = () => {
+                const year = viewDate.getFullYear();
+                const month = viewDate.getMonth();
+                const daysInMonth = getDaysInMonth(year, month);
+                const firstDay = getFirstDayOfMonth(year, month);
+                
+                const grid = [];
+                for (let i = 0; i < firstDay; i++) grid.push(<div key={`empty-${i}`} className="w-9 h-9"></div>);
+                
+                for (let i = 1; i <= daysInMonth; i++) {
+                    const dateObj = new Date(year, month, i);
+                    const dateStr = toLocalISOString(dateObj);
+                    
+                    const isPast = dateStr <= todayStr;
+                    const isClosed = closedDates.some(c => c.date === dateStr);
+                    const isFull = fullyBookedDates.includes(dateStr);
+                    const isSpecial = specialDates.some(s => s.date === dateStr);
+                    
+                    const isCheckIn = dates.checkIn === dateStr;
+                    const isCheckOut = dates.checkOut === dateStr;
+                    const isInBetween = dates.checkIn && dates.checkOut && dateStr > dates.checkIn && dateStr < dates.checkOut;
+                    
+                    let baseClasses = "w-9 h-9 flex flex-col items-center justify-center text-sm rounded-full relative transition-all duration-200 cursor-pointer ";
+                    
+                    if (isPast) {
+                        baseClasses += "text-gray-300 dark:text-gray-600 cursor-not-allowed ";
+                    } else if (isClosed) {
+                        baseClasses += "bg-red-50 dark:bg-red-900/30 text-red-400 dark:text-red-500 line-through cursor-not-allowed ";
+                    } else if (isCheckIn || isCheckOut) {
+                        baseClasses += "bg-green-600 text-white font-bold shadow-md transform scale-110 ";
+                    } else if (isInBetween) {
+                        baseClasses += "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 ";
+                    } else if (isFull) {
+                        baseClasses += "bg-gray-100 dark:bg-gray-700/50 text-gray-400 dark:text-gray-500 cursor-not-allowed ";
+                    } else {
+                        baseClasses += "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 ";
+                    }
+
+                    grid.push(
+                        <div key={i} className="flex justify-center items-center py-1">
+                            <div className={baseClasses} onClick={() => handleDateClick(dateObj)}>
+                                <span className="z-10">{i}</span>
+                                {isSpecial && !isCheckIn && !isCheckOut && !isPast && !isClosed && (
+                                    <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-orange-400 rounded-full"></div>
+                                )}
+                            </div>
+                        </div>
+                    );
+                }
+                return grid;
+            };
+
+            return (
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-100 dark:border-gray-700 p-4 mb-4 select-none">
+                    <div className="flex justify-between items-center mb-4">
+                        <p className="font-bold text-gray-800 dark:text-white text-sm"><i className="fas fa-calendar-alt text-green-600 mr-2"></i> {t('selectDates')}</p>
+                        <button onClick={() => setDates({checkIn:'', checkOut:''})} className="text-xs text-red-500 hover:text-red-700 underline">{t('clearDates')}</button>
+                    </div>
+                    
+                    <div className="flex justify-between items-center mb-2 px-2">
+                        <button onClick={handlePrevMonth} className="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300"><i className="fas fa-chevron-left"></i></button>
+                        <div className="font-bold text-gray-800 dark:text-white">{months[viewDate.getMonth()]} {viewDate.getFullYear() + yearOffset}</div>
+                        <button onClick={handleNextMonth} className="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300"><i className="fas fa-chevron-right"></i></button>
+                    </div>
+
+                    <div className="grid grid-cols-7 gap-1 mb-2">
+                        {days.map((d, idx) => (
+                            <div key={idx} className="text-center text-xs font-bold text-gray-400 dark:text-gray-500">{d}</div>
+                        ))}
+                    </div>
+
+                    <div className="grid grid-cols-7 gap-y-1 gap-x-1">
+                        {renderCalendar()}
+                    </div>
+
+                    <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700 flex flex-col gap-2">
+                        <div className="flex justify-between text-xs text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 p-2 rounded">
+                            <span><b>In:</b> {dates.checkIn ? formatDateLocalized(dates.checkIn) : '-'}</span>
+                            <span><b>Out:</b> {dates.checkOut ? formatDateLocalized(dates.checkOut) : '-'}</span>
+                        </div>
+                        <div className="flex justify-center flex-wrap gap-x-3 gap-y-2 text-[10px] text-gray-500 dark:text-gray-400 mt-1">
+                            <span className="flex items-center"><div className="w-2 h-2 rounded-full bg-green-600 mr-1"></div>{t('legendSelected')}</span>
+                            <span className="flex items-center"><div className="w-2 h-2 rounded-full bg-orange-400 mr-1"></div>{t('legendSpecial')}</span>
+                            <span className="flex items-center"><div className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600 mr-1"></div>{t('legendFull')}</span>
+                            <span className="flex items-center"><div className="w-2 h-2 rounded-full bg-red-100 border border-red-300 mr-1"></div>{t('legendClosed')}</span>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
         
         const App = () => {
             const [isDark, setIsDark] = React.useState(true);
+            
             const [lang, setLang] = React.useState(() => {
-                return localStorage.getItem('khanam_lang') || 'th';
+                const saved = localStorage.getItem('khanam_lang');
+                if (saved) return saved;
+                const browserLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
+                return browserLang.includes('th') ? 'th' : 'en'; 
             });
+
             const [step, setStep] = React.useState(1);
             const [mode, setMode] = React.useState(() => {
                 const params = new URLSearchParams(window.location.search);
                 return params.get('mode') === 'manage' ? 'manage' : 'booking';
             }); 
+            
+            const [viewStyle, setViewStyle] = React.useState('map'); 
 
             const [isInitializing, setIsInitializing] = React.useState(true); 
             const [dates, setDates] = React.useState({ checkIn: '', checkOut: '' });
@@ -355,12 +514,15 @@
             const [pinPos, setPinPos] = React.useState(DEFAULT_POSITIONS);
             
             const [roomConfig, setRoomConfig] = React.useState({});
-            const [systemSettings, setSystemSettings] = React.useState({ closed: [], special: [] });
+            const [systemSettings, setSystemSettings] = React.useState({ closed: [], special: [], fullyBookedDates: [] });
             const [siteConfig, setSiteConfig] = React.useState(DEFAULT_CONFIG);
 
             const [discount, setDiscount] = React.useState({ code: '', val: 0, type: '', message: '', status: '' });
             const [checkingDiscount, setCheckingDiscount] = React.useState(false);
+            
             const [slipImg, setSlipImg] = React.useState(null);
+            const [slipStatus, setSlipStatus] = React.useState(null); 
+            
             const [bookingResult, setBookingResult] = React.useState(null);
             const [agreed, setAgreed] = React.useState(false);
             const [qrUrl, setQrUrl] = React.useState(null);
@@ -380,12 +542,20 @@
             const [rescheduleDates, setRescheduleDates] = React.useState({ checkIn: '', checkOut: '' });
             const [manageTab, setManageTab] = React.useState('info'); 
             const [addOnCart, setAddOnCart] = React.useState([]); 
+            
             const [addOnSlip, setAddOnSlip] = React.useState(null);
+            const [addOnSlipStatus, setAddOnSlipStatus] = React.useState(null);
+
             const [addOnQr, setAddOnQr] = React.useState(null);
             const [manageForm, setManageForm] = React.useState({ bookingId: '', phone: '' });
 
             const [modalAlert, setModalAlert] = React.useState({ show: false, type: 'info', title: '', text: '' }); 
             const [modalConfirm, setModalConfirm] = React.useState({ show: false, title: '', text: '', onConfirm: null });
+
+            // Scroll to Top on Step/Mode Change
+            React.useEffect(() => {
+                window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+            }, [step, mode, manageTab]);
 
             const t = (key, params = {}) => {
                 let text = TRANSLATIONS[lang][key] || key;
@@ -395,13 +565,47 @@
                 return text;
             };
 
+            const tData = (text, forceLang = null) => {
+                if (!text) return "";
+                const parts = String(text).split('|');
+                const targetLang = forceLang || lang;
+                if (targetLang === 'en' && parts.length > 1) {
+                    return parts[1].trim();
+                }
+                return parts[0].trim();
+            };
+
+            const tDataList = (text) => {
+                if(!text || text === '-') return text;
+                return text.split(',').map(item => {
+                    const parts = item.split('|');
+                    if (parts.length > 1) {
+                        const th = parts[0].trim();
+                        let en = parts[1].trim();
+                        let suffix = '';
+                        
+                        const match = en.match(/(x\d+|\(\d+\s*ท่าน\)|\(\d+\s*คน\))$/);
+                        if (match) {
+                            let rawSuffix = match[1];
+                            if (lang === 'en') {
+                                rawSuffix = rawSuffix.replace('ท่าน', 'Guests').replace('คน', 'Guests');
+                            }
+                            suffix = ' ' + rawSuffix;
+                            en = en.replace(match[1], '').trim();
+                        }
+                        return lang === 'en' ? `${en}${suffix}` : `${th}${suffix}`;
+                    }
+                    return item.trim();
+                }).join('\n'); 
+            };
+
             const toggleLanguage = () => {
                 const newLang = lang === 'th' ? 'en' : 'th';
                 setLang(newLang);
                 localStorage.setItem('khanam_lang', newLang);
             };
 
-            const getTommorow = () => { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().split('T')[0]; };
+            const getTommorow = () => { const d = new Date(); d.setDate(d.getDate() + 1); return toLocalISOString(d); };
             
             const formatDateLocalized = (dateStr) => { 
                 if(!dateStr) return "-"; 
@@ -416,13 +620,25 @@
             };
             
             const getClosedDateOverlap = (inDate, outDate) => {
+                if (!inDate || !outDate) return null;
                 let current = new Date(inDate); const end = new Date(outDate);
-                while(current < end) { const dStr = current.toISOString().split('T')[0]; const closed = systemSettings.closed.find(c => c.date === dStr); if (closed) return closed; current.setDate(current.getDate() + 1); }
+                while(current < end) { 
+                    const dStr = toLocalISOString(current); 
+                    const closed = systemSettings.closed.find(c => c.date === dStr); 
+                    if (closed) return closed; 
+                    current.setDate(current.getDate() + 1); 
+                }
                 return null;
             };
+
             const checkDateOverlapHighSeason = (inDate, outDate) => {
+                if (!inDate || !outDate) return false;
                 let current = new Date(inDate); const end = new Date(outDate);
-                while(current < end) { const dStr = current.toISOString().split('T')[0]; if (systemSettings.special.some(s => s.date === dStr)) return true; current.setDate(current.getDate() + 1); }
+                while(current < end) { 
+                    const dStr = toLocalISOString(current); 
+                    if (systemSettings.special.some(s => s.date === dStr)) return true; 
+                    current.setDate(current.getDate() + 1); 
+                }
                 return false;
             };
 
@@ -478,13 +694,28 @@
                     }).catch(err => { console.error('LIFF Error', err); setIsLiffReady(true); });
                 } else { setIsLiffReady(true); }
                 
+                const cachedData = sessionStorage.getItem('khanam_init_data');
+                if (cachedData) {
+                    try {
+                        const parsed = JSON.parse(cachedData);
+                        setSystemSettings({ closed: parsed.settings.closed, special: parsed.settings.special, fullyBookedDates: parsed.settings.fullyBookedDates || [] });
+                        setSiteConfig(prev => ({ ...prev, ...parsed.siteConfig }));
+                        setRoomConfig(parsed.roomConfig);
+                        setPinPos(parsed.mapConfig);
+                        setIsInitializing(false); 
+                    } catch(e) {
+                        console.error('Cache parsing error', e);
+                    }
+                }
+
                 fetchWithTimeout(`${GOOGLE_SCRIPT_URL}?action=getInitialData`).then(r => r.json()).then(res => {
                     if (res.status === 'success') {
                         const { settings, siteConfig, roomConfig, mapConfig } = res.data;
-                        setSystemSettings({ closed: settings.closed, special: settings.special });
+                        setSystemSettings({ closed: settings.closed, special: settings.special, fullyBookedDates: settings.fullyBookedDates || [] });
                         setSiteConfig(prev => ({ ...prev, ...siteConfig }));
                         setRoomConfig(roomConfig);
                         setPinPos(mapConfig);
+                        sessionStorage.setItem('khanam_init_data', JSON.stringify(res.data));
                     }
                     setIsInitializing(false);
                 }).catch(e=>{
@@ -541,7 +772,7 @@
                 setLoading(true);
                 fetchWithTimeout(`${GOOGLE_SCRIPT_URL}?action=getAvailability&checkIn=${dates.checkIn}&checkOut=${dates.checkOut}&_t=${Date.now()}`)
                 .then(r => r.json()).then(data => { setAvailability(data); setStep(2); setLoading(false); })
-                .catch(e => { setLoading(false); alert(e.name === 'AbortError' ? 'การเชื่อมต่อใช้เวลานานเกินไป กรุณาลองอีกครั้งครับ' : 'Error: ' + e); });
+                .catch(e => { setLoading(false); alert(e.name === 'AbortError' ? (lang==='en'?'Connection timeout, please try again.':'การเชื่อมต่อใช้เวลานานเกินไป กรุณาลองอีกครั้งครับ') : 'Error: ' + e); });
             };
 
             const openRoomModal = (roomId) => { 
@@ -563,7 +794,10 @@
                 const targetCart = mode === 'manage' ? addOnCart : cart; 
                 const setTargetCart = mode === 'manage' ? setAddOnCart : setCart;
                 
-                const finalName = foodNote.trim() ? `${selectedFood.name} (${foodNote.trim()})` : selectedFood.name;
+                const finalName = foodNote.trim() 
+                    ? `${tData(selectedFood.name, 'th')} (${foodNote.trim()}) | ${tData(selectedFood.name, 'en')} (${foodNote.trim()})` 
+                    : selectedFood.name;
+
                 const existIndex = targetCart.findIndex(c => c.id === selectedFood.id && c.name === finalName && c.type === 'food');
                 
                 if (existIndex > -1) {
@@ -635,86 +869,99 @@
             const handleSubmit = () => {
                 if (!canSubmit) return; setLoading(true);
                 const payload = { action: 'saveBooking', customer, checkIn: dates.checkIn, checkOut: dates.checkOut, totalGuests: cart.filter(c => c.type !== 'food').reduce((s, c) => s + parseInt(c.guests || 1), 0), cart, pricing, discountCode: discount.code, slipImage: slipImg };
-                fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) }).then(r => r.json()).then(res => { if (res.status === 'success') { setBookingResult(res.bookingId); setStep(5); } else { alert('Error: ' + res.message); } setLoading(false); }).catch(e => { setLoading(false); alert(e.name === 'AbortError' ? 'การเชื่อมต่อใช้เวลานานเกินไป กรุณาลองอีกครั้งครับ (เน็ตอาจจะไม่เสถียร)' : 'Failed: ' + e); });
+                fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) }).then(r => r.json()).then(res => { if (res.status === 'success') { setBookingResult(res.bookingId); setStep(5); } else { alert('Error: ' + res.message); } setLoading(false); }).catch(e => { setLoading(false); alert(e.name === 'AbortError' ? (lang==='en'?'Connection timeout':'การเชื่อมต่อใช้เวลานานเกินไป กรุณาลองอีกครั้งครับ') : 'Failed: ' + e); });
             };
             
             const selectBookingToManage = (booking, tab = 'info') => { setManageData(booking); setManageForm({ bookingId: booking.id, phone: booking.phone }); setManageTab(tab); }
             
             const handleCustomerReschedule = () => {
-                if(!rescheduleDates.checkIn || !rescheduleDates.checkOut) return setModalAlert({ show: true, type: 'warning', title: 'แจ้งเตือน', text: 'กรุณาเลือกวันเข้าพักและวันออกใหม่' });
-                if(rescheduleDates.checkIn < getTommorow()) return setModalAlert({ show: true, type: 'warning', title: 'แจ้งเตือน', text: 'ไม่สามารถเลือกวันที่ปัจจุบันหรือย้อนหลังได้' });
-                if(rescheduleDates.checkIn >= rescheduleDates.checkOut) return setModalAlert({ show: true, type: 'warning', title: 'แจ้งเตือน', text: 'วันเช็คเอาท์ต้องอยู่หลังวันเช็คอิน' });
+                if(!rescheduleDates.checkIn || !rescheduleDates.checkOut) return setModalAlert({ show: true, type: 'warning', title: t('notice'), text: lang === 'en' ? 'Please select both new dates.' : 'กรุณาเลือกวันเข้าพักและวันออกใหม่' });
+                if(rescheduleDates.checkIn < getTommorow()) return setModalAlert({ show: true, type: 'warning', title: t('notice'), text: lang === 'en' ? 'Cannot select past or current date.' : 'ไม่สามารถเลือกวันที่ปัจจุบันหรือย้อนหลังได้' });
+                if(rescheduleDates.checkIn >= rescheduleDates.checkOut) return setModalAlert({ show: true, type: 'warning', title: t('notice'), text: lang === 'en' ? 'Check-out must be after check-in.' : 'วันเช็คเอาท์ต้องอยู่หลังวันเช็คอิน' });
                 const today = new Date(); today.setHours(0,0,0,0);
                 const currentCheckIn = new Date(manageData.checkIn); currentCheckIn.setHours(0,0,0,0);
                 const diffTime = currentCheckIn.getTime() - today.getTime();
                 const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24));
-                if (diffDays < 7) return setModalAlert({ show: true, type: 'warning', title: 'ไม่สามารถเลื่อนได้', text: `ต้องทำการเลื่อนล่วงหน้าอย่างน้อย 7 วัน (เหลืออีก ${diffDays} วัน)` });
+                if (diffDays < 7) return setModalAlert({ show: true, type: 'warning', title: t('notice'), text: lang === 'en' ? `Must reschedule at least 7 days in advance (${diffDays} days left)` : `ต้องทำการเลื่อนล่วงหน้าอย่างน้อย 7 วัน (เหลืออีก ${diffDays} วัน)` });
 
-                setModalConfirm({ show: true, title: 'ยืนยันการเลื่อนวัน', text: `เปลี่ยนเป็น\n${formatThaiDate(rescheduleDates.checkIn)} - ${formatThaiDate(rescheduleDates.checkOut)}`, onConfirm: () => { setModalConfirm({ ...modalConfirm, show: false }); executeReschedule(); } });
+                setModalConfirm({ show: true, title: lang === 'en' ? 'Confirm Reschedule' : 'ยืนยันการเลื่อนวัน', text: `${lang==='en'?'Change to:':'เปลี่ยนเป็น'}\n${formatDateLocalized(rescheduleDates.checkIn)} - ${formatDateLocalized(rescheduleDates.checkOut)}`, onConfirm: () => { setModalConfirm({ ...modalConfirm, show: false }); executeReschedule(); } });
             };
 
             const executeReschedule = () => {
                 setLoading(true);
                 fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'customerReschedule', bookingId: manageData.id, phone: manageData.phone, newCheckIn: rescheduleDates.checkIn, newCheckOut: rescheduleDates.checkOut }) })
-                .then(r => r.json()).then(res => { setLoading(false); if(res.status === 'success') { setModalAlert({ show: true, type: 'success', title: 'สำเร็จ!', text: 'เลื่อนวันเรียบร้อย' }); setManageData(null); setMode('booking'); } else { setModalAlert({ show: true, type: 'error', title: 'ไม่สำเร็จ', text: res.message }); } }).catch(e => { setLoading(false); setModalAlert({ show: true, type: 'error', title: 'Error', text: e.name === 'AbortError' ? 'การเชื่อมต่อใช้เวลานานเกินไป' : String(e) }); });
+                .then(r => r.json()).then(res => { setLoading(false); if(res.status === 'success') { setModalAlert({ show: true, type: 'success', title: t('success'), text: t('rescheduleSuccess') }); setManageData(null); setMode('booking'); } else { setModalAlert({ show: true, type: 'error', title: t('error'), text: res.message }); } }).catch(e => { setLoading(false); setModalAlert({ show: true, type: 'error', title: 'Error', text: e.name === 'AbortError' ? 'Timeout' : String(e) }); });
             };
 
             const handleCustomerAddFood = () => {
-                if(addOnCart.length === 0) return setModalAlert({ show: true, type: 'warning', title: 'แจ้งเตือน', text: 'กรุณาเลือกอาหาร' });
-                if(!addOnSlip) return setModalAlert({ show: true, type: 'warning', title: 'แจ้งเตือน', text: 'กรุณาแนบสลิป' });
+                if(addOnCart.length === 0) return setModalAlert({ show: true, type: 'warning', title: t('notice'), text: lang === 'en' ? 'Please select food items.' : 'กรุณาเลือกอาหาร' });
+                if(!addOnSlip) return setModalAlert({ show: true, type: 'warning', title: t('notice'), text: lang === 'en' ? 'Please upload slip.' : 'กรุณาแนบสลิป' });
                 const today = new Date(); today.setHours(0,0,0,0);
                 const currentCheckIn = new Date(manageData.checkIn); currentCheckIn.setHours(0,0,0,0);
                 const diffTime = currentCheckIn.getTime() - today.getTime();
                 const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24));
-                if (diffDays < 2) return setModalAlert({ show: true, type: 'warning', title: 'ไม่สามารถสั่งเพิ่มได้', text: 'ต้องสั่งอาหารล่วงหน้าอย่างน้อย 2 วันก่อนเข้าพัก' });
-                setModalConfirm({ show: true, title: 'ยืนยันการสั่งอาหาร', text: `รายการ:\n${addOnCart.map(i => '- '+i.name).join('\n')}`, onConfirm: () => { setModalConfirm({ ...modalConfirm, show: false }); executeAddFood(); } });
+                if (diffDays < 2) return setModalAlert({ show: true, type: 'warning', title: t('notice'), text: lang === 'en' ? 'Must order at least 2 days in advance.' : 'ต้องสั่งอาหารล่วงหน้าอย่างน้อย 2 วันก่อนเข้าพัก' });
+                setModalConfirm({ show: true, title: lang === 'en' ? 'Confirm Order' : 'ยืนยันการสั่งอาหาร', text: `${lang==='en'?'Items:':'รายการ:'}\n${addOnCart.map(i => '- '+ tData(i.name)).join('\n')}`, onConfirm: () => { setModalConfirm({ ...modalConfirm, show: false }); executeAddFood(); } });
             };
 
             const executeAddFood = () => {
                 setLoading(true);
                 fetchWithTimeout(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'customerAddFood', bookingId: manageData.id, phone: manageData.phone, newFoodItems: addOnCart, slipImage: addOnSlip }) })
-                .then(r => r.json()).then(res => { setLoading(false); if(res.status === 'success') { setModalAlert({ show: true, type: 'success', title: 'สำเร็จ!', text: 'สั่งอาหารเรียบร้อย' }); setManageData(null); setAddOnCart([]); setAddOnSlip(null); setMode('booking'); } else { setModalAlert({ show: true, type: 'error', title: 'ไม่สำเร็จ', text: res.message }); } }).catch(e => { setLoading(false); setModalAlert({ show: true, type: 'error', title: 'Error', text: e.name === 'AbortError' ? 'การเชื่อมต่อใช้เวลานานเกินไป' : String(e) }); });
+                .then(r => r.json()).then(res => { setLoading(false); if(res.status === 'success') { setModalAlert({ show: true, type: 'success', title: t('success'), text: t('orderFoodSuccess') }); setManageData(null); setAddOnCart([]); setAddOnSlip(null); setMode('booking'); } else { setModalAlert({ show: true, type: 'error', title: t('error'), text: res.message }); } }).catch(e => { setLoading(false); setModalAlert({ show: true, type: 'error', title: 'Error', text: e.name === 'AbortError' ? 'Timeout' : String(e) }); });
             };
 
             return (
                 <div className={isDark ? "dark" : ""}>
-                    <div className="min-h-screen bg-[#f3f4f6] dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-300 relative">
-                        {/* THEME TOGGLE */}
-                        <button onClick={() => setIsDark(!isDark)} className="fixed top-4 right-4 z-50 bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-10 h-10 flex items-center justify-center transition-transform hover:scale-110"> {isDark ? '☀️' : '🌙'} </button>
+                    <div className="min-h-screen bg-[#f3f4f6] dark:bg-gray-900 pb-10 text-gray-800 dark:text-gray-100 transition-colors duration-300 relative">
                         
-                        {/* MODE TOGGLE */}
-                        <button onClick={() => { setMode(mode === 'booking' ? 'manage' : 'booking'); setStep(1); setManageData(null); setManageTab('info'); }} className="fixed top-16 right-4 z-50 bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-10 h-10 flex items-center justify-center transition-transform hover:scale-110 text-gray-800 dark:text-white"> {mode === 'booking' ? <i className="fas fa-search"></i> : <i className="fas fa-home"></i>} </button>
+                        {/* FLOATING ACTION BUTTONS (Top-Right Stack) */}
+                        <div className="fixed top-4 right-4 z-50 flex flex-col gap-3">
+                            
+                            <button onClick={toggleLanguage} className="bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-12 h-12 flex flex-col items-center justify-center transition-transform hover:scale-110 text-blue-600 dark:text-blue-400">
+                                <i className="fas fa-globe text-sm mb-0.5"></i>
+                                <span className="text-[10px] font-bold leading-none">{lang === 'th' ? 'EN' : 'TH'}</span>
+                            </button>
+
+                            <button onClick={() => setIsDark(!isDark)} className="bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-12 h-12 flex items-center justify-center transition-transform hover:scale-110 text-gray-800 dark:text-white"> 
+                                {isDark ? '☀️' : '🌙'} 
+                            </button>
+                            
+                            <button onClick={() => { setMode(mode === 'booking' ? 'manage' : 'booking'); setStep(1); setManageData(null); setManageTab('info'); }} className="bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 w-12 h-12 flex items-center justify-center transition-transform hover:scale-110 text-gray-800 dark:text-white"> 
+                                {mode === 'booking' ? <i className="fas fa-search"></i> : <i className="fas fa-home"></i>} 
+                            </button>
+
+                        </div>
 
                         {/* --- MANAGE MODE --- */}
                         {mode === 'manage' && (
-                            <div className="max-w-md mx-auto p-4 pt-16">
-                                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 min-h-[300px]">
-                                    <h2 className="text-xl font-bold mb-4 text-center text-blue-600 dark:text-blue-400">จัดการการจอง</h2>
+                            <div className="max-w-md mx-auto p-4 sm:pt-8">
+                                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 min-h-[500px]">
+                                    <h2 className="text-xl font-bold mb-4 text-center text-blue-600 dark:text-blue-400">{t('manageTitle')}</h2>
                                     
                                     {!manageData ? (
                                         <div className="animate-pop">
                                             {loading ? (
                                                 <div className="flex flex-col items-center justify-center py-10">
                                                     <i className="fas fa-campground text-5xl text-green-600 animate-bounce mb-4"></i>
-                                                    <p className="text-gray-500 dark:text-gray-400 font-bold">กำลังกางเต็นท์ข้อมูล...</p>
+                                                    <p className="text-gray-500 dark:text-gray-400 font-bold">{t('loadingData')}</p>
                                                 </div>
                                             ) : (
                                                 !isLiffReady ? (
                                                     <div className="text-center py-10">
-                                                        <p className="text-gray-500">Connecting to LINE...</p>
+                                                        <p className="text-gray-500">{t('connectingLine')}</p>
                                                     </div>
                                                 ) : (
                                                     !customer.userId ? (
                                                         <div className="text-center py-10">
                                                             <div className="text-4xl mb-4">⚠️</div>
-                                                            <p className="text-gray-500">ไม่พบข้อมูลผู้ใช้ LINE</p>
-                                                            <p className="text-xs text-gray-400 mt-2">กรุณาเปิดผ่านแอป LINE หรือ</p>
-                                                            <button onClick={() => liff.login({ redirectUri: window.location.href })} className="mt-4 bg-green-500 text-white px-6 py-2 rounded-full font-bold shadow hover:bg-green-600 transition">เข้าสู่ระบบ LINE</button>
+                                                            <p className="text-gray-500">{t('noLineUser')}</p>
+                                                            <p className="text-xs text-gray-400 mt-2">{t('noLineUserDesc')}</p>
+                                                            <button onClick={() => liff.login({ redirectUri: window.location.href })} className="mt-4 bg-green-500 text-white px-6 py-2 rounded-full font-bold shadow hover:bg-green-600 transition">{t('loginLine')}</button>
                                                         </div>
                                                     ) : (
                                                         bookingList.length > 0 ? (
                                                             <div className="space-y-4 animate-pop">
-                                                                <p className="text-sm text-gray-500 text-center mb-4">พบ {bookingList.length} รายการจอง</p>
+                                                                <p className="text-sm text-gray-500 text-center mb-4">{t('foundBookings', { count: bookingList.length })}</p>
                                                                 {bookingList.map(b => {
                                                                     const isPast = isBookingPast(b.checkOut);
                                                                     return (
@@ -722,25 +969,25 @@
                                                                             <div onClick={() => selectBookingToManage(b, 'info')} className="p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600 transition">
                                                                                 <div className="flex justify-between items-start mb-2">
                                                                                      <span className="font-bold text-blue-600 dark:text-blue-400 text-lg">{b.id}</span>
-                                                                                     <span className={`text-xs px-2 py-1 rounded-full font-bold ${isPast ? 'bg-gray-200 text-gray-600' : 'bg-green-100 text-green-800'}`}>{isPast ? 'สำเร็จ' : b.status}</span>
+                                                                                     <span className={`text-xs px-2 py-1 rounded-full font-bold ${isPast ? 'bg-gray-200 text-gray-600' : 'bg-green-100 text-green-800'}`}>{isPast ? t('statusPast') : b.status}</span>
                                                                                 </div>
                                                                                 <div className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
-                                                                                    <div className="flex items-center"><i className="fas fa-calendar-day w-5 text-center mr-2 text-gray-400"></i> {formatThaiDate(b.checkIn)}</div>
-                                                                                    <div className="flex items-center"><i className="fas fa-home w-5 text-center mr-2 text-gray-400"></i> {b.rooms}</div>
+                                                                                    <div className="flex items-center"><i className="fas fa-calendar-day w-5 text-center mr-2 text-gray-400"></i> {formatDateLocalized(b.checkIn)}</div>
+                                                                                    <div className="flex items-center"><i className="fas fa-home w-5 text-center mr-2 text-gray-400"></i> {tDataList(b.rooms)}</div>
                                                                                 </div>
                                                                             </div>
                                                                             {!isPast ? (
                                                                                 <div className="flex border-t border-gray-100 dark:border-gray-600 divide-x divide-gray-100 dark:divide-gray-600 bg-gray-50 dark:bg-gray-800">
                                                                                     <button onClick={() => selectBookingToManage(b, 'reschedule')} className="flex-1 py-3 text-sm font-bold text-orange-600 hover:bg-orange-50 dark:hover:bg-gray-700 transition flex items-center justify-center gap-2">
-                                                                                        <i className="fas fa-calendar-alt"></i> เลื่อนวัน
+                                                                                        <i className="fas fa-calendar-alt"></i> {t('btnReschedule')}
                                                                                     </button>
                                                                                     <button onClick={() => selectBookingToManage(b, 'food')} className="flex-1 py-3 text-sm font-bold text-green-600 hover:bg-green-50 dark:hover:bg-gray-700 transition flex items-center justify-center gap-2">
-                                                                                        <i className="fas fa-utensils"></i> สั่งอาหาร
+                                                                                        <i className="fas fa-utensils"></i> {t('btnOrderFood')}
                                                                                     </button>
                                                                                 </div>
                                                                             ) : (
                                                                                 <div className="bg-gray-50 dark:bg-gray-800 p-3 text-center text-xs text-gray-400 border-t border-gray-100 dark:border-gray-600">
-                                                                                    <i className="fas fa-check-circle mr-1"></i> สิ้นสุดการเข้าพัก
+                                                                                    <i className="fas fa-check-circle mr-1"></i> {t('checkedOut')}
                                                                                 </div>
                                                                             )}
                                                                         </div>
@@ -750,9 +997,9 @@
                                                         ) : (
                                                             <div className="text-center py-10 animate-pop">
                                                                 <div className="text-6xl mb-4">🔍</div>
-                                                                <p className="text-gray-500">ไม่พบประวัติการจอง</p>
-                                                                <p className="text-xs text-gray-400 mt-2">หากเพิ่งจอง กรุณารอแอดมินยืนยันสักครู่</p>
-                                                                <button onClick={() => window.location.reload()} className="mt-4 text-blue-600 text-sm underline">ลองใหม่อีกครั้ง</button>
+                                                                <p className="text-gray-500">{t('noBookings')}</p>
+                                                                <p className="text-xs text-gray-400 mt-2">{t('noBookingsDesc')}</p>
+                                                                <button onClick={() => window.location.reload()} className="mt-4 text-blue-600 text-sm underline">{t('tryAgain')}</button>
                                                             </div>
                                                         )
                                                     )
@@ -763,15 +1010,15 @@
                                         <div className="animate-pop">
                                             <div className="flex items-center mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
                                                 <button onClick={() => setManageData(null)} className="mr-3 text-gray-500 hover:text-blue-600 p-1"><i className="fas fa-arrow-left text-lg"></i></button>
-                                                <span className="font-bold text-gray-700 dark:text-gray-200">รายการ: {manageData.id}</span>
+                                                <span className="font-bold text-gray-700 dark:text-gray-200">ID: {manageData.id}</span>
                                             </div>
                                             {(() => {
                                                 const isPast = isBookingPast(manageData.checkOut);
                                                 return !isPast ? (
                                                     <div className="flex border-b border-gray-200 dark:border-gray-700 mb-4">
-                                                        <button onClick={() => setManageTab('info')} className={`flex-1 py-2 text-sm font-bold ${manageTab === 'info' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}>ข้อมูล</button>
-                                                        <button onClick={() => setManageTab('reschedule')} className={`flex-1 py-2 text-sm font-bold ${manageTab === 'reschedule' ? 'text-orange-600 border-b-2 border-orange-600' : 'text-gray-500'}`}>เลื่อนวัน</button>
-                                                        <button onClick={() => setManageTab('food')} className={`flex-1 py-2 text-sm font-bold ${manageTab === 'food' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-500'}`}>สั่งอาหาร</button>
+                                                        <button onClick={() => setManageTab('info')} className={`flex-1 py-2 text-sm font-bold ${manageTab === 'info' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}>{t('tabInfo')}</button>
+                                                        <button onClick={() => setManageTab('reschedule')} className={`flex-1 py-2 text-sm font-bold ${manageTab === 'reschedule' ? 'text-orange-600 border-b-2 border-orange-600' : 'text-gray-500'}`}>{t('tabReschedule')}</button>
+                                                        <button onClick={() => setManageTab('food')} className={`flex-1 py-2 text-sm font-bold ${manageTab === 'food' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-500'}`}>{t('tabFood')}</button>
                                                     </div>
                                                 ) : null;
                                             })()}
@@ -781,14 +1028,14 @@
                                                     <div className="text-center mb-2"><span className="bg-blue-600 text-white px-2 py-1 rounded text-xs">{manageData.status}</span></div>
                                                     <h3 className="text-lg font-bold text-center mb-4 text-gray-800 dark:text-white">{manageData.name}</h3>
                                                     <div className="text-sm space-y-2 text-gray-700 dark:text-gray-300">
-                                                        <div className="flex justify-between"><span>เข้าพัก:</span> <b>{formatThaiDate(manageData.checkIn)}</b></div>
-                                                        <div className="flex justify-between"><span>ออก:</span> <b>{formatThaiDate(manageData.checkOut)}</b></div>
-                                                        <div className="flex justify-between"><span>จำนวนผู้เข้าพัก:</span> <b>{manageData.guests} คน</b></div>
-                                                        <div className="flex justify-between"><span>ห้องพัก:</span> <span className="text-right">{manageData.rooms}</span></div>
+                                                        <div className="flex justify-between"><span>{t('checkIn')}</span> <b>{formatDateLocalized(manageData.checkIn)}</b></div>
+                                                        <div className="flex justify-between"><span>{t('checkOut')}</span> <b>{formatDateLocalized(manageData.checkOut)}</b></div>
+                                                        <div className="flex justify-between"><span>{t('guestsCount')}</span> <b>{manageData.guests} {t('persons')}</b></div>
+                                                        <div className="flex justify-between"><span>{t('roomsList')}</span> <span className="text-right whitespace-pre-line">{tDataList(manageData.rooms)}</span></div>
                                                     </div>
                                                     <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-700">
-                                                        <h4 className="font-bold text-sm text-blue-800 dark:text-blue-300 mb-2">อาหารที่สั่งแล้ว</h4>
-                                                        <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">{manageData.food}</p>
+                                                        <h4 className="font-bold text-sm text-blue-800 dark:text-blue-300 mb-2">{t('orderedFood')}</h4>
+                                                        <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">{tDataList(manageData.food)}</p>
                                                     </div>
                                                 </div>
                                             )}
@@ -796,17 +1043,17 @@
                                             {manageTab === 'reschedule' && (
                                                 <div className="space-y-3 animate-pop">
                                                     <div className="bg-yellow-50 dark:bg-yellow-900/20 text-xs p-2 rounded mb-4 text-yellow-800 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-800">
-                                                        ⚠️ เงื่อนไข: ต้องเลื่อนล่วงหน้าอย่างน้อย 7 วัน และห้องพักต้องว่างในวันที่เลือกใหม่
+                                                        {t('rescheduleRule')}
                                                     </div>
-                                                    <div><label className="block text-xs font-bold mb-1 text-gray-700 dark:text-gray-300">เช็คอินใหม่</label><input type="date" min={getTommorow()} className="w-full border p-2 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white" onChange={e => setRescheduleDates({...rescheduleDates, checkIn: e.target.value})} /></div>
-                                                    <div><label className="block text-xs font-bold mb-1 text-gray-700 dark:text-gray-300">เช็คเอาท์ใหม่</label><input type="date" min={rescheduleDates.checkIn || getTommorow()} className="w-full border p-2 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white" onChange={e => setRescheduleDates({...rescheduleDates, checkOut: e.target.value})} /></div>
-                                                    <button onClick={handleCustomerReschedule} disabled={loading} className="w-full bg-orange-600 text-white py-3 rounded-lg font-bold shadow hover:bg-orange-700 transition mt-4">{loading ? 'กำลังทำงาน...' : 'ยืนยันการเลื่อน'}</button>
+                                                    <div><label className="block text-xs font-bold mb-1 text-gray-700 dark:text-gray-300">{t('newCheckIn')}</label><input type="date" min={getTommorow()} className="w-full border p-2 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white" onChange={e => setRescheduleDates({...rescheduleDates, checkIn: e.target.value})} /></div>
+                                                    <div><label className="block text-xs font-bold mb-1 text-gray-700 dark:text-gray-300">{t('newCheckOut')}</label><input type="date" min={rescheduleDates.checkIn || getTommorow()} className="w-full border p-2 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white" onChange={e => setRescheduleDates({...rescheduleDates, checkOut: e.target.value})} /></div>
+                                                    <button onClick={handleCustomerReschedule} disabled={loading} className="w-full bg-orange-600 text-white py-3 rounded-lg font-bold shadow hover:bg-orange-700 transition mt-4">{loading ? t('working') : t('confirmRescheduleBtn')}</button>
                                                 </div>
                                             )}
 
                                             {manageTab === 'food' && (
                                                 <div className="space-y-4 animate-pop">
-                                                    <div className="bg-green-50 dark:bg-green-900/20 text-xs p-2 rounded mb-4 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-800">🍽️ เงื่อนไข: สั่งล่วงหน้าอย่างน้อย 2 วันก่อนเข้าพัก</div>
+                                                    <div className="bg-green-50 dark:bg-green-900/20 text-xs p-2 rounded mb-4 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-800">{t('foodOrderRule')}</div>
                                                     <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto custom-scrollbar">
                                                         {siteConfig.foodMenu.map(f => {
                                                             const inCart = addOnCart.find(c => c.id === f.id);
@@ -817,39 +1064,66 @@
                                                                     const diffTime = currentCheckIn.getTime() - today.getTime();
                                                                     const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24));
                                                                     if (diffDays < 2) {
-                                                                        setModalAlert({ show: true, type: 'warning', title: 'ไม่สามารถสั่งเพิ่มได้', text: 'ต้องสั่งอาหารล่วงหน้าอย่างน้อย 2 วันก่อนเข้าพัก' });
+                                                                        setModalAlert({ show: true, type: 'warning', title: t('notice'), text: lang === 'en' ? 'Must order at least 2 days in advance.' : 'ต้องสั่งอาหารล่วงหน้าอย่างน้อย 2 วันก่อนเข้าพัก' });
                                                                         return;
                                                                     }
                                                                     openFoodModal(f);
                                                                 }} className={`cursor-pointer rounded-lg overflow-hidden border-2 transition-all shadow-sm relative ${inCart ? 'border-green-500 bg-green-50 dark:bg-green-900 dark:border-green-500' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700'}`}>
                                                                     <img src={f.img} className="w-full h-20 object-cover" />
-                                                                    <div className="p-1"><h4 className="font-bold text-xs line-clamp-1">{f.name}</h4><div className="flex justify-between items-center mt-1"><span className="text-green-600 text-xs font-bold">{f.price}.-</span>{inCart && <span className="bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">x{inCart.qty}</span>}</div></div>
+                                                                    <div className="p-1"><h4 className="font-bold text-xs line-clamp-1">{tData(f.name)}</h4><div className="flex justify-between items-center mt-1"><span className="text-green-600 text-xs font-bold">{f.price}.-</span>{inCart && <span className="bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">x{inCart.qty}</span>}</div></div>
                                                                 </div>
                                                             );
                                                         })}
                                                     </div>
                                                     {addOnCart.length > 0 && (
                                                         <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded mb-4">
-                                                            <h4 className="font-bold text-xs mb-2">รายการที่เลือก ({addOnCart.length})</h4>
-                                                            {addOnCart.map((c,i)=><div key={i} className="flex justify-between text-xs mt-1"><span>{c.name} x{c.qty}</span><button onClick={()=>setAddOnCart(addOnCart.filter((_,idx)=>idx!==i))} className="text-red-500">ลบ</button></div>)}
-                                                            <div className="mt-2 pt-2 border-t text-right font-bold text-sm text-green-600 mb-2">รวม {formatMoney(addOnCart.reduce((sum,c)=>sum+(c.price*c.qty),0))} บ.</div>
+                                                            <h4 className="font-bold text-xs mb-2">{t('selectedItems', { count: addOnCart.length })}</h4>
+                                                            {addOnCart.map((c,i)=><div key={i} className="flex justify-between text-xs mt-1"><span>{tData(c.name)} x{c.qty}</span><button onClick={()=>setAddOnCart(addOnCart.filter((_,idx)=>idx!==i))} className="text-red-500">{t('delete')}</button></div>)}
+                                                            <div className="mt-2 pt-2 border-t text-right font-bold text-sm text-green-600 mb-2">{t('total')} {formatMoney(addOnCart.reduce((sum,c)=>sum+(c.price*c.qty),0))} ฿</div>
                                                             <div className="bg-white dark:bg-gray-800 p-3 rounded border border-gray-200 dark:border-gray-600">
-                                                                <p className="text-xs font-bold mb-2 text-center">สแกนจ่ายเพื่อยืนยันออเดอร์</p>
+                                                                <p className="text-xs font-bold mb-2 text-center">{t('scanToOrder')}</p>
                                                                 {addOnQr && (
                                                                     <div className="flex flex-col items-center mb-3">
                                                                         <img src={addOnQr} className="mx-auto border-2 border-gray-200 dark:border-gray-600 rounded-xl mb-3 shadow-sm p-2 bg-white" alt="QR Code" style={{ width: '150px', height: '150px' }} />
                                                                         <a href={addOnQr} download={`qr-food-${manageData.id}.png`} className="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-2 shadow-sm">
-                                                                            <i className="fas fa-download"></i> บันทึกภาพ QR Code
+                                                                            <i className="fas fa-download"></i> {t('saveQrBtn')}
                                                                         </a>
                                                                     </div>
                                                                 )}
                                                                 <div className="text-[10px] text-center mb-2 text-gray-500">{PROMPTPAY_NAME} - {PROMPTPAY_PHONE}</div>
-                                                                <input type="file" accept="image/*" onChange={async (e) => { const f = e.target.files[0]; if (f) { try { const resizedBase64 = await compressImage(f); setAddOnSlip(resizedBase64); } catch (err) { alert('Upload Error'); } } }} className="text-xs w-full mb-1" />
-                                                                {!addOnSlip && <div className="text-red-500 text-[10px] text-center">* กรุณาแนบสลิปโอนเงิน</div>}
+                                                                <input type="file" accept="image/*" onChange={async (e) => { 
+                                                                    const f = e.target.files[0]; 
+                                                                    if (f) { 
+                                                                        try { 
+                                                                            setAddOnSlipStatus({ type: 'loading', msg: lang === 'en' ? 'Checking slip...' : 'กำลังตรวจสอบสลิป...' });
+                                                                            const resizedBase64 = await compressImage(f); 
+                                                                            setAddOnSlip(resizedBase64); 
+
+                                                                            // Client-Side Slip Verification
+                                                                            checkSlipQR(resizedBase64, PROMPTPAY_PHONE, (res) => {
+                                                                                setAddOnSlipStatus(res);
+                                                                            });
+                                                                        } catch (err) { alert('Upload Error'); } 
+                                                                    } 
+                                                                }} className="text-xs w-full mb-1" />
+                                                                
+                                                                {/* สถานะเช็คสลิป */}
+                                                                {addOnSlipStatus && addOnSlipStatus.type !== 'loading' && (
+                                                                    <p className={`text-[10px] mt-2 p-1.5 rounded ${addOnSlipStatus.type === 'success' ? 'bg-green-100 text-green-700' : addOnSlipStatus.type === 'error' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                                                        {t(addOnSlipStatus.msg)}
+                                                                    </p>
+                                                                )}
+                                                                {addOnSlipStatus && addOnSlipStatus.type === 'loading' && (
+                                                                    <p className="text-[10px] mt-2 p-1.5 rounded bg-blue-100 text-blue-700">
+                                                                        <i className="fas fa-spinner fa-spin mr-1"></i> {addOnSlipStatus.msg}
+                                                                    </p>
+                                                                )}
+
+                                                                {!addOnSlip && <div className="text-red-500 text-[10px] text-center">{t('pleaseAttachSlip')}</div>}
                                                             </div>
                                                         </div>
                                                     )}
-                                                    <button onClick={handleCustomerAddFood} disabled={loading || (addOnCart.length > 0 && !addOnSlip)} className={`w-full py-3 rounded-lg font-bold shadow transition ${loading || (addOnCart.length > 0 && !addOnSlip) ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700'}`}>{loading ? 'กำลังส่งข้อมูล...ให้แม่ครัว' : 'ยืนยันการสั่งอาหาร'}</button>
+                                                    <button onClick={handleCustomerAddFood} disabled={loading || (addOnCart.length > 0 && !addOnSlip)} className={`w-full py-3 rounded-lg font-bold shadow transition ${loading || (addOnCart.length > 0 && !addOnSlip) ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700'}`}>{loading ? t('sendingToKitchen') : t('confirmOrderBtn')}</button>
                                                 </div>
                                             )}
                                         </div>
@@ -860,76 +1134,172 @@
 
                         {/* --- MODE: BOOKING --- */}
                         {mode === 'booking' && step === 1 && (
-                            <div className="max-w-md mx-auto bg-white dark:bg-gray-800 shadow-xl rounded-xl mt-4 border dark:border-gray-700 overflow-hidden">
-                                <div className="h-48 relative"><img src={siteConfig.bannerUrl} referrerPolicy="no-referrer" className="w-full h-full object-cover" /><div className="absolute inset-0 bg-black bg-opacity-10"></div></div>
-                                <div className="p-6 -mt-24 relative z-10">
-                                    <img src={siteConfig.logoUrl} referrerPolicy="no-referrer" className="w-48 h-48 mx-auto rounded-full border-4 border-white dark:border-gray-800 object-cover bg-white shadow-lg mb-4"/>
-                                    <h1 className="text-xl text-center mb-2 text-green-800 dark:text-green-400 font-bold">{siteConfig.headerTitle}</h1>
-                                    <p className="block text-center mb-4 text-gray-700 dark:text-gray-300 text-sm whitespace-pre-line">{siteConfig.headerDesc}</p>
-                                    <div className="space-y-4">
-                                        <div><label className="block text-gray-700 dark:text-green-400 font-bold mb-1">วันที่เข้าพัก</label><input type="date" min={getTommorow()} className="w-full border p-2 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white" onChange={e => setDates({...dates, checkIn: e.target.value})} /></div>
-                                        <div><label className="block text-gray-700 dark:text-red-300 font-bold mb-1">วันที่ออก</label><input type="date" min={dates.checkIn || getTommorow()} className="w-full border p-2 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white" onChange={e => setDates({...dates, checkOut: e.target.value})} /></div>
-                                        <button onClick={handleSearch} disabled={loading} className="w-full bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition font-bold shadow-lg mt-2">{loading ? 'กำลังตรวจสอบ...' : 'ค้นหาที่พักว่าง'}</button>
+                            <div className="max-w-md mx-auto bg-white dark:bg-gray-800 shadow-xl sm:rounded-2xl sm:mt-8 border-0 sm:border dark:border-gray-700 overflow-hidden pb-6 min-h-screen sm:min-h-[auto] flex flex-col">
+                                <div className="h-56 sm:h-64 relative flex-shrink-0">
+                                    <img src={siteConfig.bannerUrl} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                                </div>
+                                <div className="px-5 relative z-10 flex-1 flex flex-col">
+                                    <div className="flex justify-center -mt-16 mb-3">
+                                        <img src={siteConfig.logoUrl} referrerPolicy="no-referrer" className="w-32 h-32 rounded-full border-4 border-white dark:border-gray-800 object-cover bg-white shadow-md"/>
+                                    </div>
+                                    <h1 className="text-2xl text-center mb-1 text-green-800 dark:text-green-400 font-bold">{tData(siteConfig.headerTitle)}</h1>
+                                    <p className="block text-center mb-6 text-gray-600 dark:text-gray-300 text-sm whitespace-pre-line px-2 leading-relaxed">{tData(siteConfig.headerDesc)}</p>
+                                    
+                                    <div className="mt-auto">
+                                        {/* --- CUSTOM CALENDAR REPLACES NATIVE DATE INPUTS --- */}
+                                        <DateRangePicker 
+                                            dates={dates} 
+                                            setDates={setDates} 
+                                            closedDates={systemSettings.closed || []} 
+                                            specialDates={systemSettings.special || []} 
+                                            fullyBookedDates={systemSettings.fullyBookedDates || []}
+                                            lang={lang} 
+                                            t={t}
+                                            setModalAlert={setModalAlert}
+                                            formatDateLocalized={formatDateLocalized}
+                                        />
+                                        
+                                        <button onClick={handleSearch} disabled={loading} className="w-full bg-green-600 text-white p-3.5 rounded-xl hover:bg-green-700 transition font-bold shadow-lg mt-2 text-lg">{loading ? t('searching') : t('searchRooms')}</button>
                                     </div>
                                 </div>
                             </div>
                         )}
 
-                        {}
                         {mode === 'booking' && step === 2 && (
-                            <div className="max-w-4xl mx-auto p-4 relative">
-                                <div className="flex justify-between items-center mb-4"><div className="flex items-center gap-2"><button onClick={()=>setStep(1)} className="text-gray-500 dark:text-gray-300 hover:text-green-600 font-bold"><i className="fas fa-chevron-left"></i> ย้อนกลับ</button><h2 className="text-xl font-bold dark:text-white">เลือกที่พัก</h2></div></div>
-                                <div className="map-container bg-blue-100 dark:bg-gray-700 mb-6" style={{paddingBottom: '100%'}}>
-                                    <img src={siteConfig?.roomImages?.['MAP_BG']?.[0] || "https://img2.pic.in.th/3d539b84-44ce-4336-ad90-bd2f84b13eca.jpg"} referrerPolicy="no-referrer" className="absolute top-0 left-0 w-full h-full object-cover" alt="Camp Map" />
-                                    {Object.keys(pinPos).map(key => {
-                                        if (!roomConfig[key]) return null;
-                                        const rConf = roomConfig[key];
-                                        const searchStr = rConf ? (rConf.type + " " + rConf.name).toLowerCase() : '';
-                                        const isSharedZone = rConf ? (rConf.type === 'ground') : (key === 'Z8' || key === 'R6528' || searchStr.includes('ลานกาง') || searchStr.includes('ground'));
-                                        
-                                        let available = 1;
-                                        if (availability && availability.roomAvailableCount && availability.roomAvailableCount[key] !== undefined) {
-                                            available = parseInt(availability.roomAvailableCount[key]);
-                                        } else if (availability) {
-                                             available = isSharedZone ? (availability.tentAvailable && availability.tentAvailable[key] !== undefined ? parseInt(availability.tentAvailable[key]) : parseInt(availability.zone8Available || 20)) : (availability.bookedRooms.includes(key) ? 0 : 1);
-                                        }
-                                        
-                                        const currentInCart = cart.filter(c => c.id === key).reduce((sum, c) => sum + parseInt(c.guests || 1), 0);
-                                        const remaining = isSharedZone ? Math.max(0, available - currentInCart) : available;
-                                        
-                                        const isBooked = availability && availability.bookedRooms && availability.bookedRooms.includes(key);
-                                        const inCart = cart.find(c => c.id === key);
-                                        
-                                        const disable = isBooked || (isSharedZone && remaining <= 0) || (!isSharedZone && inCart);
-
-                                        let circleClasses = "w-12 h-12 rounded-full flex items-center justify-center text-center text-[8px] font-bold border-2 shadow-lg p-1 leading-tight transition-all duration-300";
-                                        if (disable) circleClasses += " bg-gray-400 text-white border-gray-500 cursor-not-allowed opacity-80 grayscale";
-                                        else if (inCart) circleClasses += " bg-yellow-400 text-black border-yellow-600 scale-110 shadow-xl z-20";
-                                        else circleClasses += " bg-white dark:bg-gray-800 text-green-800 dark:text-green-400 border-green-600 hover:scale-110 z-10";
-                                        return ( 
-                                            <div key={key} className="absolute transform -translate-x-1/2 -translate-y-1/2 map-pin-responsive" style={{left: `${pinPos[key].x}%`, top: `${pinPos[key].y}%`}} 
-                                                onClick={() => { 
-                                                    if(disable) return; 
-                                                    if(inCart && !isSharedZone) setCart(cart.filter(c => c.id !== key)); 
-                                                    else openRoomModal(key); 
-                                                }}> 
-                                                <div className={circleClasses}> <div> {roomConfig[key].name} </div> </div> 
-                                            </div> 
-                                        )
-                                    })}
+                            <div className="max-w-4xl mx-auto p-4 pt-6 sm:pt-8 relative min-h-screen bg-white dark:bg-gray-800 sm:rounded-2xl sm:my-8 shadow-xl">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <button onClick={()=>setStep(1)} className="text-gray-500 dark:text-gray-300 hover:text-green-600 font-bold text-lg"><i className="fas fa-chevron-left"></i></button>
+                                    <h2 className="text-xl font-bold dark:text-white">{t('selectRoom')}</h2>
                                 </div>
+                                
+                                {/* --- MAP VIEW --- */}
+                                {viewStyle === 'map' && (
+                                    <div className="map-container bg-blue-100 dark:bg-gray-700 mb-3 animate-pop" style={{paddingBottom: '100%'}}>
+                                        <img src={siteConfig?.roomImages?.['MAP_BG']?.[0] || "https://img2.pic.in.th/3d539b84-44ce-4336-ad90-bd2f84b13eca.jpg"} referrerPolicy="no-referrer" className="absolute top-0 left-0 w-full h-full object-cover" alt="Camp Map" />
+                                        {Object.keys(pinPos).map(key => {
+                                            if (!roomConfig[key]) return null;
+                                            const rConf = roomConfig[key];
+                                            const searchStr = rConf ? (rConf.type + " " + rConf.name).toLowerCase() : '';
+                                            const isSharedZone = rConf ? (rConf.type === 'ground') : (key === 'Z8' || key === 'R6528' || searchStr.includes('ลานกาง') || searchStr.includes('ground'));
+                                            
+                                            let available = 1;
+                                            if (availability && availability.roomAvailableCount && availability.roomAvailableCount[key] !== undefined) {
+                                                available = parseInt(availability.roomAvailableCount[key]);
+                                            } else if (availability) {
+                                                 available = isSharedZone ? (availability.tentAvailable && availability.tentAvailable[key] !== undefined ? parseInt(availability.tentAvailable[key]) : parseInt(availability.zone8Available || 20)) : (availability.bookedRooms.includes(key) ? 0 : 1);
+                                            }
+                                            
+                                            const currentInCart = cart.filter(c => c.id === key).reduce((sum, c) => sum + parseInt(c.guests || 1), 0);
+                                            const remaining = isSharedZone ? Math.max(0, available - currentInCart) : available;
+                                            
+                                            const isBooked = availability && availability.bookedRooms && availability.bookedRooms.includes(key);
+                                            const inCart = cart.find(c => c.id === key);
+                                            
+                                            const disable = isBooked || (isSharedZone && remaining <= 0) || (!isSharedZone && inCart);
+
+                                            let circleClasses = "w-12 h-12 rounded-full flex items-center justify-center text-center text-[8px] font-bold border-2 shadow-lg p-1 leading-tight transition-all duration-300";
+                                            if (disable) circleClasses += " bg-gray-400 text-white border-gray-500 cursor-not-allowed opacity-80 grayscale";
+                                            else if (inCart) circleClasses += " bg-yellow-400 text-black border-yellow-600 scale-110 shadow-xl z-20";
+                                            else circleClasses += " bg-white dark:bg-gray-800 text-green-800 dark:text-green-400 border-green-600 hover:scale-110 z-10";
+                                            return ( 
+                                                <div key={key} className="absolute transform -translate-x-1/2 -translate-y-1/2 map-pin-responsive" style={{left: `${pinPos[key].x}%`, top: `${pinPos[key].y}%`}} 
+                                                    onClick={() => { 
+                                                        if(disable) return; 
+                                                        if(inCart && !isSharedZone) setCart(cart.filter(c => c.id !== key)); 
+                                                        else openRoomModal(key); 
+                                                    }}> 
+                                                    <div className={circleClasses}> <div> {tData(roomConfig[key].name)} </div> </div> 
+                                                </div> 
+                                            )
+                                        })}
+                                    </div>
+                                )}
+
+                                {/* --- LIST VIEW --- */}
+                                {viewStyle === 'list' && (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 animate-pop">
+                                        {Object.keys(roomConfig).map(key => {
+                                            const rConf = roomConfig[key];
+                                            const searchStr = rConf ? (rConf.type + " " + rConf.name).toLowerCase() : '';
+                                            const isSharedZone = rConf ? (rConf.type === 'ground') : (key === 'Z8' || key === 'R6528' || searchStr.includes('ลานกาง') || searchStr.includes('ground'));
+                                            
+                                            let available = 1;
+                                            if (availability && availability.roomAvailableCount && availability.roomAvailableCount[key] !== undefined) {
+                                                available = parseInt(availability.roomAvailableCount[key]);
+                                            } else if (availability) {
+                                                 available = isSharedZone ? (availability.tentAvailable && availability.tentAvailable[key] !== undefined ? parseInt(availability.tentAvailable[key]) : parseInt(availability.zone8Available || 20)) : (availability.bookedRooms.includes(key) ? 0 : 1);
+                                            }
+                                            
+                                            const currentInCart = cart.filter(c => c.id === key).reduce((sum, c) => sum + parseInt(c.guests || 1), 0);
+                                            const remaining = isSharedZone ? Math.max(0, available - currentInCart) : available;
+                                            
+                                            const isBooked = availability && availability.bookedRooms && availability.bookedRooms.includes(key);
+                                            const inCart = cart.find(c => c.id === key);
+                                            
+                                            const disable = isBooked || (isSharedZone && remaining <= 0) || (!isSharedZone && inCart);
+                                            
+                                            const priceInfo = typeof rConf.pricing === 'string' ? safeJsonParse(rConf.pricing, {}) : (rConf.pricing || {});
+                                            const startPrice = priceInfo.priceHead || (priceInfo.tiers && priceInfo.tiers.length > 0 ? priceInfo.tiers[0].price : 0);
+
+                                            return (
+                                                <div key={key} onClick={() => {
+                                                    if(disable) return;
+                                                    if(inCart && !isSharedZone) setCart(cart.filter(c => c.id !== key)); 
+                                                    else openRoomModal(key);
+                                                }} className={`flex bg-white dark:bg-gray-700 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-600 transition-all ${disable ? 'opacity-60 grayscale cursor-not-allowed' : inCart && !isSharedZone ? 'border-yellow-400 bg-yellow-50 dark:bg-yellow-900 cursor-pointer' : 'hover:shadow-md cursor-pointer hover:border-green-300'}`}>
+                                                    <div className="w-1/3 min-h-[100px] bg-gray-200 dark:bg-gray-600 relative">
+                                                        <img src={(siteConfig.roomImages[key]||[])[0] || 'https://via.placeholder.com/150?text=No+Image'} className="w-full h-full object-cover absolute inset-0" />
+                                                        {disable && <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-bold text-xs">{t('fullyBooked')}</div>}
+                                                    </div>
+                                                    <div className="w-2/3 p-3 flex flex-col justify-between">
+                                                        <div>
+                                                            <h3 className="font-bold text-sm text-gray-800 dark:text-white line-clamp-1">{tData(rConf.name)}</h3>
+                                                            <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mt-1">{tData(siteConfig.roomDescriptions?.[key]) || t('noDesc')}</p>
+                                                        </div>
+                                                        <div className="flex justify-between items-end mt-2">
+                                                            <div className="text-green-600 dark:text-green-400 font-bold text-sm">{formatMoney(startPrice)}฿<span className="text-[10px] font-normal text-gray-500 dark:text-gray-400">/{isSharedZone ? t('persons') : t('nightsUnit')}</span></div>
+                                                            {!disable ? (
+                                                                inCart && !isSharedZone ? (
+                                                                    <span className="text-xs text-yellow-600 font-bold"><i className="fas fa-check"></i> {t('legendSelected')}</span>
+                                                                ) : (
+                                                                    <button className="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-3 py-1 rounded text-xs font-bold">{t('selectRoom')}</button>
+                                                                )
+                                                            ) : (
+                                                                <span className="text-xs text-red-500 font-bold">{t('fullyBooked')}</span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                )}
+
+                                {/* --- TOGGLE VIEW BUTTONS --- */}
+                                <div className="flex justify-center mb-8">
+                                    <div className="flex bg-gray-200 dark:bg-gray-700 p-1 rounded-xl shadow-inner">
+                                        <button onClick={() => setViewStyle('map')} className={`px-6 py-2 text-sm rounded-lg font-bold transition-all flex items-center ${viewStyle === 'map' ? 'bg-white dark:bg-gray-800 text-green-700 dark:text-green-400 shadow-md' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>
+                                            <i className="fas fa-map-marked-alt mr-2"></i> {t('mapView')}
+                                        </button>
+                                        <button onClick={() => setViewStyle('list')} className={`px-6 py-2 text-sm rounded-lg font-bold transition-all flex items-center ${viewStyle === 'list' ? 'bg-white dark:bg-gray-800 text-green-700 dark:text-green-400 shadow-md' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>
+                                            <i className="fas fa-th-list mr-2"></i> {t('listView')}
+                                        </button>
+                                    </div>
+                                </div>
+
                                 {selectedRoomId && roomConfig[selectedRoomId] && (
                                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-sm relative">
+                                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-sm relative animate-pop">
                                             <div className="relative w-full h-48 mb-4 rounded-lg overflow-hidden bg-gray-200">
                                                 <img src={(siteConfig.roomImages[selectedRoomId]||[])[currentImgIdx] || "https://via.placeholder.com/600x400?text=No+Image"} className="w-full h-full object-cover transition-opacity duration-300" />
                                                 {(siteConfig.roomImages[selectedRoomId]||[]).length > 1 && ( <> <button onClick={prevImage} className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-full hover:bg-opacity-70"><i className="fas fa-chevron-left"></i></button> <button onClick={nextImage} className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-full hover:bg-opacity-70"><i className="fas fa-chevron-right"></i></button> </> )}
                                             </div>
-                                            <h3 className="text-xl font-bold mb-2 text-green-800 dark:text-green-400">{roomConfig[selectedRoomId].name}</h3>
-                                            <p className="text-gray-500 dark:text-gray-300 text-sm mb-4"> {siteConfig.roomDescriptions?.[selectedRoomId] || "ไม่มีคำอธิบาย"} </p>
+                                            <h3 className="text-xl font-bold mb-2 text-green-800 dark:text-green-400">{tData(roomConfig[selectedRoomId].name)}</h3>
+                                            <p className="text-gray-500 dark:text-gray-300 text-sm mb-4 h-16 overflow-y-auto custom-scrollbar"> {tData(siteConfig.roomDescriptions?.[selectedRoomId]) || t('noDesc')} </p>
                                             <div className="flex items-center justify-between mb-6 bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
                                                 <button onClick={() => setGuestCount(Math.max((parseInt(roomConfig[selectedRoomId].min)||1), guestCount - 1))} className="w-10 h-10 bg-green-600 hover:bg-green-700 text-white rounded shadow text-xl font-bold transition-colors">-</button>
-                                                <div className="text-center"> <div className="text-2xl font-bold dark:text-white">{guestCount}</div> <div className="text-xs text-gray-500 dark:text-gray-400">คน</div> </div>
+                                                <div className="text-center"> <div className="text-2xl font-bold dark:text-white">{guestCount}</div> <div className="text-xs text-gray-500 dark:text-gray-400">{t('persons')}</div> </div>
                                                 <button onClick={() => { 
                                                     const rConf = roomConfig[selectedRoomId];
                                                     const searchStr = rConf ? (rConf.type + " " + rConf.name).toLowerCase() : '';
@@ -952,19 +1322,18 @@
                                                     if (guestCount < limit) {
                                                         setGuestCount(guestCount + 1);
                                                     } else {
-                                                        setModalAlert({ show: true, type: 'warning', title: 'โควต้าเต็ม', text: `สามารถเพิ่มได้สูงสุด ${limit} ท่านครับ` });
+                                                        setModalAlert({ show: true, type: 'warning', title: t('quotaFullTitle'), text: t('quotaFullDesc', { limit: limit }) });
                                                     }
                                                 }} className="w-10 h-10 bg-green-600 hover:bg-green-700 text-white rounded shadow text-xl font-bold transition-colors">+</button>
                                             </div>
-                                            <div className="flex gap-2"> <button onClick={() => setSelectedRoomId(null)} className="flex-1 py-3 text-gray-500 bg-gray-200 dark:bg-gray-600 dark:text-gray-300 rounded-lg font-bold">ยกเลิก</button> <button onClick={confirmRoomSelection} className="flex-1 py-3 text-white bg-green-600 hover:bg-green-700 rounded-lg font-bold shadow-lg">ยืนยัน</button> </div>
+                                            <div className="flex gap-2"> <button onClick={() => setSelectedRoomId(null)} className="flex-1 py-3 text-gray-500 bg-gray-200 dark:bg-gray-600 dark:text-gray-300 rounded-lg font-bold">{t('cancel')}</button> <button onClick={confirmRoomSelection} className="flex-1 py-3 text-white bg-green-600 hover:bg-green-700 rounded-lg font-bold shadow-lg">{t('confirm')}</button> </div>
                                         </div>
                                     </div>
                                 )}
                                 <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-4">
-                                    <h3 className="font-bold mb-4 dark:text-white text-lg">🍽️ สั่งอาหารล่วงหน้า</h3>
+                                    <h3 className="font-bold mb-4 dark:text-white text-lg">{t('preOrderFood')}</h3>
                                     <div className="grid grid-cols-2 gap-3">
                                         {siteConfig.foodMenu.map(f => {
-                                            // เช็คว่ามีเมนูนี้ในตะกร้ากี่รายการ โดยดูจากชื่อพื้นฐานของ id นั้นๆ
                                             const inCartItems = cart.filter(c => c.id === f.id && c.type === 'food');
                                             const inCartCount = inCartItems.reduce((sum, item) => sum + item.qty, 0);
                                             
@@ -972,8 +1341,8 @@
                                                 <div key={f.id} onClick={() => openFoodModal(f)} className={`cursor-pointer rounded-lg overflow-hidden border-2 transition-all shadow-sm relative ${inCartCount > 0 ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900 dark:border-yellow-500' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 hover:border-green-400'}`} > 
                                                     <img src={f.img} className="w-full h-24 object-cover" /> 
                                                     <div className="p-2"> 
-                                                        <h4 className="font-bold text-sm text-gray-800 dark:text-white line-clamp-1">{f.name}</h4> 
-                                                        {f.desc && <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 my-1">{f.desc}</p>} 
+                                                        <h4 className="font-bold text-sm text-gray-800 dark:text-white line-clamp-1">{tData(f.name)}</h4> 
+                                                        {f.desc && <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 my-1">{tData(f.desc)}</p>} 
                                                         <div className="flex justify-between items-center mt-1"> 
                                                             <span className="text-green-600 dark:text-green-400 text-sm font-bold">{f.price}.-</span> 
                                                             {inCartCount > 0 && <span className="bg-yellow-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">x{inCartCount}</span>} 
@@ -984,61 +1353,91 @@
                                         })}
                                     </div>
                                 </div>
-                                <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded mb-4"><h3 className="font-bold dark:text-white">🛒 ตะกร้า ({cart.length})</h3> {cart.map((c,i)=><div key={i} className="flex justify-between text-sm mt-1 dark:text-gray-200"><span>{c.name} {c.type==='food'?`x${c.qty}`:`(${c.guests} ท่าน)`}</span><button onClick={()=>setCart(cart.filter((_,idx)=>idx!==i))} className="text-red-500">ลบ</button></div>)} </div>
-                                <button onClick={() => { const hasRoom = cart.some(c => c.type !== 'food'); if (!hasRoom) { setShowRoomRequiredModal(true); return; } setStep(3); }} className="w-full bg-green-600 text-white p-3 rounded-lg font-bold"> ดำเนินการต่อ </button>
+                                <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded mb-4"><h3 className="font-bold dark:text-white">{t('cart')} ({cart.length})</h3> {cart.map((c,i)=><div key={i} className="flex justify-between text-sm mt-1 dark:text-gray-200"><span>{tData(c.name)} {c.type==='food'?`x${c.qty}`:`(${c.guests} ${t('persons')})`}</span><button onClick={()=>setCart(cart.filter((_,idx)=>idx!==i))} className="text-red-500">{t('delete')}</button></div>)} </div>
+                                <button onClick={() => { const hasRoom = cart.some(c => c.type !== 'food'); if (!hasRoom) { setShowRoomRequiredModal(true); return; } setStep(3); }} className="w-full bg-green-600 text-white p-3 rounded-lg font-bold shadow-lg text-lg"> {t('continueBtn')} </button>
                             </div>
                         )}
 
                         {mode === 'booking' && step === 3 && (
-                            <div className="max-w-md mx-auto p-6 bg-white dark:bg-gray-800 shadow-xl rounded-xl">
-                                <div className="flex items-center gap-2 mb-4"><button onClick={()=>setStep(2)} className="text-gray-500 dark:text-gray-300 hover:text-green-600 font-bold text-sm"><i className="fas fa-chevron-left"></i> ย้อนกลับ</button><h2 className="text-xl font-bold dark:text-white">สรุปยอดและชำระเงิน</h2></div>
+                            <div className="max-w-md mx-auto p-6 pt-16 bg-white dark:bg-gray-800 shadow-xl rounded-xl">
+                                <div className="flex items-center gap-2 mb-4"><button onClick={()=>setStep(2)} className="text-gray-500 dark:text-gray-300 hover:text-green-600 font-bold text-sm"><i className="fas fa-chevron-left"></i> {t('back')}</button><h2 className="text-xl font-bold dark:text-white">{t('summaryPayment')}</h2></div>
                                 <div className="space-y-2 mb-4 text-sm dark:text-gray-200">
-                                    <p><strong>เข้าพัก:</strong> {formatThaiDate(dates.checkIn)}</p>
-                                    <p><strong>คืนห้อง:</strong> {formatThaiDate(dates.checkOut)}</p>
-                                    <p><strong>จำนวน:</strong> {calculateNights()} คืน</p>
-                                    {pricing.isHighSeason && <div className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 p-1 rounded">ℹ️ ช่วงเทศกาล/วันพิเศษ คิดมัดจำ 100%</div>}
+                                    <p><strong>{t('checkIn')}</strong> {formatDateLocalized(dates.checkIn)}</p>
+                                    <p><strong>{t('checkOut')}</strong> {formatDateLocalized(dates.checkOut)}</p>
+                                    <p><strong>{t('nights')}</strong> {calculateNights()} {t('nightsUnit')}</p>
+                                    {pricing.isHighSeason && <div className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 p-1 rounded">{t('highSeasonNotice')}</div>}
                                     <hr className="dark:border-gray-600"/>
-                                    {cart.map((c, i) => <div key={i} className="flex justify-between"><span>{c.name} {c.type !== 'food' && `(${c.guests} ท่าน)`}</span><span>{formatMoney(c.type==='food' ? Number(c.price||0)*Number(c.qty||1) : (c.isPerHead ? Number(c.pricePerNight||0) * calculateNights() * Number(c.guests||1) : Number(c.pricePerNight||0)*calculateNights()))} บ.</span></div>)}
+                                    {cart.map((c, i) => <div key={i} className="flex justify-between"><span>{tData(c.name)} {c.type !== 'food' && `(${c.guests} ${t('persons')})`}</span><span>{formatMoney(c.type==='food' ? Number(c.price||0)*Number(c.qty||1) : (c.isPerHead ? Number(c.pricePerNight||0) * calculateNights() * Number(c.guests||1) : Number(c.pricePerNight||0)*calculateNights()))} ฿</span></div>)}
                                     <hr className="dark:border-gray-600"/>
-                                    {pricing.discount > 0 && <div className="flex justify-between text-red-500 font-bold"><span>ส่วนลดที่พัก</span><span>-{formatMoney(pricing.discount)} บ.</span></div>}
-                                    <div className="flex justify-between font-bold text-lg"><span>สุทธิ</span><span>{formatMoney(pricing.netTotal)} บ.</span></div>
-                                    <div className="bg-yellow-100 dark:bg-yellow-900 p-2 rounded text-center border border-yellow-300 dark:border-yellow-700 mt-2"><span className="block text-sm text-yellow-800 dark:text-yellow-200">ยอดมัดจำที่ต้องโอน</span><span className="text-2xl font-bold text-red-600 dark:text-red-400">{formatMoney(pricing.deposit)} บาท</span></div>
+                                    {pricing.discount > 0 && <div className="flex justify-between text-red-500 font-bold"><span>{t('discountRoom')}</span><span>-{formatMoney(pricing.discount)} ฿</span></div>}
+                                    <div className="flex justify-between font-bold text-lg"><span>{t('netTotal')}</span><span>{formatMoney(pricing.netTotal)} ฿</span></div>
+                                    <div className="bg-yellow-100 dark:bg-yellow-900 p-2 rounded text-center border border-yellow-300 dark:border-yellow-700 mt-2"><span className="block text-sm text-yellow-800 dark:text-yellow-200">{t('depositRequired')}</span><span className="text-2xl font-bold text-red-600 dark:text-red-400">{formatMoney(pricing.deposit)} ฿</span></div>
                                 </div>
                                 <div className="mb-4">
-                                    <div className="flex gap-2"> <input placeholder="กรอกโค้ดส่วนลด" className="border p-2 rounded flex-1 dark:bg-gray-700 dark:border-gray-600 dark:text-white" onChange={e => setDiscount({...discount, code: e.target.value})} /> <button className="bg-gray-800 dark:bg-gray-600 text-white px-4 rounded" onClick={checkDiscountCode}>กดใช้โค้ด</button> </div>
+                                    <div className="flex gap-2"> <input placeholder={t('enterDiscount')} className="border p-2 rounded flex-1 dark:bg-gray-700 dark:border-gray-600 dark:text-white" onChange={e => setDiscount({...discount, code: e.target.value})} /> <button className="bg-gray-800 dark:bg-gray-600 text-white px-4 rounded" onClick={checkDiscountCode}>{t('applyCode')}</button> </div>
                                     {discount.message && <p className={`text-xs mt-1 ${discount.status==='success'?'text-green-600 dark:text-green-400':'text-red-500 dark:text-red-400'}`}>{discount.message}</p>}
                                 </div>
                                 <div className="space-y-3 mb-6">
-                                    <input placeholder="ชื่อผู้จอง" className="w-full border p-2 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white" value={customer.name} onChange={e => setCustomer({...customer, name: e.target.value})} />
-                                    <input placeholder="เบอร์โทรศัพท์" className="w-full border p-2 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white" type="tel" value={customer.phone} onChange={e => setCustomer({...customer, phone: e.target.value})} />
+                                    <input placeholder={t('bookerName')} className="w-full border p-2 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white" value={customer.name} onChange={e => setCustomer({...customer, name: e.target.value})} />
+                                    <input placeholder={t('phoneNumber')} className="w-full border p-2 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white" type="tel" value={customer.phone} onChange={e => setCustomer({...customer, phone: e.target.value})} />
                                 </div>
                                 
                                 <div className="text-center mb-6">
-                                    <p className="mb-2 font-bold dark:text-white">สแกนจ่ายมัดจำ (พร้อมเพย์)</p>
+                                    <p className="mb-2 font-bold dark:text-white">{t('scanPromptpay')}</p>
                                     {qrUrl ? ( 
                                         <div className="flex flex-col items-center"> 
                                             <img src={qrUrl} className="mx-auto border-2 border-gray-200 dark:border-gray-600 rounded-xl mb-3 shadow-sm p-2 bg-white" alt="QR Code" style={{ width: '200px', height: '200px' }} /> 
-                                            <p className="text-sm text-blue-600 dark:text-blue-400 font-bold mt-1"> แคปหน้าจอหรือกดค้างเพื่อบันทึก</p> 
+                                            <p className="text-sm text-blue-600 dark:text-blue-400 font-bold mt-1"> {t('saveQrNote')}</p> 
                                         </div> 
-                                    ) : ( <div className="h-[200px] flex items-center justify-center text-gray-400">กำลังสร้าง QR Code...</div> )}
+                                    ) : ( <div className="h-[200px] flex items-center justify-center text-gray-400">{t('generatingQr')}</div> )}
                                     <div className="mt-4 bg-gray-50 dark:bg-gray-700 p-2 rounded"> <p className="text-sm font-bold text-gray-800 dark:text-white">{PROMPTPAY_NAME}</p> <p className="text-xs text-gray-500 dark:text-gray-400 font-mono tracking-wider">{PROMPTPAY_PHONE}</p> </div>
                                 </div>
                                 
-                                <div className="mb-4"> <label className="block mb-1 text-sm dark:text-gray-300">สลิปโอนเงิน <span className="text-red-500">*</span></label> <input type="file" accept="image/*" onChange={async (e) => { const f = e.target.files[0]; if (f) { try { const resizedBase64 = await compressImage(f); setSlipImg(resizedBase64); } catch (err) { alert('ไม่สามารถประมวลผลรูปภาพได้'); } } }} className="w-full text-sm dark:text-gray-300" /> </div>
-                                <div className="flex items-start gap-2 mb-4 text-xs text-gray-600 dark:text-gray-400"> <input type="checkbox" className="mt-1" checked={agreed} onChange={e => setAgreed(e.target.checked)} /> <p>ฉันอ่านกฎระเบียบและยอมรับเงื่อนไขของ ขนำลุงดำ แคมป์ปิ้ง ทุกประการ </p> </div>
-                                <button onClick={handleSubmit} disabled={loading || !canSubmit} className={`w-full p-3 rounded-lg font-bold text-white transition ${loading || !canSubmit ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 shadow-lg'}`}>{loading ? 'กำลังยืนยันการจอง...' : 'ยืนยันการจองที่พัก'}</button>
+                                <div className="mb-4"> 
+                                    <label className="block mb-1 text-sm dark:text-gray-300">{t('uploadSlip')} <span className="text-red-500">*</span></label> 
+                                    <input type="file" accept="image/*" onChange={async (e) => { 
+                                        const f = e.target.files[0]; 
+                                        if (f) { 
+                                            try { 
+                                                setSlipStatus({ type: 'loading', msg: lang === 'en' ? 'Checking slip...' : 'กำลังตรวจสอบสลิป...' });
+                                                const resizedBase64 = await compressImage(f); 
+                                                setSlipImg(resizedBase64); 
+                                                
+                                                // Client-Side Slip Verification
+                                                checkSlipQR(resizedBase64, PROMPTPAY_PHONE, (res) => {
+                                                    setSlipStatus(res);
+                                                });
+                                            } catch (err) { alert('Upload error'); } 
+                                        } 
+                                    }} className="w-full text-sm dark:text-gray-300" /> 
+                                    
+                                    {/* สถานะเช็คสลิป */}
+                                    {slipStatus && slipStatus.type !== 'loading' && (
+                                        <p className={`text-[10px] mt-2 p-1.5 rounded ${slipStatus.type === 'success' ? 'bg-green-100 text-green-700' : slipStatus.type === 'error' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                            {t(slipStatus.msg)}
+                                        </p>
+                                    )}
+                                    {slipStatus && slipStatus.type === 'loading' && (
+                                        <p className="text-[10px] mt-2 p-1.5 rounded bg-blue-100 text-blue-700">
+                                            <i className="fas fa-spinner fa-spin mr-1"></i> {slipStatus.msg}
+                                        </p>
+                                    )}
+                                </div>
+
+                                <div className="flex items-start gap-2 mb-4 text-xs text-gray-600 dark:text-gray-400"> <input type="checkbox" className="mt-1" checked={agreed} onChange={e => setAgreed(e.target.checked)} /> <p>{t('agreeTerms')}</p> </div>
+                                <button onClick={handleSubmit} disabled={loading || !canSubmit} className={`w-full p-3 rounded-lg font-bold text-white transition ${loading || !canSubmit ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 shadow-lg'}`}>{loading ? t('confirmingBtn') : t('confirmBookingBtn')}</button>
                             </div>
                         )}
 
                         {mode === 'booking' && step === 5 && (
-                            <div className="max-w-md mx-auto p-8 text-center bg-white dark:bg-gray-800 shadow-xl rounded-xl mt-10">
+                            <div className="max-w-md mx-auto p-8 pt-16 text-center bg-white dark:bg-gray-800 shadow-xl rounded-xl">
                                 <div className="w-20 h-20 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-6 text-green-500 text-4xl shadow-inner animate-pop"><i className="fas fa-check"></i></div>
-                                <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">จองสำเร็จ!</h2>
-                                <p className="text-gray-600 dark:text-gray-300 mb-6">รหัสการจอง: <span className="font-bold text-green-600">{bookingResult}</span></p>
+                                <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">{t('bookingSuccessTitle')}</h2>
+                                <p className="text-gray-600 dark:text-gray-300 mb-6">{t('bookingIdText')} <span className="font-bold text-green-600">{bookingResult}</span></p>
                                 <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg text-sm text-gray-700 dark:text-gray-300 mb-6 whitespace-pre-line">
-                                    ระบบได้ส่งข้อมูลการจองไปที่ LINE ของท่านแล้ว<br/>แอดมินจะตรวจสอบสลิปและอัปเดตสถานะเร็วๆ นี้ครับ
+                                    {t('successMessage')}
                                 </div>
-                                <button onClick={() => window.location.reload()} className="w-full bg-gray-800 dark:bg-gray-600 text-white p-3 rounded-lg hover:bg-gray-700 transition font-bold shadow">กลับหน้าแรก</button>
+                                <button onClick={() => window.location.reload()} className="w-full bg-gray-800 dark:bg-gray-600 text-white p-3 rounded-lg hover:bg-gray-700 transition font-bold shadow">{t('backToHome')}</button>
                             </div>
                         )}
 
@@ -1048,8 +1447,8 @@
                                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm relative animate-pop overflow-hidden">
                                     <button onClick={() => setSelectedFood(null)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10 w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm"><i className="fas fa-times text-lg"></i></button>
                                     <div className="w-full h-48 -mt-6 -mx-6 mb-4 relative"><img src={selectedFood.img} className="w-full h-full object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div></div>
-                                    <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-1">{selectedFood.name}</h3>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 h-10 overflow-y-auto custom-scrollbar">{selectedFood.desc || 'ไม่มีคำอธิบาย'}</p>
+                                    <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-1">{tData(selectedFood.name)}</h3>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 h-10 overflow-y-auto custom-scrollbar">{tData(selectedFood.desc) || t('noDesc')}</p>
                                     <div className="flex items-center justify-between mb-4 bg-gray-50 dark:bg-gray-700 p-4 rounded-xl border border-gray-100 dark:border-gray-600">
                                         <div className="text-lg font-bold text-green-600 dark:text-green-400">{selectedFood.price} ฿ <span className="text-xs text-gray-500">/ ชุด</span></div>
                                         <div className="flex items-center gap-3">
@@ -1062,14 +1461,14 @@
                                     <div className="mb-4">
                                         <textarea 
                                             className="w-full border border-gray-200 dark:border-gray-600 rounded-lg p-2 text-sm bg-white dark:bg-gray-700 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-green-500 outline-none" 
-                                            placeholder="หมายเหตุเพิ่มเติม (เช่น ไม่เผ็ด, เพิ่มไข่ดาว)..." 
+                                            placeholder={t('foodNotePlaceholder')} 
                                             rows="2"
                                             value={foodNote}
                                             onChange={(e) => setFoodNote(e.target.value)}
                                         ></textarea>
                                     </div>
 
-                                    <button onClick={confirmFoodSelection} className="w-full bg-green-600 text-white py-3 rounded-xl font-bold shadow-lg hover:bg-green-700 transition flex items-center justify-center gap-2"><i className="fas fa-cart-plus"></i> เพิ่มลงตะกร้า</button>
+                                    <button onClick={confirmFoodSelection} className="w-full bg-green-600 text-white py-3 rounded-xl font-bold shadow-lg hover:bg-green-700 transition flex items-center justify-center gap-2"><i className="fas fa-cart-plus"></i> {t('addCart')}</button>
                                 </div>
                             </div>
                         )}
@@ -1078,23 +1477,23 @@
                             <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-6">
                                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center relative animate-pop">
                                     <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center mx-auto mb-4"><i className="fas fa-campground text-3xl text-yellow-500 dark:text-yellow-300"></i></div>
-                                    <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">กรุณาเลือกที่พัก</h3>
-                                    <p className="text-gray-600 dark:text-gray-300 mb-6 text-sm">คุณต้องเลือกห้องพักหรือลานกางเต็นท์อย่างน้อย 1 รายการก่อนดำเนินการต่อครับ</p>
-                                    <button onClick={() => setShowRoomRequiredModal(false)} className="w-full bg-yellow-500 text-white py-3 rounded-xl font-bold hover:bg-yellow-600 transition shadow">รับทราบ</button>
+                                    <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{t('roomRequiredTitle')}</h3>
+                                    <p className="text-gray-600 dark:text-gray-300 mb-6 text-sm">{t('roomRequiredDesc')}</p>
+                                    <button onClick={() => setShowRoomRequiredModal(false)} className="w-full bg-yellow-500 text-white py-3 rounded-xl font-bold hover:bg-yellow-600 transition shadow">{t('acknowledge')}</button>
                                 </div>
                             </div>
                         )}
                         
-                        {closedModal && ( <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-6"> <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center relative animate-pop"> <div className="w-16 h-16 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center mx-auto mb-4"> <i className="fas fa-ban text-3xl text-red-500 dark:text-red-300"></i> </div> <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">วันปิดให้บริการ</h3> <p className="text-gray-600 dark:text-gray-300 mb-1">วันที่ <strong>{formatThaiDate(closedModal.date)}</strong></p> <p className="text-red-500 dark:text-red-400 font-medium mb-6">"{closedModal.reason}"</p> <button onClick={() => setClosedModal(null)} className="w-full bg-gray-800 dark:bg-gray-600 text-white py-3 rounded-xl font-bold hover:bg-gray-700 transition">เลือกวันใหม่</button> </div> </div> )}
+                        {closedModal && ( <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-6"> <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center relative animate-pop"> <div className="w-16 h-16 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center mx-auto mb-4"> <i className="fas fa-ban text-3xl text-red-500 dark:text-red-300"></i> </div> <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">วันปิดให้บริการ</h3> <p className="text-gray-600 dark:text-gray-300 mb-1">วันที่ <strong>{formatDateLocalized(closedModal.date)}</strong></p> <p className="text-red-500 dark:text-red-400 font-medium mb-6">"{closedModal.reason}"</p> <button onClick={() => setClosedModal(null)} className="w-full bg-gray-800 dark:bg-gray-600 text-white py-3 rounded-xl font-bold hover:bg-gray-700 transition">เลือกวันใหม่</button> </div> </div> )}
                         
-                        {searchError && ( <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-6"> <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center relative animate-pop"> <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center mx-auto mb-4"> <i className="fas fa-exclamation-triangle text-3xl text-yellow-500 dark:text-yellow-300"></i> </div> <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">แจ้งเตือน</h3> <p className="text-gray-600 dark:text-gray-300 mb-6 text-sm">{searchError}</p> <button onClick={() => setSearchError(null)} className="w-full bg-yellow-500 text-white py-3 rounded-xl font-bold hover:bg-yellow-600 transition">ตกลง</button> </div> </div> )}
+                        {searchError && ( <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-6"> <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center relative animate-pop"> <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center mx-auto mb-4"> <i className="fas fa-exclamation-triangle text-3xl text-yellow-500 dark:text-yellow-300"></i> </div> <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{t('notice')}</h3> <p className="text-gray-600 dark:text-gray-300 mb-6 text-sm">{searchError}</p> <button onClick={() => setSearchError(null)} className="w-full bg-yellow-500 text-white py-3 rounded-xl font-bold hover:bg-yellow-600 transition">{t('ok')}</button> </div> </div> )}
                         
-                        {modalAlert.show && ( <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-60 backdrop-blur-sm transition-opacity"> <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-xs overflow-hidden animate-pop"> <div className={`p-6 text-center ${modalAlert.type==='error'?'bg-red-50 dark:bg-red-900/20':''}`}> <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${modalAlert.type==='error'?'bg-red-100 text-red-500': modalAlert.type==='success'?'bg-green-100 text-green-500':'bg-yellow-100 text-yellow-500'}`}> <i className={`fas ${modalAlert.type==='error'?'fa-times':modalAlert.type==='success'?'fa-check':'fa-exclamation'} text-2xl`}></i> </div> <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{modalAlert.title}</h3> <p className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-wrap">{modalAlert.text}</p> </div> <div className="p-4 bg-gray-50 dark:bg-gray-700"> <button onClick={() => setModalAlert({ ...modalAlert, show: false })} className="w-full py-2.5 bg-gray-800 dark:bg-gray-600 text-white rounded-xl font-bold hover:bg-gray-700 transition">ตกลง</button> </div> </div> </div> )}
+                        {modalAlert.show && ( <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-60 backdrop-blur-sm transition-opacity"> <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-xs overflow-hidden animate-pop"> <div className={`p-6 text-center ${modalAlert.type==='error'?'bg-red-50 dark:bg-red-900/20':''}`}> <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${modalAlert.type==='error'?'bg-red-100 text-red-500': modalAlert.type==='success'?'bg-green-100 text-green-500':'bg-yellow-100 text-yellow-500'}`}> <i className={`fas ${modalAlert.type==='error'?'fa-times':modalAlert.type==='success'?'fa-check':'fa-exclamation'} text-2xl`}></i> </div> <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{modalAlert.title}</h3> <p className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-wrap">{modalAlert.text}</p> </div> <div className="p-4 bg-gray-50 dark:bg-gray-700"> <button onClick={() => setModalAlert({ ...modalAlert, show: false })} className="w-full py-2.5 bg-gray-800 dark:bg-gray-600 text-white rounded-xl font-bold hover:bg-gray-700 transition">{t('ok')}</button> </div> </div> </div> )}
                         
-                        {modalConfirm.show && ( <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-60 backdrop-blur-sm transition-opacity"> <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-xs overflow-hidden animate-pop"> <div className="p-6 text-center"> <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-blue-100 text-blue-500"> <i className="fas fa-question text-3xl"></i> </div> <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{modalConfirm.title}</h3> <p className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-wrap">{modalConfirm.text}</p> </div> <div className="p-4 bg-gray-50 dark:bg-gray-700 flex gap-2"> <button onClick={() => setModalConfirm({ ...modalConfirm, show: false })} className="flex-1 py-2.5 bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-200 rounded-xl font-bold hover:bg-gray-50 transition">ยกเลิก</button> <button onClick={modalConfirm.onConfirm} className="flex-1 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition shadow">ยืนยัน</button> </div> </div> </div> )}
+                        {modalConfirm.show && ( <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-60 backdrop-blur-sm transition-opacity"> <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-xs overflow-hidden animate-pop"> <div className="p-6 text-center"> <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-blue-100 text-blue-500"> <i className="fas fa-question text-3xl"></i> </div> <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{modalConfirm.title}</h3> <p className="text-gray-600 dark:text-gray-300 text-sm whitespace-pre-wrap">{modalConfirm.text}</p> </div> <div className="p-4 bg-gray-50 dark:bg-gray-700 flex gap-2"> <button onClick={() => setModalConfirm({ ...modalConfirm, show: false })} className="flex-1 py-2.5 bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-200 rounded-xl font-bold hover:bg-gray-50 transition">{t('cancel')}</button> <button onClick={modalConfirm.onConfirm} className="flex-1 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition shadow">{t('confirm')}</button> </div> </div> </div> )}
 
                         {/* --- CAMPING LOADING OVERLAY --- */}
-                        {(loading || isInitializing) && <CampingLoaderOverlay text={isInitializing ? 'กำลังเตรียมพื้นที่กางเต็นท์...' : 'กำลังดำเนินการ...'} />}
+                        {(loading || isInitializing) && <CampingLoaderOverlay text={isInitializing ? t('loadingPrepare') : t('loadingWait')} />}
                     </div>
                 </div>
             );
