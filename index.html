@@ -17,8 +17,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="ขนำลุงดำ" />
     <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/pw/AP1GczPi_rYAbsNGi4X96mW5koYl0JJ3BN9ipRf6UgsXAOQgkyhrs2ChGcZlbsuQ3OLJOYnYhSTYJhWUuu2hwWtPqlt4MUfdUDSS3s4RdRLeD36gPLiK-8OhYLXWmqxVLh2eOtkLIx7pQxrQA6ZnqBYHOftH=w913-h913-s-no-gm" />
+    <link rel="manifest" href='data:application/manifest+json,{"name":"ขนำลุงดำ แคมป์ปิ้ง","short_name":"ขนำลุงดำ","display":"standalone","background_color":"#f3f4f6","theme_color":"#16a34a","start_url":".","icons":[{"src":"https://lh3.googleusercontent.com/pw/AP1GczPi_rYAbsNGi4X96mW5koYl0JJ3BN9ipRf6UgsXAOQgkyhrs2ChGcZlbsuQ3OLJOYnYhSTYJhWUuu2hwWtPqlt4MUfdUDSS3s4RdRLeD36gPLiK-8OhYLXWmqxVLh2eOtkLIx7pQxrQA6ZnqBYHOftH=w913-h913-s-no-gm","sizes":"512x512","type":"image/png"}]}' />
     
-    <!-- Preconnect -->
+    <!-- Preconnect ช่วยเพิ่มความเร็วในการโหลดทรัพยากร -->
     <link rel="preconnect" href="https://script.google.com" crossorigin>
     <link rel="preconnect" href="https://unpkg.com" crossorigin>
     <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
@@ -249,8 +250,9 @@
                         let dataUrl = canvas.toDataURL('image/jpeg', quality);
                         const head = 'data:image/jpeg;base64,';
                         const sizeInBytes = Math.round((dataUrl.length - head.length) * 3 / 4);
-                        if (sizeInBytes > 500000 && quality > 0.3) resolve(compressImage(file, quality - 0.2, maxWidth * 0.8)); 
-                        else resolve(dataUrl);
+                        if (sizeInBytes > 500000 && quality > 0.3) {
+                            resolve(compressImage(file, quality - 0.2, maxWidth * 0.8)); 
+                        } else { resolve(dataUrl); }
                     };
                     img.onerror = (err) => reject(err);
                 };
@@ -305,6 +307,10 @@
             const days = lang === 'en' ? dayNamesEN : dayNamesTH;
             const yearOffset = lang === 'en' ? 0 : 543;
             
+            const cDates = closedDates || [];
+            const sDates = specialDates || [];
+            const fDates = fullyBookedDates || [];
+
             const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
             const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
             
@@ -314,11 +320,11 @@
             const handleDateClick = (dateObj) => {
                 const dateStr = toLocalISOString(dateObj);
                 
-                if (closedDates.some(c => c.date === dateStr)) return;
+                if (cDates.some(c => c.date === dateStr)) return;
                 if (dateStr <= todayStr) return; 
                 
                 if (!dates.checkIn || (dates.checkIn && dates.checkOut)) {
-                    if (fullyBookedDates.includes(dateStr)) {
+                    if (fDates.includes(dateStr)) {
                         setModalAlert({ show: true, type: 'warning', title: t('notice'), text: t('errFullyBookedDate') });
                         return;
                     }
@@ -334,7 +340,7 @@
 
                         while(current < end) {
                             const dStr = toLocalISOString(current);
-                            if (closedDates.some(c => c.date === dStr) || fullyBookedDates.includes(dStr)) {
+                            if (cDates.some(c => c.date === dStr) || fDates.includes(dStr)) {
                                 hasIssue = true; break;
                             }
                             current.setDate(current.getDate() + 1);
@@ -347,7 +353,7 @@
                             setDates({ ...dates, checkOut: dateStr });
                         }
                     } else {
-                        if (fullyBookedDates.includes(dateStr)) {
+                        if (fDates.includes(dateStr)) {
                             setModalAlert({ show: true, type: 'warning', title: t('notice'), text: t('errFullyBookedDate') });
                             return;
                         }
@@ -370,9 +376,9 @@
                     const dateStr = toLocalISOString(dateObj);
                     
                     const isPast = dateStr <= todayStr;
-                    const isClosed = closedDates.some(c => c.date === dateStr);
-                    const isFull = fullyBookedDates.includes(dateStr);
-                    const isSpecial = specialDates.some(s => s.date === dateStr);
+                    const isClosed = cDates.some(c => c.date === dateStr);
+                    const isFull = fDates.includes(dateStr);
+                    const isSpecial = sDates.some(s => s.date === dateStr);
                     
                     const isCheckIn = dates.checkIn === dateStr;
                     const isCheckOut = dates.checkOut === dateStr;
@@ -449,6 +455,7 @@
         
         const App = () => {
             const [isDark, setIsDark] = React.useState(true);
+            
             const [lang, setLang] = React.useState(() => {
                 const saved = localStorage.getItem('khanam_lang');
                 if (saved) return saved;
@@ -511,7 +518,7 @@
             React.useEffect(() => { window.scrollTo({ top: 0, left: 0, behavior: 'smooth' }); }, [step, mode, manageTab]);
 
             const t = (key, params = {}) => {
-                let text = TRANSLATIONS[lang][key] || key;
+                let text = TRANSLATIONS[lang]?.[key] || TRANSLATIONS['th'][key] || key;
                 for (let k in params) text = text.replace(`{${k}}`, params[k]);
                 return text;
             };
@@ -556,6 +563,7 @@
             const formatDateLocalized = (dateStr) => { 
                 if(!dateStr) return "-"; 
                 const d = new Date(dateStr); 
+                if (isNaN(d.getTime())) return dateStr;
                 if (lang === 'en') {
                     const m = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]; 
                     return `${d.getDate()} ${m[d.getMonth()]} ${d.getFullYear()}`;
@@ -564,32 +572,21 @@
                     return `${d.getDate()} ${m[d.getMonth()]} ${d.getFullYear() + 543}`;
                 }
             };
-            
-            const getClosedDateOverlap = (inDate, outDate) => {
-                if (!inDate || !outDate) return null;
-                let current = new Date(inDate); const end = new Date(outDate);
-                while(current < end) { 
-                    const dStr = toLocalISOString(current); 
-                    const closed = systemSettings.closed.find(c => c.date === dStr); 
-                    if (closed) return closed; 
-                    current.setDate(current.getDate() + 1); 
-                }
-                return null;
-            };
 
+            const calculateNights = () => { if(!dates.checkIn || !dates.checkOut) return 0; return Math.round((new Date(dates.checkOut) - new Date(dates.checkIn)) / (1000 * 3600 * 24)); }
+            
             const checkDateOverlapHighSeason = (inDate, outDate) => {
                 if (!inDate || !outDate) return false;
                 let current = new Date(inDate); const end = new Date(outDate);
+                const specialArr = systemSettings.special || [];
                 while(current < end) { 
                     const dStr = toLocalISOString(current); 
-                    if (systemSettings.special.some(s => s.date === dStr)) return true; 
+                    if (specialArr.some(s => s.date === dStr)) return true; 
                     current.setDate(current.getDate() + 1); 
                 }
                 return false;
             };
 
-            const calculateNights = () => { if(!dates.checkIn || !dates.checkOut) return 0; return Math.round((new Date(dates.checkOut) - new Date(dates.checkIn)) / (1000 * 3600 * 24)); }
-            
             const getPricing = () => {
                 const nights = calculateNights(); let roomTotal = 0; let foodTotal = 0; let z8Total = 0;
                 cart.forEach(item => { 
@@ -625,14 +622,19 @@
                     }).catch(err => { console.error('LIFF Error', err); setIsLiffReady(true); });
                 } else { setIsLiffReady(true); }
                 
-                const cachedData = sessionStorage.getItem('khanam_init_data_v2');
+                // เปลี่ยนชื่อคีย์ Cache ใหม่ เป็น v3 เพื่อป้องกันไฟล์เก่าค้างจนหน้าขาว
+                const cachedData = sessionStorage.getItem('khanam_data_v3');
                 if (cachedData) {
                     try {
                         const parsed = JSON.parse(cachedData);
-                        setSystemSettings({ closed: parsed.settings.closed, special: parsed.settings.special, fullyBookedDates: parsed.settings.fullyBookedDates || [] });
-                        setSiteConfig(prev => ({ ...prev, ...parsed.siteConfig }));
-                        setRoomConfig(parsed.roomConfig);
-                        setPinPos(parsed.mapConfig);
+                        setSystemSettings({ 
+                            closed: parsed.settings?.closed || [], 
+                            special: parsed.settings?.special || [], 
+                            fullyBookedDates: parsed.settings?.fullyBookedDates || [] 
+                        });
+                        setSiteConfig(prev => ({ ...prev, ...(parsed.siteConfig || {}) }));
+                        setRoomConfig(parsed.roomConfig || {});
+                        setPinPos(parsed.mapConfig || DEFAULT_POSITIONS);
                         setIsInitializing(false); 
                     } catch(e) {}
                 }
@@ -640,11 +642,15 @@
                 fetchWithTimeout(`${GOOGLE_SCRIPT_URL}?action=getInitialData`).then(r => r.json()).then(res => {
                     if (res.status === 'success') {
                         const { settings, siteConfig, roomConfig, mapConfig } = res.data;
-                        setSystemSettings({ closed: settings.closed, special: settings.special, fullyBookedDates: settings.fullyBookedDates || [] });
-                        setSiteConfig(prev => ({ ...prev, ...siteConfig }));
-                        setRoomConfig(roomConfig);
-                        setPinPos(mapConfig);
-                        sessionStorage.setItem('khanam_init_data_v2', JSON.stringify(res.data));
+                        setSystemSettings({ 
+                            closed: settings?.closed || [], 
+                            special: settings?.special || [], 
+                            fullyBookedDates: settings?.fullyBookedDates || [] 
+                        });
+                        setSiteConfig(prev => ({ ...prev, ...(siteConfig || {}) }));
+                        setRoomConfig(roomConfig || {});
+                        setPinPos(mapConfig || DEFAULT_POSITIONS);
+                        sessionStorage.setItem('khanam_data_v3', JSON.stringify(res.data));
                     }
                     setIsInitializing(false);
                 }).catch(e=>{ setIsInitializing(false); });
@@ -686,7 +692,26 @@
             const handleSearch = () => {
                 if (!dates.checkIn || !dates.checkOut) { setSearchError(lang === 'en' ? 'Please select both check-in and check-out dates.' : 'กรุณาเลือกวันเข้าพักและวันที่ออกให้ครบถ้วนครับ'); return; }
                 if (dates.checkIn >= dates.checkOut) { setSearchError(lang === 'en' ? 'Check-out date must be after check-in date.' : 'วันเช็คเอาท์ต้องอยู่หลังจากวันเช็คอินครับ'); return; }
-                const closedFound = getClosedDateOverlap(dates.checkIn, dates.checkOut); if (closedFound) { setClosedModal(closedFound); return; }
+                
+                // ตรวจสอบว่าคร่อมวันปิดไหม
+                let current = new Date(dates.checkIn);
+                let end = new Date(dates.checkOut);
+                let hasClosed = false;
+                let closedItem = null;
+                const closedArr = systemSettings.closed || [];
+                
+                current = new Date(current.getTime() + Math.abs(current.getTimezoneOffset() * 60000));
+                end = new Date(end.getTime() + Math.abs(end.getTimezoneOffset() * 60000));
+
+                while(current < end) {
+                    const dStr = toLocalISOString(current);
+                    const found = closedArr.find(c => c.date === dStr);
+                    if (found) { hasClosed = true; closedItem = found; break; }
+                    current.setDate(current.getDate() + 1);
+                }
+
+                if (hasClosed && closedItem) { setClosedModal(closedItem); return; }
+                
                 setLoading(true);
                 fetchWithTimeout(`${GOOGLE_SCRIPT_URL}?action=getAvailability&checkIn=${dates.checkIn}&checkOut=${dates.checkOut}&_t=${Date.now()}`)
                 .then(r => r.json()).then(data => { setAvailability(data); setStep(2); setLoading(false); })
@@ -792,7 +817,7 @@
 
             return (
                 <div className={isDark ? "dark" : ""}>
-                    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-300">
+                    <div className="min-h-screen bg-[#f3f4f6] dark:bg-gray-900 pb-10 text-gray-800 dark:text-gray-100 transition-colors duration-300 relative">
                         
                         {/* FLOATING ACTION BUTTONS */}
                         <div className="fixed top-3 right-3 z-50 flex flex-col gap-2">
@@ -810,7 +835,7 @@
 
                         {/* --- MANAGE MODE --- */}
                         {mode === 'manage' && (
-                            <div className="w-full max-w-lg mx-auto bg-white dark:bg-gray-800 min-h-screen shadow-2xl p-6 pt-16 flex flex-col">
+                            <div className="w-full max-w-lg mx-auto bg-white dark:bg-gray-800 min-h-screen shadow-2xl p-6 pt-16 flex flex-col sm:rounded-2xl sm:my-8 sm:min-h-[auto]">
                                 <h2 className="text-xl font-bold mb-6 text-center text-blue-600 dark:text-blue-400">{t('manageTitle')}</h2>
                                 
                                 {!manageData ? (
@@ -1007,7 +1032,7 @@
 
                         {/* --- STEP 1: HOME --- */}
                         {mode === 'booking' && step === 1 && (
-                            <div className="w-full max-w-lg mx-auto bg-white dark:bg-gray-800 min-h-screen flex flex-col shadow-2xl">
+                            <div className="w-full max-w-lg mx-auto bg-white dark:bg-gray-800 min-h-screen flex flex-col shadow-2xl sm:rounded-2xl sm:my-8 sm:min-h-[auto] overflow-hidden border border-gray-100 dark:border-gray-700">
                                 <div className="h-64 sm:h-72 relative flex-shrink-0">
                                     <img src={siteConfig.bannerUrl} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
@@ -1020,6 +1045,7 @@
                                     <p className="block text-center mb-6 text-gray-600 dark:text-gray-300 text-sm whitespace-pre-line leading-relaxed">{tData(siteConfig.headerDesc)}</p>
                                     
                                     <div className="mt-auto">
+                                        {/* --- CUSTOM CALENDAR REPLACES NATIVE DATE INPUTS --- */}
                                         <DateRangePicker 
                                             dates={dates} 
                                             setDates={setDates} 
@@ -1042,184 +1068,179 @@
 
                         {/* --- STEP 2: SELECT ROOM --- */}
                         {mode === 'booking' && step === 2 && (
-                            <div className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 min-h-screen flex flex-col shadow-2xl">
-                                
-                                {/* Sticky Header */}
-                                <div className="flex items-center gap-3 p-4 pt-5 sticky top-0 z-40 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-100 dark:border-gray-700">
-                                    <button onClick={()=>setStep(1)} className="text-gray-500 dark:text-gray-300 hover:text-green-600 font-bold text-lg p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <div className="w-full max-w-4xl mx-auto p-4 pt-16 relative min-h-screen bg-white dark:bg-gray-800 sm:rounded-2xl sm:my-8 shadow-xl">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <button onClick={()=>setStep(1)} className="text-gray-500 dark:text-gray-300 hover:text-green-600 font-bold text-lg w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 dark:bg-gray-700">
                                         <i className="fas fa-chevron-left"></i>
                                     </button>
-                                    <h2 className="text-xl font-bold dark:text-white truncate">{t('selectRoom')}</h2>
+                                    <h2 className="text-xl font-bold dark:text-white">{t('selectRoom')}</h2>
                                 </div>
                                 
-                                <div className="p-4 flex-1">
-                                    
-                                    {/* --- MAP VIEW --- */}
-                                    {viewStyle === 'map' && (
-                                        <div className="map-container bg-blue-100 dark:bg-gray-700 animate-pop" style={{paddingBottom: '100%'}}>
-                                            <img src={siteConfig?.roomImages?.['MAP_BG']?.[0] || "https://img2.pic.in.th/3d539b84-44ce-4336-ad90-bd2f84b13eca.jpg"} referrerPolicy="no-referrer" className="absolute top-0 left-0 w-full h-full object-cover" alt="Camp Map" />
-                                            {Object.keys(pinPos).map(key => {
-                                                if (!roomConfig[key]) return null;
-                                                const rConf = roomConfig[key];
-                                                const searchStr = rConf ? (rConf.type + " " + rConf.name).toLowerCase() : '';
-                                                const isSharedZone = rConf ? (rConf.type === 'ground') : (key === 'Z8' || key === 'R6528' || searchStr.includes('ลานกาง') || searchStr.includes('ground'));
-                                                
-                                                let available = 1;
-                                                if (availability && availability.roomAvailableCount && availability.roomAvailableCount[key] !== undefined) {
-                                                    available = parseInt(availability.roomAvailableCount[key]);
-                                                } else if (availability) {
-                                                     available = isSharedZone ? (availability.tentAvailable && availability.tentAvailable[key] !== undefined ? parseInt(availability.tentAvailable[key]) : parseInt(availability.zone8Available || 20)) : (availability.bookedRooms.includes(key) ? 0 : 1);
-                                                }
-                                                
-                                                const currentInCart = cart.filter(c => c.id === key).reduce((sum, c) => sum + parseInt(c.guests || 1), 0);
-                                                const remaining = isSharedZone ? Math.max(0, available - currentInCart) : available;
-                                                
-                                                const isBooked = availability && availability.bookedRooms && availability.bookedRooms.includes(key);
-                                                const inCart = cart.find(c => c.id === key);
-                                                
-                                                const disable = isBooked || (isSharedZone && remaining <= 0) || (!isSharedZone && inCart);
+                                {/* --- MAP VIEW --- */}
+                                {viewStyle === 'map' && (
+                                    <div className="map-container bg-blue-100 dark:bg-gray-700 mb-3 animate-pop" style={{paddingBottom: '100%'}}>
+                                        <img src={siteConfig?.roomImages?.['MAP_BG']?.[0] || "https://img2.pic.in.th/3d539b84-44ce-4336-ad90-bd2f84b13eca.jpg"} referrerPolicy="no-referrer" className="absolute top-0 left-0 w-full h-full object-cover" alt="Camp Map" />
+                                        {Object.keys(pinPos).map(key => {
+                                            if (!roomConfig[key]) return null;
+                                            const rConf = roomConfig[key];
+                                            const searchStr = rConf ? (rConf.type + " " + rConf.name).toLowerCase() : '';
+                                            const isSharedZone = rConf ? (rConf.type === 'ground') : (key === 'Z8' || key === 'R6528' || searchStr.includes('ลานกาง') || searchStr.includes('ground'));
+                                            
+                                            let available = 1;
+                                            if (availability && availability.roomAvailableCount && availability.roomAvailableCount[key] !== undefined) {
+                                                available = parseInt(availability.roomAvailableCount[key]);
+                                            } else if (availability) {
+                                                 available = isSharedZone ? (availability.tentAvailable && availability.tentAvailable[key] !== undefined ? parseInt(availability.tentAvailable[key]) : parseInt(availability.zone8Available || limit);
+                                            }
+                                            
+                                            const currentInCart = cart.filter(c => c.id === key).reduce((sum, c) => sum + parseInt(c.guests || 1), 0);
+                                            const remaining = isSharedZone ? Math.max(0, available - currentInCart) : available;
+                                            
+                                            const isBooked = availability && availability.bookedRooms && availability.bookedRooms.includes(key);
+                                            const inCart = cart.find(c => c.id === key);
+                                            
+                                            const disable = isBooked || (isSharedZone && remaining <= 0) || (!isSharedZone && inCart);
 
-                                                let circleClasses = "w-12 h-12 rounded-full flex items-center justify-center text-center text-[8px] font-bold border-2 shadow-lg p-1 leading-tight transition-all duration-300";
-                                                if (disable) circleClasses += " bg-gray-400 text-white border-gray-500 cursor-not-allowed opacity-80 grayscale";
-                                                else if (inCart) circleClasses += " bg-yellow-400 text-black border-yellow-600 scale-110 shadow-xl z-20";
-                                                else circleClasses += " bg-white dark:bg-gray-800 text-green-800 dark:text-green-400 border-green-600 hover:scale-110 z-10";
-                                                return ( 
-                                                    <div key={key} className="absolute transform -translate-x-1/2 -translate-y-1/2 map-pin-responsive" style={{left: `${pinPos[key].x}%`, top: `${pinPos[key].y}%`}} 
-                                                        onClick={() => { 
-                                                            if(disable) return; 
-                                                            if(inCart && !isSharedZone) setCart(cart.filter(c => c.id !== key)); 
-                                                            else openRoomModal(key); 
-                                                        }}> 
-                                                        <div className={circleClasses}> <div> {tData(roomConfig[key].name)} </div> </div> 
-                                                    </div> 
-                                                )
-                                            })}
-                                        </div>
-                                    )}
-
-                                    {/* --- LIST VIEW --- */}
-                                    {viewStyle === 'list' && (
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-pop">
-                                            {Object.keys(roomConfig).map(key => {
-                                                const rConf = roomConfig[key];
-                                                const searchStr = rConf ? (rConf.type + " " + rConf.name).toLowerCase() : '';
-                                                const isSharedZone = rConf ? (rConf.type === 'ground') : (key === 'Z8' || key === 'R6528' || searchStr.includes('ลานกาง') || searchStr.includes('ground'));
-                                                
-                                                let available = 1;
-                                                if (availability && availability.roomAvailableCount && availability.roomAvailableCount[key] !== undefined) {
-                                                    available = parseInt(availability.roomAvailableCount[key]);
-                                                } else if (availability) {
-                                                     available = isSharedZone ? (availability.tentAvailable && availability.tentAvailable[key] !== undefined ? parseInt(availability.tentAvailable[key]) : parseInt(availability.zone8Available || 20)) : (availability.bookedRooms.includes(key) ? 0 : 1);
-                                                }
-                                                
-                                                const currentInCart = cart.filter(c => c.id === key).reduce((sum, c) => sum + parseInt(c.guests || 1), 0);
-                                                const remaining = isSharedZone ? Math.max(0, available - currentInCart) : available;
-                                                
-                                                const isBooked = availability && availability.bookedRooms && availability.bookedRooms.includes(key);
-                                                const inCart = cart.find(c => c.id === key);
-                                                
-                                                const disable = isBooked || (isSharedZone && remaining <= 0) || (!isSharedZone && inCart);
-                                                
-                                                const priceInfo = typeof rConf.pricing === 'string' ? safeJsonParse(rConf.pricing, {}) : (rConf.pricing || {});
-                                                const startPrice = priceInfo.priceHead || (priceInfo.tiers && priceInfo.tiers.length > 0 ? priceInfo.tiers[0].price : 0);
-
-                                                return (
-                                                    <div key={key} onClick={() => {
-                                                        if(disable) return;
+                                            let circleClasses = "w-12 h-12 rounded-full flex items-center justify-center text-center text-[8px] font-bold border-2 shadow-lg p-1 leading-tight transition-all duration-300";
+                                            if (disable) circleClasses += " bg-gray-400 text-white border-gray-500 cursor-not-allowed opacity-80 grayscale";
+                                            else if (inCart) circleClasses += " bg-yellow-400 text-black border-yellow-600 scale-110 shadow-xl z-20";
+                                            else circleClasses += " bg-white dark:bg-gray-800 text-green-800 dark:text-green-400 border-green-600 hover:scale-110 z-10";
+                                            return ( 
+                                                <div key={key} className="absolute transform -translate-x-1/2 -translate-y-1/2 map-pin-responsive" style={{left: `${pinPos[key].x}%`, top: `${pinPos[key].y}%`}} 
+                                                    onClick={() => { 
+                                                        if(disable) return; 
                                                         if(inCart && !isSharedZone) setCart(cart.filter(c => c.id !== key)); 
-                                                        else openRoomModal(key);
-                                                    }} className={`flex bg-white dark:bg-gray-700 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-600 transition-all ${disable ? 'opacity-60 grayscale cursor-not-allowed' : inCart && !isSharedZone ? 'border-yellow-400 bg-yellow-50 dark:bg-yellow-900 cursor-pointer' : 'hover:shadow-md cursor-pointer hover:border-green-300'}`}>
-                                                        <div className="w-1/3 min-h-[110px] bg-gray-200 dark:bg-gray-600 relative">
-                                                            <img src={(siteConfig.roomImages[key]||[])[0] || 'https://via.placeholder.com/150?text=No+Image'} className="w-full h-full object-cover absolute inset-0" />
-                                                            {disable && <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-bold text-xs">{t('fullyBooked')}</div>}
+                                                        else openRoomModal(key); 
+                                                    }}> 
+                                                    <div className={circleClasses}> <div> {tData(roomConfig[key].name)} </div> </div> 
+                                                </div> 
+                                            )
+                                        })}
+                                    </div>
+                                )}
+
+                                {/* --- LIST VIEW --- */}
+                                {viewStyle === 'list' && (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-pop">
+                                        {Object.keys(roomConfig).map(key => {
+                                            const rConf = roomConfig[key];
+                                            const searchStr = rConf ? (rConf.type + " " + rConf.name).toLowerCase() : '';
+                                            const isSharedZone = rConf ? (rConf.type === 'ground') : (key === 'Z8' || key === 'R6528' || searchStr.includes('ลานกาง') || searchStr.includes('ground'));
+                                            
+                                            let available = 1;
+                                            if (availability && availability.roomAvailableCount && availability.roomAvailableCount[key] !== undefined) {
+                                                available = parseInt(availability.roomAvailableCount[key]);
+                                            } else if (availability) {
+                                                 available = isSharedZone ? (availability.tentAvailable && availability.tentAvailable[key] !== undefined ? parseInt(availability.tentAvailable[key]) : parseInt(availability.zone8Available || 20)) : (availability.bookedRooms.includes(key) ? 0 : 1);
+                                            }
+                                            
+                                            const currentInCart = cart.filter(c => c.id === key).reduce((sum, c) => sum + parseInt(c.guests || 1), 0);
+                                            const remaining = isSharedZone ? Math.max(0, available - currentInCart) : available;
+                                            
+                                            const isBooked = availability && availability.bookedRooms && availability.bookedRooms.includes(key);
+                                            const inCart = cart.find(c => c.id === key);
+                                            
+                                            const disable = isBooked || (isSharedZone && remaining <= 0) || (!isSharedZone && inCart);
+                                            
+                                            const priceInfo = typeof rConf.pricing === 'string' ? safeJsonParse(rConf.pricing, {}) : (rConf.pricing || {});
+                                            const startPrice = priceInfo.priceHead || (priceInfo.tiers && priceInfo.tiers.length > 0 ? priceInfo.tiers[0].price : 0);
+
+                                            return (
+                                                <div key={key} onClick={() => {
+                                                    if(disable) return;
+                                                    if(inCart && !isSharedZone) setCart(cart.filter(c => c.id !== key)); 
+                                                    else openRoomModal(key);
+                                                }} className={`flex bg-white dark:bg-gray-700 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-600 transition-all ${disable ? 'opacity-60 grayscale cursor-not-allowed' : inCart && !isSharedZone ? 'border-yellow-400 bg-yellow-50 dark:bg-yellow-900 cursor-pointer' : 'hover:shadow-md cursor-pointer hover:border-green-300'}`}>
+                                                    <div className="w-1/3 min-h-[110px] bg-gray-200 dark:bg-gray-600 relative">
+                                                        <img src={(siteConfig.roomImages[key]||[])[0] || 'https://via.placeholder.com/150?text=No+Image'} className="w-full h-full object-cover absolute inset-0" />
+                                                        {disable && <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-bold text-xs">{t('fullyBooked')}</div>}
+                                                    </div>
+                                                    <div className="w-2/3 p-3 flex flex-col justify-between">
+                                                        <div>
+                                                            <h3 className="font-bold text-sm text-gray-800 dark:text-white line-clamp-1">{tData(rConf.name)}</h3>
+                                                            <p className="text-[11px] text-gray-500 dark:text-gray-400 line-clamp-2 mt-1 leading-snug">{tData(siteConfig.roomDescriptions?.[key]) || t('noDesc')}</p>
                                                         </div>
-                                                        <div className="w-2/3 p-3 flex flex-col justify-between">
-                                                            <div>
-                                                                <h3 className="font-bold text-sm text-gray-800 dark:text-white line-clamp-1">{tData(rConf.name)}</h3>
-                                                                <p className="text-[11px] text-gray-500 dark:text-gray-400 line-clamp-2 mt-1 leading-snug">{tData(siteConfig.roomDescriptions?.[key]) || t('noDesc')}</p>
-                                                            </div>
-                                                            <div className="flex justify-between items-end mt-2">
-                                                                <div className="text-green-600 dark:text-green-400 font-bold text-sm">{formatMoney(startPrice)}฿<span className="text-[10px] font-normal text-gray-500 dark:text-gray-400">/{isSharedZone ? t('persons') : t('nightsUnit')}</span></div>
-                                                                {!disable ? (
-                                                                    inCart && !isSharedZone ? (
-                                                                        <span className="text-xs text-yellow-600 font-bold"><i className="fas fa-check"></i> {t('legendSelected')}</span>
-                                                                    ) : (
-                                                                        <button className="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-3 py-1 rounded-lg text-xs font-bold shadow-sm">{t('selectRoom')}</button>
-                                                                    )
+                                                        <div className="flex justify-between items-end mt-2">
+                                                            <div className="text-green-600 dark:text-green-400 font-bold text-sm">{formatMoney(startPrice)}฿<span className="text-[10px] font-normal text-gray-500 dark:text-gray-400">/{isSharedZone ? t('persons') : t('nightsUnit')}</span></div>
+                                                            {!disable ? (
+                                                                inCart && !isSharedZone ? (
+                                                                    <span className="text-xs text-yellow-600 font-bold"><i className="fas fa-check"></i> {t('legendSelected')}</span>
                                                                 ) : (
-                                                                    <span className="text-xs text-red-500 font-bold">{t('fullyBooked')}</span>
-                                                                )}
-                                                            </div>
+                                                                    <button className="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-3 py-1 rounded-lg text-xs font-bold shadow-sm">{t('selectRoom')}</button>
+                                                                )
+                                                            ) : (
+                                                                <span className="text-xs text-red-500 font-bold">{t('fullyBooked')}</span>
+                                                            )}
                                                         </div>
                                                     </div>
-                                                )
-                                            })}
-                                        </div>
-                                    )}
-
-                                    {/* --- TOGGLE VIEW BUTTONS --- */}
-                                    <div className="flex justify-center mt-4 mb-8">
-                                        <div className="flex bg-gray-100 dark:bg-gray-700 p-1.5 rounded-full shadow-inner">
-                                            <button onClick={() => setViewStyle('map')} className={`px-6 py-2 text-sm rounded-full font-bold transition-all flex items-center ${viewStyle === 'map' ? 'bg-white dark:bg-gray-800 text-green-700 dark:text-green-400 shadow-md' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>
-                                                <i className="fas fa-map-marked-alt mr-2"></i> {t('mapView')}
-                                            </button>
-                                            <button onClick={() => setViewStyle('list')} className={`px-6 py-2 text-sm rounded-full font-bold transition-all flex items-center ${viewStyle === 'list' ? 'bg-white dark:bg-gray-800 text-green-700 dark:text-green-400 shadow-md' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>
-                                                <i className="fas fa-th-list mr-2"></i> {t('listView')}
-                                            </button>
-                                        </div>
+                                                </div>
+                                            )
+                                        })}
                                     </div>
+                                )}
 
-                                    {/* --- PRE-ORDER FOOD --- */}
-                                    <div className="bg-gray-50 dark:bg-gray-700/50 p-4 -mx-4 sm:mx-0 sm:rounded-2xl mb-8">
-                                        <h3 className="font-bold mb-4 dark:text-white text-lg px-2"><i className="fas fa-utensils text-orange-500 mr-2"></i>{t('preOrderFood')}</h3>
-                                        <div className="grid grid-cols-2 gap-3 px-2 sm:px-0">
-                                            {siteConfig.foodMenu.map(f => {
-                                                const inCartItems = cart.filter(c => c.id === f.id && c.type === 'food');
-                                                const inCartCount = inCartItems.reduce((sum, item) => sum + item.qty, 0);
-                                                
-                                                return ( 
-                                                    <div key={f.id} onClick={() => openFoodModal(f)} className={`cursor-pointer rounded-xl overflow-hidden border transition-all shadow-sm relative ${inCartCount > 0 ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900 dark:border-yellow-500' : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-green-400'}`} > 
-                                                        <img src={f.img} className="w-full h-24 object-cover" /> 
-                                                        <div className="p-2.5"> 
-                                                            <h4 className="font-bold text-sm text-gray-800 dark:text-white line-clamp-1">{tData(f.name)}</h4> 
-                                                            {f.desc && <p className="text-[10px] text-gray-500 dark:text-gray-400 line-clamp-1 my-1">{tData(f.desc)}</p>} 
-                                                            <div className="flex justify-between items-center mt-1.5"> 
-                                                                <span className="text-green-600 dark:text-green-400 text-sm font-bold">{f.price} ฿</span> 
-                                                                {inCartCount > 0 ? (
-                                                                    <span className="bg-yellow-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">x{inCartCount}</span>
-                                                                ) : (
-                                                                    <span className="text-gray-300 dark:text-gray-500 text-xs"><i className="fas fa-plus-circle"></i></span>
-                                                                )}
-                                                            </div> 
+                                {/* --- TOGGLE VIEW BUTTONS --- */}
+                                <div className="flex justify-center mt-4 mb-8">
+                                    <div className="flex bg-gray-100 dark:bg-gray-700 p-1.5 rounded-full shadow-inner">
+                                        <button onClick={() => setViewStyle('map')} className={`px-6 py-2 text-sm rounded-full font-bold transition-all flex items-center ${viewStyle === 'map' ? 'bg-white dark:bg-gray-800 text-green-700 dark:text-green-400 shadow-md' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>
+                                            <i className="fas fa-map-marked-alt mr-2"></i> {t('mapView')}
+                                        </button>
+                                        <button onClick={() => setViewStyle('list')} className={`px-6 py-2 text-sm rounded-full font-bold transition-all flex items-center ${viewStyle === 'list' ? 'bg-white dark:bg-gray-800 text-green-700 dark:text-green-400 shadow-md' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>
+                                            <i className="fas fa-th-list mr-2"></i> {t('listView')}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* --- PRE-ORDER FOOD --- */}
+                                <div className="bg-gray-50 dark:bg-gray-700/50 p-4 -mx-4 sm:mx-0 sm:rounded-2xl mb-8">
+                                    <h3 className="font-bold mb-4 dark:text-white text-lg px-2"><i className="fas fa-utensils text-orange-500 mr-2"></i>{t('preOrderFood')}</h3>
+                                    <div className="grid grid-cols-2 gap-3 px-2 sm:px-0">
+                                        {siteConfig.foodMenu.map(f => {
+                                            const inCartItems = cart.filter(c => c.id === f.id && c.type === 'food');
+                                            const inCartCount = inCartItems.reduce((sum, item) => sum + item.qty, 0);
+                                            
+                                            return ( 
+                                                <div key={f.id} onClick={() => openFoodModal(f)} className={`cursor-pointer rounded-xl overflow-hidden border transition-all shadow-sm relative ${inCartCount > 0 ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900 dark:border-yellow-500' : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-green-400'}`} > 
+                                                    <img src={f.img} className="w-full h-24 object-cover" /> 
+                                                    <div className="p-2.5"> 
+                                                        <h4 className="font-bold text-sm text-gray-800 dark:text-white line-clamp-1">{tData(f.name)}</h4> 
+                                                        {f.desc && <p className="text-[10px] text-gray-500 dark:text-gray-400 line-clamp-1 my-1">{tData(f.desc)}</p>} 
+                                                        <div className="flex justify-between items-center mt-1.5"> 
+                                                            <span className="text-green-600 dark:text-green-400 text-sm font-bold">{f.price} ฿</span> 
+                                                            {inCartCount > 0 ? (
+                                                                <span className="bg-yellow-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">x{inCartCount}</span>
+                                                            ) : (
+                                                                <span className="text-gray-300 dark:text-gray-500 text-xs"><i className="fas fa-plus-circle"></i></span>
+                                                            )}
                                                         </div> 
                                                     </div> 
-                                                );
-                                            })}
-                                        </div>
+                                                </div> 
+                                            );
+                                        })}
                                     </div>
-
-                                    {/* --- CART SUMMARY --- */}
-                                    <div className="bg-gray-100 dark:bg-gray-700/80 p-5 rounded-2xl mb-8 border border-gray-200 dark:border-gray-600">
-                                        <h3 className="font-bold dark:text-white text-lg mb-3 border-b border-gray-200 dark:border-gray-600 pb-2">{t('cart')} ({cart.length})</h3> 
-                                        {cart.length === 0 && <p className="text-sm text-gray-400 text-center py-4">ตะกร้าว่างเปล่า</p>}
-                                        {cart.map((c,i)=>
-                                            <div key={i} className="flex justify-between items-center text-sm mt-2 dark:text-gray-200 bg-white dark:bg-gray-800 p-2.5 rounded-lg shadow-sm">
-                                                <span className="font-medium">{tData(c.name)} {c.type==='food'?<span className="text-orange-500 font-bold ml-1">x{c.qty}</span>:<span className="text-blue-500 ml-1">({c.guests} {t('persons')})</span>}</span>
-                                                <button onClick={()=>setCart(cart.filter((_,idx)=>idx!==i))} className="text-red-500 hover:text-red-700 w-8 h-8 flex items-center justify-center bg-red-50 dark:bg-red-900/30 rounded-full"><i className="fas fa-trash-alt"></i></button>
-                                            </div>
-                                        )} 
-                                    </div>
-                                    
-                                    <button onClick={() => { const hasRoom = cart.some(c => c.type !== 'food'); if (!hasRoom) { setShowRoomRequiredModal(true); return; } setStep(3); }} className="w-full bg-green-600 text-white p-4 rounded-xl font-bold shadow-lg text-lg hover:bg-green-700 transition transform active:scale-95"> 
-                                        {t('continueBtn')} <i className="fas fa-arrow-right ml-2"></i>
-                                    </button>
                                 </div>
+
+                                {/* --- CART SUMMARY --- */}
+                                <div className="bg-gray-100 dark:bg-gray-700/80 p-5 rounded-2xl mb-8 border border-gray-200 dark:border-gray-600">
+                                    <h3 className="font-bold dark:text-white text-lg mb-3 border-b border-gray-200 dark:border-gray-600 pb-2">{t('cart')} ({cart.length})</h3> 
+                                    {cart.length === 0 && <p className="text-sm text-gray-400 text-center py-4">ตะกร้าว่างเปล่า</p>}
+                                    {cart.map((c,i)=>
+                                        <div key={i} className="flex justify-between items-center text-sm mt-2 dark:text-gray-200 bg-white dark:bg-gray-800 p-2.5 rounded-lg shadow-sm">
+                                            <span className="font-medium">{tData(c.name)} {c.type==='food'?<span className="text-orange-500 font-bold ml-1">x{c.qty}</span>:<span className="text-blue-500 ml-1">({c.guests} {t('persons')})</span>}</span>
+                                            <button onClick={()=>setCart(cart.filter((_,idx)=>idx!==i))} className="text-red-500 hover:text-red-700 w-8 h-8 flex items-center justify-center bg-red-50 dark:bg-red-900/30 rounded-full"><i className="fas fa-trash-alt"></i></button>
+                                        </div>
+                                    )} 
+                                </div>
+                                
+                                <button onClick={() => { const hasRoom = cart.some(c => c.type !== 'food'); if (!hasRoom) { setShowRoomRequiredModal(true); return; } setStep(3); }} className="w-full bg-green-600 text-white p-4 rounded-xl font-bold shadow-lg text-lg hover:bg-green-700 transition transform active:scale-95"> 
+                                    {t('continueBtn')} <i className="fas fa-arrow-right ml-2"></i>
+                                </button>
                             </div>
                         )}
 
                         {/* ROOM MODAL */}
                         {selectedRoomId && roomConfig[selectedRoomId] && (
-                            <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm transition-opacity">
+                            <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm transition-opacity">
                                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm relative animate-pop overflow-hidden">
                                     <div className="relative w-full h-56 -mt-6 -mx-6 mb-4 bg-gray-200">
                                         <img src={(siteConfig.roomImages[selectedRoomId]||[])[currentImgIdx] || "https://via.placeholder.com/600x400?text=No+Image"} className="w-full h-full object-cover transition-opacity duration-300" />
@@ -1363,6 +1384,19 @@
                             </div>
                         )}
 
+                        {/* --- STEP 5: SUCCESS --- */}
+                        {mode === 'booking' && step === 5 && (
+                            <div className="max-w-md mx-auto p-8 pt-16 text-center bg-white dark:bg-gray-800 shadow-xl sm:rounded-2xl sm:my-8 min-h-screen sm:min-h-[auto] flex flex-col justify-center">
+                                <div className="w-20 h-20 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-6 text-green-500 text-4xl shadow-inner animate-pop"><i className="fas fa-check"></i></div>
+                                <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">{t('bookingSuccessTitle')}</h2>
+                                <p className="text-gray-600 dark:text-gray-300 mb-6">{t('bookingIdText')} <span className="font-bold text-green-600">{bookingResult}</span></p>
+                                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg text-sm text-gray-700 dark:text-gray-300 mb-6 whitespace-pre-line">
+                                    {t('successMessage')}
+                                </div>
+                                <button onClick={() => window.location.reload()} className="w-full bg-gray-800 dark:bg-gray-600 text-white p-3 rounded-lg hover:bg-gray-700 transition font-bold shadow">{t('backToHome')}</button>
+                            </div>
+                        )}
+
                         {/* --- MODALS (Food, etc.) --- */}
                         {selectedFood && (
                             <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm transition-opacity">
@@ -1406,6 +1440,10 @@
                             </div>
                         )}
                         
+                        {closedModal && ( <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-6 backdrop-blur-sm"> <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center relative animate-pop"> <div className="w-16 h-16 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center mx-auto mb-4"> <i className="fas fa-ban text-3xl text-red-500 dark:text-red-300"></i> </div> <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">วันปิดให้บริการ</h3> <p className="text-gray-600 dark:text-gray-300 mb-1">วันที่ <strong>{formatDateLocalized(closedModal.date)}</strong></p> <p className="text-red-500 dark:text-red-400 font-medium mb-6">"{closedModal.reason}"</p> <button onClick={() => setClosedModal(null)} className="w-full bg-gray-800 dark:bg-gray-600 text-white py-3.5 rounded-xl font-bold hover:bg-gray-700 transition text-lg">เลือกวันใหม่</button> </div> </div> )}
+                        
+                        {searchError && ( <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-6 backdrop-blur-sm"> <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center relative animate-pop"> <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center mx-auto mb-4"> <i className="fas fa-exclamation-triangle text-3xl text-yellow-500 dark:text-yellow-300"></i> </div> <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{t('notice')}</h3> <p className="text-gray-600 dark:text-gray-300 mb-6 text-sm">{searchError}</p> <button onClick={() => setSearchError(null)} className="w-full bg-yellow-500 text-white py-3.5 rounded-xl font-bold hover:bg-yellow-600 transition text-lg">{t('ok')}</button> </div> </div> )}
+                        
                         {modalAlert.show && ( 
                             <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity"> 
                                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-pop"> 
@@ -1425,7 +1463,7 @@
                         
                         {modalConfirm.show && ( 
                             <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity"> 
-                                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-pop"> 
+                                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-xs overflow-hidden animate-pop"> 
                                     <div className="p-6 text-center"> 
                                         <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-blue-100 text-blue-500"> 
                                             <i className="fas fa-question text-3xl"></i> 
