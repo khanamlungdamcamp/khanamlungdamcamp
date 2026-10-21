@@ -2,9 +2,31 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ขนำลุงดำ แคมป์ปิ้ง - จองที่พัก</title>
     
+    <!-- ========================================== -->
+    <!-- 1. Open Graph Tags (สำหรับแชร์ลิงก์ให้สวยงาม) -->
+    <!-- ========================================== -->
+    <meta property="og:title" content="ขนำลุงดำ แคมป์ปิ้ง - จองที่พัก" />
+    <meta property="og:description" content="🏕️ ขนำลุงดำ แคมป์ปิ้ง ดั้งเดิมมาจากหนำปู่ บริการที่พัก ลานกางเต็นท์ ริมน้ำ บรรยากาศสุดชิล สงขลา" />
+    <meta property="og:image" content="https://img5.pic.in.th/file/secure-sv1/LINE_ALBUM__240916_14dd72f9bd7de4facf.jpg" />
+    <meta property="og:url" content="https://khanamlungdamcamp.github.io/khanamlungdamcamp/index.html" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- ========================================== -->
+    <!-- 2. PWA & Web App Meta Tags (เปลี่ยนเว็บเป็นแอป) -->
+    <!-- ========================================== -->
+    <meta name="theme-color" content="#16a34a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="ขนำลุงดำ" />
+    <!-- โลโก้แอปสำหรับ iOS / Android (Add to Home Screen) -->
+    <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/pw/AP1GczPi_rYAbsNGi4X96mW5koYl0JJ3BN9ipRf6UgsXAOQgkyhrs2ChGcZlbsuQ3OLJOYnYhSTYJhWUuu2hwWtPqlt4MUfdUDSS3s4RdRLeD36gPLiK-8OhYLXWmqxVLh2eOtkLIx7pQxrQA6ZnqBYHOftH=w913-h913-s-no-gm" />
+    <!-- ข้อมูล PWA Manifest แบบ Inline (ฝังไฟล์ ไม่ต้องโหลดเพิ่ม) -->
+    <link rel="manifest" href='data:application/manifest+json,{"name":"ขนำลุงดำ แคมป์ปิ้ง","short_name":"ขนำลุงดำ","display":"standalone","background_color":"#f3f4f6","theme_color":"#16a34a","start_url":".","icons":[{"src":"https://lh3.googleusercontent.com/pw/AP1GczPi_rYAbsNGi4X96mW5koYl0JJ3BN9ipRf6UgsXAOQgkyhrs2ChGcZlbsuQ3OLJOYnYhSTYJhWUuu2hwWtPqlt4MUfdUDSS3s4RdRLeD36gPLiK-8OhYLXWmqxVLh2eOtkLIx7pQxrQA6ZnqBYHOftH=w913-h913-s-no-gm","sizes":"512x512","type":"image/png"}]}' />
+
     <!-- Preconnect ช่วยเพิ่มความเร็วในการโหลดทรัพยากร -->
     <link rel="preconnect" href="https://script.google.com" crossorigin>
     <link rel="preconnect" href="https://unpkg.com" crossorigin>
@@ -226,9 +248,7 @@
                 slipWarningNoQR: "⚠️ No QR Code detected. Admin will verify manually.",
                 slipWarningWrongQR: "⚠️ This slip might not belong to our account. Please verify!",
                 slipValid: "✅ Valid slip (Merchant QR detected)",
-                // Calendar Translation
-                selectDates: "Select Dates (Check-in & Check-out)",
-                clearDates: "Clear",
+                selectDates: "Select Dates (Check-in & Check-out)", clearDates: "Clear",
                 legendAvailable: "Available", legendSelected: "Selected", legendSpecial: "High Season", legendClosed: "Closed", legendFull: "Fully Booked",
                 errCrossClosed: "Your selected range includes closed dates. Please select again.",
                 errFullyBookedDate: "The selected date is fully booked. Please select another date.",
@@ -245,7 +265,6 @@
 
         const formatMoney = (val) => Number(val || 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
         
-        // Helper ป้องกันปัญหา Timezone ฝั่ง JS เวลาสร้าง Date()
         const toLocalISOString = (d) => {
             const z = n => ('0' + n).slice(-2);
             return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}`;
@@ -353,14 +372,12 @@
                 if (dateStr <= todayStr) return; 
                 
                 if (!dates.checkIn || (dates.checkIn && dates.checkOut)) {
-                    // คลิกครั้งแรก (เลือกวัน Check-In) -> ถ้าวันนั้นเต็มห้ามคลิก
                     if (fullyBookedDates.includes(dateStr)) {
                         setModalAlert({ show: true, type: 'warning', title: t('notice'), text: t('errFullyBookedDate') });
                         return;
                     }
                     setDates({ checkIn: dateStr, checkOut: '' });
                 } else {
-                    // คลิกครั้งที่สอง (เลือกวัน Check-Out)
                     if (dateStr > dates.checkIn) {
                         let current = new Date(dates.checkIn);
                         let end = new Date(dateStr);
@@ -371,7 +388,6 @@
 
                         while(current < end) {
                             const dStr = toLocalISOString(current);
-                            // ถ้าช่วงที่ลากคร่อมมีวันปิดร้าน หรือ วันที่เต็มแล้ว ให้แจ้งเตือนและยกเลิก
                             if (closedDates.some(c => c.date === dStr) || fullyBookedDates.includes(dStr)) {
                                 hasIssue = true; break;
                             }
@@ -380,12 +396,11 @@
                         
                         if(hasIssue) {
                             setModalAlert({ show: true, type: 'error', title: t('error'), text: t('errCrossClosed') });
-                            setDates({ checkIn: dateStr, checkOut: '' }); // รีเซ็ตให้เลือกใหม่
+                            setDates({ checkIn: dateStr, checkOut: '' });
                         } else {
                             setDates({ ...dates, checkOut: dateStr });
                         }
                     } else {
-                        // เลือดย้อนหลัง -> รีเซ็ตเป็นวัน Check-In ใหม่
                         if (fullyBookedDates.includes(dateStr)) {
                             setModalAlert({ show: true, type: 'warning', title: t('notice'), text: t('errFullyBookedDate') });
                             return;
@@ -552,7 +567,6 @@
             const [modalAlert, setModalAlert] = React.useState({ show: false, type: 'info', title: '', text: '' }); 
             const [modalConfirm, setModalConfirm] = React.useState({ show: false, title: '', text: '', onConfirm: null });
 
-            // Scroll to Top on Step/Mode Change
             React.useEffect(() => {
                 window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
             }, [step, mode, manageTab]);
@@ -1168,9 +1182,13 @@
 
                         {mode === 'booking' && step === 2 && (
                             <div className="max-w-4xl mx-auto p-4 pt-6 sm:pt-8 relative min-h-screen bg-white dark:bg-gray-800 sm:rounded-2xl sm:my-8 shadow-xl">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <button onClick={()=>setStep(1)} className="text-gray-500 dark:text-gray-300 hover:text-green-600 font-bold text-lg"><i className="fas fa-chevron-left"></i></button>
-                                    <h2 className="text-xl font-bold dark:text-white">{t('selectRoom')}</h2>
+                                <div className="flex justify-between items-center mb-4">
+                                    <div className="flex items-center gap-2">
+                                        <button onClick={()=>setStep(1)} className="text-gray-500 dark:text-gray-300 hover:text-green-600 font-bold">
+                                            <i className="fas fa-chevron-left"></i> {t('back')}
+                                        </button>
+                                        <h2 className="text-xl font-bold dark:text-white hidden sm:block">{t('selectRoom')}</h2>
+                                    </div>
                                 </div>
                                 
                                 {/* --- MAP VIEW --- */}
@@ -1359,7 +1377,7 @@
                         )}
 
                         {mode === 'booking' && step === 3 && (
-                            <div className="max-w-md mx-auto p-6 pt-16 bg-white dark:bg-gray-800 shadow-xl rounded-xl">
+                            <div className="max-w-md mx-auto p-6 pt-16 bg-white dark:bg-gray-800 shadow-xl sm:rounded-2xl sm:my-8 min-h-screen sm:min-h-[auto]">
                                 <div className="flex items-center gap-2 mb-4"><button onClick={()=>setStep(2)} className="text-gray-500 dark:text-gray-300 hover:text-green-600 font-bold text-sm"><i className="fas fa-chevron-left"></i> {t('back')}</button><h2 className="text-xl font-bold dark:text-white">{t('summaryPayment')}</h2></div>
                                 <div className="space-y-2 mb-4 text-sm dark:text-gray-200">
                                     <p><strong>{t('checkIn')}</strong> {formatDateLocalized(dates.checkIn)}</p>
@@ -1430,7 +1448,7 @@
                         )}
 
                         {mode === 'booking' && step === 5 && (
-                            <div className="max-w-md mx-auto p-8 pt-16 text-center bg-white dark:bg-gray-800 shadow-xl rounded-xl">
+                            <div className="max-w-md mx-auto p-8 pt-16 text-center bg-white dark:bg-gray-800 shadow-xl sm:rounded-2xl sm:my-8 min-h-screen sm:min-h-[auto] flex flex-col justify-center">
                                 <div className="w-20 h-20 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-6 text-green-500 text-4xl shadow-inner animate-pop"><i className="fas fa-check"></i></div>
                                 <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">{t('bookingSuccessTitle')}</h2>
                                 <p className="text-gray-600 dark:text-gray-300 mb-6">{t('bookingIdText')} <span className="font-bold text-green-600">{bookingResult}</span></p>
