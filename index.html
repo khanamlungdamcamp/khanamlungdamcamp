@@ -186,9 +186,13 @@
                 slipWarningNoQR: "⚠️ ตรวจไม่พบ QR Code ในสลิป แอดมินจะตรวจสอบอีกครั้ง",
                 slipWarningWrongQR: "⚠️ สลิปนี้อาจไม่ใช่การโอนเข้าบัญชีขนำลุงดำ โปรดตรวจสอบอีกครั้ง!",
                 slipValid: "✅ สลิปถูกต้อง (ตรวจพบ QR Code บัญชีร้านค้า)",
-                selectDates: "เลือกวันเข้าพัก (เช็คอิน - เช็คเอาท์)", clearDates: "ล้างข้อมูล",
-                legendAvailable: "ว่าง", legendSelected: "เลือก", legendSpecial: "วันพิเศษ/เทศกาล", legendClosed: "ปิดบริการ",
-                errCrossClosed: "มีวันปิดทำการอยู่ในช่วงที่คุณเลือก กรุณาเลือกใหม่ครับ"
+                // Calendar & View Translation
+                selectDates: "เลือกวันเข้าพัก (เช็คอิน - เช็คเอาท์)",
+                clearDates: "ล้างข้อมูล",
+                legendAvailable: "ว่าง", legendSelected: "เลือก", legendSpecial: "วันพิเศษ/เทศกาล", legendClosed: "ปิดบริการ", legendFull: "ที่พักเต็ม",
+                errCrossClosed: "มีวันปิดทำการอยู่ในช่วงที่คุณเลือก กรุณาเลือกใหม่ครับ",
+                errFullyBookedDate: "วันที่คุณเลือกที่พักเต็มหมดแล้วครับ กรุณาเลือกวันอื่น",
+                mapView: "ดูแผนที่", listView: "ดูรายการ", fullyBooked: "เต็มแล้ว"
             },
             en: {
                 back: "Back", cancel: "Cancel", confirm: "Confirm", ok: "OK", delete: "Remove",
@@ -222,9 +226,12 @@
                 slipWarningNoQR: "⚠️ No QR Code detected. Admin will verify manually.",
                 slipWarningWrongQR: "⚠️ This slip might not belong to our account. Please verify!",
                 slipValid: "✅ Valid slip (Merchant QR detected)",
+                // Calendar & View Translation
                 selectDates: "Select Dates (Check-in & Check-out)", clearDates: "Clear",
-                legendAvailable: "Available", legendSelected: "Selected", legendSpecial: "High Season", legendClosed: "Closed",
-                errCrossClosed: "Your selected range includes closed dates. Please select again."
+                legendAvailable: "Available", legendSelected: "Selected", legendSpecial: "High Season", legendClosed: "Closed", legendFull: "Fully Booked",
+                errCrossClosed: "Your selected range includes closed dates. Please select again.",
+                errFullyBookedDate: "The selected date is fully booked. Please select another date.",
+                mapView: "Map View", listView: "List View", fullyBooked: "Fully Booked"
             }
         };
 
@@ -315,7 +322,7 @@
         // ==========================================
         // COMPONENT: Custom Date Range Picker Calendar
         // ==========================================
-        const DateRangePicker = ({ dates, setDates, closedDates, specialDates, lang, t, setModalAlert, formatDateLocalized }) => {
+        const DateRangePicker = ({ dates, setDates, closedDates, specialDates, fullyBookedDates, lang, t, setModalAlert, formatDateLocalized }) => {
             const [viewDate, setViewDate] = React.useState(new Date());
             
             const today = new Date();
@@ -344,31 +351,43 @@
                 if (dateStr <= todayStr) return; 
                 
                 if (!dates.checkIn || (dates.checkIn && dates.checkOut)) {
+                    // คลิกครั้งแรก (เลือกวัน Check-In) -> ถ้าวันนั้นเต็มห้ามคลิก
+                    if (fullyBookedDates.includes(dateStr)) {
+                        setModalAlert({ show: true, type: 'warning', title: t('notice'), text: t('errFullyBookedDate') });
+                        return;
+                    }
                     setDates({ checkIn: dateStr, checkOut: '' });
                 } else {
+                    // คลิกครั้งที่สอง (เลือกวัน Check-Out)
                     if (dateStr > dates.checkIn) {
                         let current = new Date(dates.checkIn);
                         let end = new Date(dateStr);
-                        let hasClosed = false;
+                        let hasIssue = false;
                         
                         current = new Date(current.getTime() + Math.abs(current.getTimezoneOffset() * 60000));
                         end = new Date(end.getTime() + Math.abs(end.getTimezoneOffset() * 60000));
 
                         while(current < end) {
                             const dStr = toLocalISOString(current);
-                            if (closedDates.some(c => c.date === dStr)) {
-                                hasClosed = true; break;
+                            // ถ้าช่วงที่ลากคร่อมมีวันปิดร้าน หรือ วันที่เต็มแล้ว ให้แจ้งเตือนและยกเลิก
+                            if (closedDates.some(c => c.date === dStr) || fullyBookedDates.includes(dStr)) {
+                                hasIssue = true; break;
                             }
                             current.setDate(current.getDate() + 1);
                         }
                         
-                        if(hasClosed) {
+                        if(hasIssue) {
                             setModalAlert({ show: true, type: 'error', title: t('error'), text: t('errCrossClosed') });
-                            setDates({ checkIn: dateStr, checkOut: '' });
+                            setDates({ checkIn: dateStr, checkOut: '' }); // รีเซ็ตให้เลือกใหม่
                         } else {
                             setDates({ ...dates, checkOut: dateStr });
                         }
                     } else {
+                        // เลือดย้อนหลัง -> รีเซ็ตเป็นวัน Check-In ใหม่
+                        if (fullyBookedDates.includes(dateStr)) {
+                            setModalAlert({ show: true, type: 'warning', title: t('notice'), text: t('errFullyBookedDate') });
+                            return;
+                        }
                         setDates({ checkIn: dateStr, checkOut: '' });
                     }
                 }
@@ -389,6 +408,7 @@
                     
                     const isPast = dateStr <= todayStr;
                     const isClosed = closedDates.some(c => c.date === dateStr);
+                    const isFull = fullyBookedDates.includes(dateStr);
                     const isSpecial = specialDates.some(s => s.date === dateStr);
                     
                     const isCheckIn = dates.checkIn === dateStr;
@@ -405,6 +425,8 @@
                         baseClasses += "bg-green-600 text-white font-bold shadow-md transform scale-110 ";
                     } else if (isInBetween) {
                         baseClasses += "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 ";
+                    } else if (isFull) {
+                        baseClasses += "bg-gray-100 dark:bg-gray-700/50 text-gray-400 dark:text-gray-500 cursor-not-allowed ";
                     } else {
                         baseClasses += "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 ";
                     }
@@ -451,9 +473,10 @@
                             <span><b>In:</b> {dates.checkIn ? formatDateLocalized(dates.checkIn) : '-'}</span>
                             <span><b>Out:</b> {dates.checkOut ? formatDateLocalized(dates.checkOut) : '-'}</span>
                         </div>
-                        <div className="flex justify-center gap-3 text-[10px] text-gray-500 dark:text-gray-400 mt-1">
+                        <div className="flex justify-center flex-wrap gap-x-3 gap-y-2 text-[10px] text-gray-500 dark:text-gray-400 mt-1">
                             <span className="flex items-center"><div className="w-2 h-2 rounded-full bg-green-600 mr-1"></div>{t('legendSelected')}</span>
                             <span className="flex items-center"><div className="w-2 h-2 rounded-full bg-orange-400 mr-1"></div>{t('legendSpecial')}</span>
+                            <span className="flex items-center"><div className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600 mr-1"></div>{t('legendFull')}</span>
                             <span className="flex items-center"><div className="w-2 h-2 rounded-full bg-red-100 border border-red-300 mr-1"></div>{t('legendClosed')}</span>
                         </div>
                     </div>
@@ -476,6 +499,8 @@
                 const params = new URLSearchParams(window.location.search);
                 return params.get('mode') === 'manage' ? 'manage' : 'booking';
             }); 
+            
+            const [viewStyle, setViewStyle] = React.useState('map'); // 'map' or 'list'
 
             const [isInitializing, setIsInitializing] = React.useState(true); 
             const [dates, setDates] = React.useState({ checkIn: '', checkOut: '' });
@@ -487,7 +512,7 @@
             const [pinPos, setPinPos] = React.useState(DEFAULT_POSITIONS);
             
             const [roomConfig, setRoomConfig] = React.useState({});
-            const [systemSettings, setSystemSettings] = React.useState({ closed: [], special: [] });
+            const [systemSettings, setSystemSettings] = React.useState({ closed: [], special: [], fullyBookedDates: [] });
             const [siteConfig, setSiteConfig] = React.useState(DEFAULT_CONFIG);
 
             const [discount, setDiscount] = React.useState({ code: '', val: 0, type: '', message: '', status: '' });
@@ -671,7 +696,7 @@
                 if (cachedData) {
                     try {
                         const parsed = JSON.parse(cachedData);
-                        setSystemSettings({ closed: parsed.settings.closed, special: parsed.settings.special });
+                        setSystemSettings({ closed: parsed.settings.closed, special: parsed.settings.special, fullyBookedDates: parsed.settings.fullyBookedDates || [] });
                         setSiteConfig(prev => ({ ...prev, ...parsed.siteConfig }));
                         setRoomConfig(parsed.roomConfig);
                         setPinPos(parsed.mapConfig);
@@ -684,7 +709,7 @@
                 fetchWithTimeout(`${GOOGLE_SCRIPT_URL}?action=getInitialData`).then(r => r.json()).then(res => {
                     if (res.status === 'success') {
                         const { settings, siteConfig, roomConfig, mapConfig } = res.data;
-                        setSystemSettings({ closed: settings.closed, special: settings.special });
+                        setSystemSettings({ closed: settings.closed, special: settings.special, fullyBookedDates: settings.fullyBookedDates || [] });
                         setSiteConfig(prev => ({ ...prev, ...siteConfig }));
                         setRoomConfig(roomConfig);
                         setPinPos(mapConfig);
@@ -1126,6 +1151,7 @@
                                             setDates={setDates} 
                                             closedDates={systemSettings.closed || []} 
                                             specialDates={systemSettings.special || []} 
+                                            fullyBookedDates={systemSettings.fullyBookedDates || []}
                                             lang={lang} 
                                             t={t}
                                             setModalAlert={setModalAlert}
@@ -1140,55 +1166,137 @@
 
                         {mode === 'booking' && step === 2 && (
                             <div className="max-w-4xl mx-auto p-4 pt-6 sm:pt-8 relative min-h-screen bg-white dark:bg-gray-800 sm:rounded-2xl sm:my-8 shadow-xl">
-                                <div className="flex justify-between items-center mb-4"><div className="flex items-center gap-2"><button onClick={()=>setStep(1)} className="text-gray-500 dark:text-gray-300 hover:text-green-600 font-bold"><i className="fas fa-chevron-left"></i> {t('back')}</button><h2 className="text-xl font-bold dark:text-white">{t('selectRoom')}</h2></div></div>
-                                <div className="map-container bg-blue-100 dark:bg-gray-700 mb-6" style={{paddingBottom: '100%'}}>
-                                    <img src={siteConfig?.roomImages?.['MAP_BG']?.[0] || "https://img2.pic.in.th/3d539b84-44ce-4336-ad90-bd2f84b13eca.jpg"} referrerPolicy="no-referrer" className="absolute top-0 left-0 w-full h-full object-cover" alt="Camp Map" />
-                                    {Object.keys(pinPos).map(key => {
-                                        if (!roomConfig[key]) return null;
-                                        const rConf = roomConfig[key];
-                                        const searchStr = rConf ? (rConf.type + " " + rConf.name).toLowerCase() : '';
-                                        const isSharedZone = rConf ? (rConf.type === 'ground') : (key === 'Z8' || key === 'R6528' || searchStr.includes('ลานกาง') || searchStr.includes('ground'));
-                                        
-                                        let available = 1;
-                                        if (availability && availability.roomAvailableCount && availability.roomAvailableCount[key] !== undefined) {
-                                            available = parseInt(availability.roomAvailableCount[key]);
-                                        } else if (availability) {
-                                             available = isSharedZone ? (availability.tentAvailable && availability.tentAvailable[key] !== undefined ? parseInt(availability.tentAvailable[key]) : parseInt(availability.zone8Available || 20)) : (availability.bookedRooms.includes(key) ? 0 : 1);
-                                        }
-                                        
-                                        const currentInCart = cart.filter(c => c.id === key).reduce((sum, c) => sum + parseInt(c.guests || 1), 0);
-                                        const remaining = isSharedZone ? Math.max(0, available - currentInCart) : available;
-                                        
-                                        const isBooked = availability && availability.bookedRooms && availability.bookedRooms.includes(key);
-                                        const inCart = cart.find(c => c.id === key);
-                                        
-                                        const disable = isBooked || (isSharedZone && remaining <= 0) || (!isSharedZone && inCart);
-
-                                        let circleClasses = "w-12 h-12 rounded-full flex items-center justify-center text-center text-[8px] font-bold border-2 shadow-lg p-1 leading-tight transition-all duration-300";
-                                        if (disable) circleClasses += " bg-gray-400 text-white border-gray-500 cursor-not-allowed opacity-80 grayscale";
-                                        else if (inCart) circleClasses += " bg-yellow-400 text-black border-yellow-600 scale-110 shadow-xl z-20";
-                                        else circleClasses += " bg-white dark:bg-gray-800 text-green-800 dark:text-green-400 border-green-600 hover:scale-110 z-10";
-                                        return ( 
-                                            <div key={key} className="absolute transform -translate-x-1/2 -translate-y-1/2 map-pin-responsive" style={{left: `${pinPos[key].x}%`, top: `${pinPos[key].y}%`}} 
-                                                onClick={() => { 
-                                                    if(disable) return; 
-                                                    if(inCart && !isSharedZone) setCart(cart.filter(c => c.id !== key)); 
-                                                    else openRoomModal(key); 
-                                                }}> 
-                                                <div className={circleClasses}> <div> {tData(roomConfig[key].name)} </div> </div> 
-                                            </div> 
-                                        )
-                                    })}
+                                <div className="flex justify-between items-center mb-4">
+                                    <div className="flex items-center gap-2">
+                                        <button onClick={()=>setStep(1)} className="text-gray-500 dark:text-gray-300 hover:text-green-600 font-bold">
+                                            <i className="fas fa-chevron-left"></i> {t('back')}
+                                        </button>
+                                        <h2 className="text-xl font-bold dark:text-white hidden sm:block">{t('selectRoom')}</h2>
+                                    </div>
+                                    
+                                    {/* --- TOGGLE VIEW BUTTONS --- */}
+                                    <div className="flex bg-gray-200 dark:bg-gray-700 p-1 rounded-lg">
+                                        <button onClick={() => setViewStyle('map')} className={`px-4 py-1.5 text-xs rounded-md font-bold transition-all ${viewStyle === 'map' ? 'bg-white dark:bg-gray-800 text-green-700 dark:text-green-400 shadow' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>
+                                            <i className="fas fa-map-marked-alt mr-1"></i> {t('mapView')}
+                                        </button>
+                                        <button onClick={() => setViewStyle('list')} className={`px-4 py-1.5 text-xs rounded-md font-bold transition-all ${viewStyle === 'list' ? 'bg-white dark:bg-gray-800 text-green-700 dark:text-green-400 shadow' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}>
+                                            <i className="fas fa-th-list mr-1"></i> {t('listView')}
+                                        </button>
+                                    </div>
                                 </div>
+                                
+                                {/* --- MAP VIEW --- */}
+                                {viewStyle === 'map' && (
+                                    <div className="map-container bg-blue-100 dark:bg-gray-700 mb-6 animate-pop" style={{paddingBottom: '100%'}}>
+                                        <img src={siteConfig?.roomImages?.['MAP_BG']?.[0] || "https://img2.pic.in.th/3d539b84-44ce-4336-ad90-bd2f84b13eca.jpg"} referrerPolicy="no-referrer" className="absolute top-0 left-0 w-full h-full object-cover" alt="Camp Map" />
+                                        {Object.keys(pinPos).map(key => {
+                                            if (!roomConfig[key]) return null;
+                                            const rConf = roomConfig[key];
+                                            const searchStr = rConf ? (rConf.type + " " + rConf.name).toLowerCase() : '';
+                                            const isSharedZone = rConf ? (rConf.type === 'ground') : (key === 'Z8' || key === 'R6528' || searchStr.includes('ลานกาง') || searchStr.includes('ground'));
+                                            
+                                            let available = 1;
+                                            if (availability && availability.roomAvailableCount && availability.roomAvailableCount[key] !== undefined) {
+                                                available = parseInt(availability.roomAvailableCount[key]);
+                                            } else if (availability) {
+                                                 available = isSharedZone ? (availability.tentAvailable && availability.tentAvailable[key] !== undefined ? parseInt(availability.tentAvailable[key]) : parseInt(availability.zone8Available || 20)) : (availability.bookedRooms.includes(key) ? 0 : 1);
+                                            }
+                                            
+                                            const currentInCart = cart.filter(c => c.id === key).reduce((sum, c) => sum + parseInt(c.guests || 1), 0);
+                                            const remaining = isSharedZone ? Math.max(0, available - currentInCart) : available;
+                                            
+                                            const isBooked = availability && availability.bookedRooms && availability.bookedRooms.includes(key);
+                                            const inCart = cart.find(c => c.id === key);
+                                            
+                                            const disable = isBooked || (isSharedZone && remaining <= 0) || (!isSharedZone && inCart);
+
+                                            let circleClasses = "w-12 h-12 rounded-full flex items-center justify-center text-center text-[8px] font-bold border-2 shadow-lg p-1 leading-tight transition-all duration-300";
+                                            if (disable) circleClasses += " bg-gray-400 text-white border-gray-500 cursor-not-allowed opacity-80 grayscale";
+                                            else if (inCart) circleClasses += " bg-yellow-400 text-black border-yellow-600 scale-110 shadow-xl z-20";
+                                            else circleClasses += " bg-white dark:bg-gray-800 text-green-800 dark:text-green-400 border-green-600 hover:scale-110 z-10";
+                                            return ( 
+                                                <div key={key} className="absolute transform -translate-x-1/2 -translate-y-1/2 map-pin-responsive" style={{left: `${pinPos[key].x}%`, top: `${pinPos[key].y}%`}} 
+                                                    onClick={() => { 
+                                                        if(disable) return; 
+                                                        if(inCart && !isSharedZone) setCart(cart.filter(c => c.id !== key)); 
+                                                        else openRoomModal(key); 
+                                                    }}> 
+                                                    <div className={circleClasses}> <div> {tData(roomConfig[key].name)} </div> </div> 
+                                                </div> 
+                                            )
+                                        })}
+                                    </div>
+                                )}
+
+                                {/* --- LIST VIEW --- */}
+                                {viewStyle === 'list' && (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 animate-pop">
+                                        {Object.keys(roomConfig).map(key => {
+                                            const rConf = roomConfig[key];
+                                            const searchStr = rConf ? (rConf.type + " " + rConf.name).toLowerCase() : '';
+                                            const isSharedZone = rConf ? (rConf.type === 'ground') : (key === 'Z8' || key === 'R6528' || searchStr.includes('ลานกาง') || searchStr.includes('ground'));
+                                            
+                                            let available = 1;
+                                            if (availability && availability.roomAvailableCount && availability.roomAvailableCount[key] !== undefined) {
+                                                available = parseInt(availability.roomAvailableCount[key]);
+                                            } else if (availability) {
+                                                 available = isSharedZone ? (availability.tentAvailable && availability.tentAvailable[key] !== undefined ? parseInt(availability.tentAvailable[key]) : parseInt(availability.zone8Available || 20)) : (availability.bookedRooms.includes(key) ? 0 : 1);
+                                            }
+                                            
+                                            const currentInCart = cart.filter(c => c.id === key).reduce((sum, c) => sum + parseInt(c.guests || 1), 0);
+                                            const remaining = isSharedZone ? Math.max(0, available - currentInCart) : available;
+                                            
+                                            const isBooked = availability && availability.bookedRooms && availability.bookedRooms.includes(key);
+                                            const inCart = cart.find(c => c.id === key);
+                                            
+                                            const disable = isBooked || (isSharedZone && remaining <= 0) || (!isSharedZone && inCart);
+                                            
+                                            const priceInfo = typeof rConf.pricing === 'string' ? safeJsonParse(rConf.pricing, {}) : (rConf.pricing || {});
+                                            const startPrice = priceInfo.priceHead || (priceInfo.tiers && priceInfo.tiers.length > 0 ? priceInfo.tiers[0].price : 0);
+
+                                            return (
+                                                <div key={key} onClick={() => {
+                                                    if(disable) return;
+                                                    if(inCart && !isSharedZone) setCart(cart.filter(c => c.id !== key)); 
+                                                    else openRoomModal(key);
+                                                }} className={`flex bg-white dark:bg-gray-700 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-600 transition-all ${disable ? 'opacity-60 grayscale cursor-not-allowed' : inCart && !isSharedZone ? 'border-yellow-400 bg-yellow-50 dark:bg-yellow-900 cursor-pointer' : 'hover:shadow-md cursor-pointer hover:border-green-300'}`}>
+                                                    <div className="w-1/3 min-h-[100px] bg-gray-200 dark:bg-gray-600 relative">
+                                                        <img src={(siteConfig.roomImages[key]||[])[0] || 'https://via.placeholder.com/150?text=No+Image'} className="w-full h-full object-cover absolute inset-0" />
+                                                        {disable && <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-bold text-xs">{t('fullyBooked')}</div>}
+                                                    </div>
+                                                    <div className="w-2/3 p-3 flex flex-col justify-between">
+                                                        <div>
+                                                            <h3 className="font-bold text-sm text-gray-800 dark:text-white line-clamp-1">{tData(rConf.name)}</h3>
+                                                            <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mt-1">{tData(siteConfig.roomDescriptions?.[key]) || t('noDesc')}</p>
+                                                        </div>
+                                                        <div className="flex justify-between items-end mt-2">
+                                                            <div className="text-green-600 dark:text-green-400 font-bold text-sm">{formatMoney(startPrice)}฿<span className="text-[10px] font-normal text-gray-500 dark:text-gray-400">/{isSharedZone ? t('persons') : t('nightsUnit')}</span></div>
+                                                            {!disable ? (
+                                                                inCart && !isSharedZone ? (
+                                                                    <span className="text-xs text-yellow-600 font-bold"><i className="fas fa-check"></i> {t('legendSelected')}</span>
+                                                                ) : (
+                                                                    <button className="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-3 py-1 rounded text-xs font-bold">{t('selectRoom')}</button>
+                                                                )
+                                                            ) : (
+                                                                <span className="text-xs text-red-500 font-bold">{t('fullyBooked')}</span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                )}
+
                                 {selectedRoomId && roomConfig[selectedRoomId] && (
                                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-sm relative">
+                                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-sm relative animate-pop">
                                             <div className="relative w-full h-48 mb-4 rounded-lg overflow-hidden bg-gray-200">
                                                 <img src={(siteConfig.roomImages[selectedRoomId]||[])[currentImgIdx] || "https://via.placeholder.com/600x400?text=No+Image"} className="w-full h-full object-cover transition-opacity duration-300" />
                                                 {(siteConfig.roomImages[selectedRoomId]||[]).length > 1 && ( <> <button onClick={prevImage} className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-full hover:bg-opacity-70"><i className="fas fa-chevron-left"></i></button> <button onClick={nextImage} className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-full hover:bg-opacity-70"><i className="fas fa-chevron-right"></i></button> </> )}
                                             </div>
                                             <h3 className="text-xl font-bold mb-2 text-green-800 dark:text-green-400">{tData(roomConfig[selectedRoomId].name)}</h3>
-                                            <p className="text-gray-500 dark:text-gray-300 text-sm mb-4"> {tData(siteConfig.roomDescriptions?.[selectedRoomId]) || t('noDesc')} </p>
+                                            <p className="text-gray-500 dark:text-gray-300 text-sm mb-4 h-16 overflow-y-auto custom-scrollbar"> {tData(siteConfig.roomDescriptions?.[selectedRoomId]) || t('noDesc')} </p>
                                             <div className="flex items-center justify-between mb-6 bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
                                                 <button onClick={() => setGuestCount(Math.max((parseInt(roomConfig[selectedRoomId].min)||1), guestCount - 1))} className="w-10 h-10 bg-green-600 hover:bg-green-700 text-white rounded shadow text-xl font-bold transition-colors">-</button>
                                                 <div className="text-center"> <div className="text-2xl font-bold dark:text-white">{guestCount}</div> <div className="text-xs text-gray-500 dark:text-gray-400">{t('persons')}</div> </div>
@@ -1246,12 +1354,12 @@
                                     </div>
                                 </div>
                                 <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded mb-4"><h3 className="font-bold dark:text-white">{t('cart')} ({cart.length})</h3> {cart.map((c,i)=><div key={i} className="flex justify-between text-sm mt-1 dark:text-gray-200"><span>{tData(c.name)} {c.type==='food'?`x${c.qty}`:`(${c.guests} ${t('persons')})`}</span><button onClick={()=>setCart(cart.filter((_,idx)=>idx!==i))} className="text-red-500">{t('delete')}</button></div>)} </div>
-                                <button onClick={() => { const hasRoom = cart.some(c => c.type !== 'food'); if (!hasRoom) { setShowRoomRequiredModal(true); return; } setStep(3); }} className="w-full bg-green-600 text-white p-3 rounded-lg font-bold"> {t('continueBtn')} </button>
+                                <button onClick={() => { const hasRoom = cart.some(c => c.type !== 'food'); if (!hasRoom) { setShowRoomRequiredModal(true); return; } setStep(3); }} className="w-full bg-green-600 text-white p-3 rounded-xl hover:bg-green-700 transition font-bold shadow-lg text-lg"> {t('continueBtn')} </button>
                             </div>
                         )}
 
                         {mode === 'booking' && step === 3 && (
-                            <div className="max-w-md mx-auto p-6 pt-6 sm:pt-8 bg-white dark:bg-gray-800 shadow-xl sm:rounded-2xl sm:my-8 min-h-screen sm:min-h-[auto]">
+                            <div className="max-w-md mx-auto p-6 pt-20 bg-white dark:bg-gray-800 shadow-xl rounded-xl">
                                 <div className="flex items-center gap-2 mb-4"><button onClick={()=>setStep(2)} className="text-gray-500 dark:text-gray-300 hover:text-green-600 font-bold text-sm"><i className="fas fa-chevron-left"></i> {t('back')}</button><h2 className="text-xl font-bold dark:text-white">{t('summaryPayment')}</h2></div>
                                 <div className="space-y-2 mb-4 text-sm dark:text-gray-200">
                                     <p><strong>{t('checkIn')}</strong> {formatDateLocalized(dates.checkIn)}</p>
@@ -1317,12 +1425,12 @@
                                 </div>
 
                                 <div className="flex items-start gap-2 mb-4 text-xs text-gray-600 dark:text-gray-400"> <input type="checkbox" className="mt-1" checked={agreed} onChange={e => setAgreed(e.target.checked)} /> <p>{t('agreeTerms')}</p> </div>
-                                <button onClick={handleSubmit} disabled={loading || !canSubmit} className={`w-full p-3 rounded-lg font-bold text-white transition ${loading || !canSubmit ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 shadow-lg'}`}>{loading ? t('confirmingBtn') : t('confirmBookingBtn')}</button>
+                                <button onClick={handleSubmit} disabled={loading || !canSubmit} className={`w-full p-3 rounded-xl font-bold text-white transition ${loading || !canSubmit ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 shadow-lg'}`}>{loading ? t('confirmingBtn') : t('confirmBookingBtn')}</button>
                             </div>
                         )}
 
                         {mode === 'booking' && step === 5 && (
-                            <div className="max-w-md mx-auto p-8 text-center bg-white dark:bg-gray-800 shadow-xl sm:rounded-2xl sm:my-8 min-h-screen sm:min-h-[auto] flex flex-col justify-center">
+                            <div className="max-w-md mx-auto p-8 pt-16 text-center bg-white dark:bg-gray-800 shadow-xl rounded-xl">
                                 <div className="w-20 h-20 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-6 text-green-500 text-4xl shadow-inner animate-pop"><i className="fas fa-check"></i></div>
                                 <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">{t('bookingSuccessTitle')}</h2>
                                 <p className="text-gray-600 dark:text-gray-300 mb-6">{t('bookingIdText')} <span className="font-bold text-green-600">{bookingResult}</span></p>
