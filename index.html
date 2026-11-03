@@ -162,7 +162,7 @@
                 selectRoom: "เลือกที่พัก", noDesc: "ไม่มีคำอธิบาย", persons: "คน",
                 quotaFullTitle: "โควต้าเต็ม", quotaFullDesc: "สามารถเพิ่มได้สูงสุด {limit} ท่านครับ",
                 preOrderFood: "🍽️ สั่งอาหารล่วงหน้า", cart: "🛒 ตะกร้า", continueBtn: "ดำเนินการต่อ", addCart: "เพิ่มลงตะกร้า",
-                foodNotePlaceholder: "หมายเหตุเพิ่มเติม...",
+                foodNotePlaceholder: "หมายเหตุเพิ่มเติม (เช่น ไม่เผ็ด, เพิ่มไข่ดาว)...",
                 roomRequiredTitle: "กรุณาเลือกที่พัก", roomRequiredDesc: "คุณต้องเลือกห้องพักหรือลานกางเต็นท์อย่างน้อย 1 รายการก่อนดำเนินการต่อครับ", acknowledge: "รับทราบ",
                 summaryPayment: "สรุปยอดและชำระเงิน", checkIn: "เข้าพัก:", checkOut: "คืนห้อง:", nights: "จำนวน:", nightsUnit: "คืน",
                 highSeasonNotice: "ℹ️ ช่วงเทศกาล/วันพิเศษ คิดมัดจำ 100%", discountRoom: "ส่วนลดที่พัก", netTotal: "สุทธิ",
@@ -202,7 +202,7 @@
                 selectRoom: "Select Accommodation", noDesc: "No description available", persons: "Guests",
                 quotaFullTitle: "Quota Full", quotaFullDesc: "Maximum additional guests allowed: {limit}.",
                 preOrderFood: "🍽️ Pre-order Food", cart: "🛒 Cart", continueBtn: "Continue", addCart: "Add to Cart",
-                foodNotePlaceholder: "Additional notes...",
+                foodNotePlaceholder: "Additional notes (e.g. No spicy, Add egg)...",
                 roomRequiredTitle: "Accommodation Required", roomRequiredDesc: "Please select at least 1 room or tent area before proceeding.", acknowledge: "Got it",
                 summaryPayment: "Summary & Payment", checkIn: "Check-in:", checkOut: "Check-out:", nights: "Duration:", nightsUnit: "Nights",
                 highSeasonNotice: "ℹ️ 100% deposit required during High Season/Holidays", discountRoom: "Discount", netTotal: "Net Total",
@@ -518,7 +518,7 @@
             const [systemSettings, setSystemSettings] = React.useState({ closed: [], special: [], fullyBookedDates: [] });
             const [siteConfig, setSiteConfig] = React.useState(DEFAULT_CONFIG);
 
-            const [discount, setDiscount] = React.useState({ code: '', val: 0, type: '', message: '', status: '' });
+            const [discount, setDiscount] = React.useState({ code: '', val: 0, type: '', message: '', status: '', rooms: [] });
             const [checkingDiscount, setCheckingDiscount] = React.useState(false);
             
             const [slipImg, setSlipImg] = React.useState(null);
@@ -647,15 +647,40 @@
             
             const getPricing = () => {
                 const nights = calculateNights(); let roomTotal = 0; let foodTotal = 0; let z8Total = 0;
+                let roomSubtotals = {};
                 
                 cart.forEach(item => { 
-                    if (item.type === 'food') foodTotal += Number(item.price||0) * Number(item.qty||1); 
-                    else if (item.isPerHead) z8Total += Number(item.pricePerNight||0) * nights * Number(item.guests||1); 
-                    else roomTotal += Number(item.pricePerNight||0) * nights; 
+                    if (item.type === 'food') {
+                        foodTotal += Number(item.price||0) * Number(item.qty||1); 
+                    } else if (item.isPerHead) {
+                        const itemSum = Number(item.pricePerNight||0) * nights * Number(item.guests||1);
+                        z8Total += itemSum;
+                        roomSubtotals[item.id] = (roomSubtotals[item.id] || 0) + itemSum;
+                    } else {
+                        const itemSum = Number(item.pricePerNight||0) * nights;
+                        roomTotal += itemSum;
+                        roomSubtotals[item.id] = (roomSubtotals[item.id] || 0) + itemSum;
+                    }
                 });
                 
-                let discountAmt = 0; if (discount.type === 'FIXED') discountAmt = Number(discount.val||0); if (discount.type === 'PERCENT') discountAmt = (roomTotal * Number(discount.val||0)) / 100; if (discountAmt > roomTotal) discountAmt = roomTotal; 
-                const totalBefore = roomTotal + z8Total + foodTotal; const netTotal = totalBefore - discountAmt;
+                let discountAmt = 0; 
+                let eligibleTotal = roomTotal + z8Total;
+
+                if (discount.type) {
+                    if (discount.rooms && discount.rooms.length > 0 && !discount.rooms.includes('ALL')) {
+                        eligibleTotal = 0;
+                        for (let rId in roomSubtotals) {
+                            if (discount.rooms.includes(rId)) eligibleTotal += roomSubtotals[rId];
+                        }
+                    }
+
+                    if (discount.type === 'FIXED') discountAmt = Number(discount.val||0); 
+                    if (discount.type === 'PERCENT') discountAmt = (eligibleTotal * Number(discount.val||0)) / 100; 
+                    if (discountAmt > eligibleTotal) discountAmt = eligibleTotal; 
+                }
+
+                const totalBefore = roomTotal + z8Total + foodTotal; 
+                const netTotal = totalBefore - discountAmt;
                 
                 let deposit = 0; const isHigh = checkDateOverlapHighSeason(dates.checkIn, dates.checkOut);
                 
@@ -864,7 +889,7 @@
 
             const checkDiscountCode = () => { 
                 if(!discount.code) return; setCheckingDiscount(true); 
-                fetchWithTimeout(`${GOOGLE_SCRIPT_URL}?action=checkDiscount&code=${discount.code}`).then(r=>r.json()).then(d => { setCheckingDiscount(false); if(d.status === 'success') setDiscount({...discount, val: Number(d.value), type: d.type, message: `ใช้โค้ดสำเร็จ ลด ${d.value} ${d.type==='PERCENT'?'%':'บาท'}`, status: 'success'}); else setDiscount({...discount, val: 0, type: '', message: 'ไม่พบโค้ดส่วนลดนี้', status: 'error'}); }).catch(e => { setCheckingDiscount(false); setDiscount({...discount, val: 0, type: '', message: e.name === 'AbortError' ? 'เน็ตหมดเวลา' : 'เกิดข้อผิดพลาด', status: 'error'}); }); 
+                fetchWithTimeout(`${GOOGLE_SCRIPT_URL}?action=checkDiscount&code=${discount.code}`).then(r=>r.json()).then(d => { setCheckingDiscount(false); if(d.status === 'success') setDiscount({...discount, val: Number(d.value), type: d.type, rooms: d.rooms || [], message: `ใช้โค้ดสำเร็จ ลด ${d.value} ${d.type==='PERCENT'?'%':'บาท'}`, status: 'success'}); else setDiscount({...discount, val: 0, type: '', rooms: [], message: 'ไม่พบโค้ดส่วนลดนี้', status: 'error'}); }).catch(e => { setCheckingDiscount(false); setDiscount({...discount, val: 0, type: '', rooms: [], message: e.name === 'AbortError' ? 'เน็ตหมดเวลา' : 'เกิดข้อผิดพลาด', status: 'error'}); }); 
             };
 
             const handleSubmit = () => {
@@ -1179,7 +1204,7 @@
                                 
                                 {/* --- MAP VIEW --- */}
                                 {viewStyle === 'map' && (
-                                    <div className="map-container bg-blue-100 dark:bg-gray-700 mb-3 animate-pop" style={{paddingBottom: '56.22%'}}>
+                                    <div className="map-container bg-blue-100 dark:bg-gray-700 mb-3 animate-pop" style={{paddingBottom: '100%'}}>
                                         <img src={siteConfig?.roomImages?.['MAP_BG']?.[0] || "https://img2.pic.in.th/3d539b84-44ce-4336-ad90-bd2f84b13eca.jpg"} referrerPolicy="no-referrer" className="absolute top-0 left-0 w-full h-full object-cover" alt="Camp Map" />
                                         {Object.keys(pinPos).map(key => {
                                             if (!roomConfig[key]) return null;
